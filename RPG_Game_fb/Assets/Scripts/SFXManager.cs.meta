@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 76d0305e0886b3240924f77b1da9737e
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - playerAttack: {fileID: 8300000, guid: d4676f4c93ba4ae4d9ff3927343dade6, type: 3}
+  - playerDie: {fileID: 8300000, guid: 41414e0efef137342b704a53a9d9d143, type: 3}
+  - playerWalk: {fileID: 8300000, guid: f754124b02546bb48bb198e7d4bff111, type: 3}
+  - Fireball: {fileID: 8300000, guid: 0859ad23136ef1c4c904b6ce98e195d9, type: 3}
+  - Power: {fileID: 8300000, guid: 677f003a8047fe4498fc3d2ef0c65f87, type: 3}
+  - Heal: {fileID: 8300000, guid: 0c155ff881e145e47999ff2e2f7e9155, type: 3}
+  - playerJump: {fileID: 8300000, guid: 8a1cad0142f73e544b0f9e7c2239f455, type: 3}
+  - Teleport: {fileID: 8300000, guid: 5b66b50bffa5ce442880ef1ecc281768, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
