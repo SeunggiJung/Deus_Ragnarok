@@ -2,17 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerIdleState : MonoBehaviour
+public class PlayerIdleState : PlayerState
 {
-    // Start is called before the first frame update
-    void Start()
+    public PlayerIdleState(PlayerController player, StateMachine stateMachine, string animBoolName) 
+        : base(player, stateMachine, animBoolName) { }
+    public override void HandleInput()
     {
-        
+        float xInput = Input.GetAxisRaw("Horizontal");
+        if(xInput != 0)
+        {
+            stateMachine.ChangeState(player.MoveState);
+        }
     }
-
-    // Update is called once per frame
-    void Update()
+    public override void Enter()
     {
-        
+        base.Enter();
+        player.SetVelocity(0, player.Rb.velocity.y);
     }
 }

@@ -11,8 +11,8 @@ public class PlayerController : BaseCharacter
     public PlayerIdleState IdleState { get; private set; }
 
     [Header("Movement Settings")]
-    public float moveSpeed = 5f;
-
+    public float moveSpeed = 2f;
+    public Rigidbody2D Rb => rb;
     protected override void Awake()
     {
         base.Awake();
@@ -38,6 +38,17 @@ public class PlayerController : BaseCharacter
     {
         StateMachine.CurrentState.PhysicsUpdate();
     }
+    public void SetVelocity(float _xVelocity, float _yVelocity)
+    {
+        rb.velocity = new Vector2(_xVelocity, _yVelocity);
+    }
 
+    public void CheckFlip(float _xInput)
+    {
+        if (_xInput > 0 && transform.localScale.x > 0)
+            transform.localScale = new Vector3(-1, 1, 1);
+        else if (_xInput < 0 && transform.localScale.x < 0)
+            transform.localScale = new Vector3(1, 1, 1);
+    }
     protected override void Die() { /* »ç¸Á ·ÎÁ÷ */ }
 }
