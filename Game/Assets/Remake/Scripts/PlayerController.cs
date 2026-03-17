@@ -9,10 +9,12 @@ public class PlayerController : BaseCharacter
     // 플레이어의 각 상태들
     public PlayerMoveState MoveState { get; private set; }
     public PlayerIdleState IdleState { get; private set; }
+    public PlayerAttackState AttackState { get; private set; }
 
     [Header("Movement Settings")]
     public float moveSpeed = 2f;
     public Rigidbody2D Rb => rb;
+    public Animator Anim => anim;
     protected override void Awake()
     {
         base.Awake();
@@ -21,6 +23,7 @@ public class PlayerController : BaseCharacter
         // 상태 객체 생성 (이후 구현)
         IdleState = new PlayerIdleState(this, StateMachine, "Idle");
         MoveState = new PlayerMoveState(this, StateMachine, "Move");
+        AttackState = new PlayerAttackState(this, StateMachine, "Attack");
     }
 
     private void Start()
@@ -44,10 +47,10 @@ public class PlayerController : BaseCharacter
     }
 
     public void CheckFlip(float _xInput)
-    {
-        if (_xInput > 0 && transform.localScale.x > 0)
+    {   //localScale.x = 1 : 왼쪽, -1 : 오른쪽
+        if (_xInput > 0 && transform.localScale.x > 0) // 입력이 오른쪽일 때, player character의 방향이 왼쪽이면
             transform.localScale = new Vector3(-1, 1, 1);
-        else if (_xInput < 0 && transform.localScale.x < 0)
+        else if (_xInput < 0 && transform.localScale.x < 0) // 입력이 왼쪽일 때, player character의 방향이 오른쪽이면
             transform.localScale = new Vector3(1, 1, 1);
     }
     protected override void Die() { /* 사망 로직 */ }

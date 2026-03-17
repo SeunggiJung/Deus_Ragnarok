@@ -13,6 +13,10 @@ public class PlayerIdleState : PlayerState
         {
             stateMachine.ChangeState(player.MoveState);
         }
+        if (Input.GetKeyDown(KeyCode.Z)) // 또는 원하는 공격 키
+        {
+            stateMachine.ChangeState(player.AttackState);
+        }
     }
     public override void Enter()
     {
