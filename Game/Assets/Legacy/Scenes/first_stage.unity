@@ -518,7 +518,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 231353589}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7910ba92350aa0f4595c5fc2d18668b7, type: 3}
   m_Name: 
@@ -2970,6 +2970,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 21300000, guid: dabd267d331a999459a380be8b483f59, type: 3}
     - target: {fileID: 3612264766852175166, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3612264766852175166, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5
       objectReference: {fileID: 0}
@@ -3029,6 +3033,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: 0.29
       objectReference: {fileID: 0}
+    - target: {fileID: 8094436115727296470, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 1dc76239a5e75bd40a8012d10d4cb284, type: 2}
     - target: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       propertyPath: m_Name
       value: sword_man
@@ -3059,6 +3067,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 887058954}
+    - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 887058956}
     - targetCorrespondingSourceObject: {fileID: 6767065318607765198, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 414876453}
@@ -7919,6 +7930,20 @@ CapsuleCollider2D:
   m_Offset: {x: 0.009637833, y: 0.29513484}
   m_Size: {x: 0.9381056, y: 1.5476514}
   m_Direction: 0
+--- !u!114 &887058956
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231353589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b04bfcc1131866a4a847a95bc1ced3ad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHp: 100
+  moveSpeed: 5
 --- !u!1 &943553818
 GameObject:
   m_ObjectHideFlags: 0
