@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerController : BaseCharacter
@@ -19,7 +20,7 @@ public class PlayerController : BaseCharacter
     {
         base.Awake();
         StateMachine = new StateMachine();
-
+        this.attackCheckRadius = 1.2f;
         // 상태 객체 생성 (이후 구현)
         IdleState = new PlayerIdleState(this, StateMachine, "Idle");
         MoveState = new PlayerMoveState(this, StateMachine, "Move");

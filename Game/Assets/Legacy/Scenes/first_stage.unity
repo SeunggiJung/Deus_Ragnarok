@@ -786,6 +786,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 250166908}
   m_CullTransparentMesh: 1
+--- !u!1 &274957776
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 274957777}
+  m_Layer: 0
+  m_Name: AttackCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &274957777
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 274957776}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 887058948}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &304370120 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 9103332868632538009, guid: 5dd7a32454ddf75448b3275b642b667a, type: 3}
@@ -1735,7 +1766,8 @@ GameObject:
   - component: {fileID: 567538960}
   - component: {fileID: 567538962}
   - component: {fileID: 567538961}
-  m_Layer: 3
+  - component: {fileID: 567538963}
+  m_Layer: 6
   m_Name: Golem
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1764,7 +1796,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 567538953}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce29c5fa22f4a8b479d534dd72e0e0df, type: 3}
   m_Name: 
@@ -1778,7 +1810,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 567538953}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 0f93a706c5edbfe41be7be19dbe02d08, type: 3}
   m_Name: 
@@ -1932,6 +1964,19 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &567538963
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567538953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a732414bb6658ea429dbeb7c7a3a5f89, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hp: 50
 --- !u!1 &699853389
 GameObject:
   m_ObjectHideFlags: 0
@@ -3044,7 +3089,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects:
     - {fileID: 8563899720519297978, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
-    m_AddedGameObjects: []
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 3612264766852175166, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 274957777}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
@@ -7943,6 +7991,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHp: 100
+  attackCheck: {fileID: 274957777}
+  attackCheckRadius: 1
+  whatIsEnemy:
+    serializedVersion: 2
+    m_Bits: 64
   moveSpeed: 5
 --- !u!1 &943553818
 GameObject:
@@ -12831,7 +12884,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1154140045
 MonoBehaviour:
   m_ObjectHideFlags: 0
