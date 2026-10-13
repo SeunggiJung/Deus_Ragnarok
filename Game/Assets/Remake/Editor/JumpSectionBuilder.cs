@@ -11,6 +11,7 @@ using UnityEngine.Tilemaps;
 // - 원작 점프맵 발판 : Trap2 / Trap4 → 떨어지는 발판, Trap3 → 위아래 왕복 (레거시 trap.cs 비활성화)
 // - 체크포인트 3곳 + 플레이어 낙사 복귀(PlayerRespawn), 플레이어의 레거시 Sword_Man 제거
 // - 보상 상자 : 공격으로 부수면 LV+1 아이템 드롭 (BreakableBox)
+// - 맨 오른쪽 포탈 : G키로 다음 스테이지 (StagePortal + 플레이어 PlayerInteractor)
 // 메뉴 : Tools/Deus/Build Jump Section  (RemakeTest 씬에서 실행, 여러 번 실행해도 결과 동일)
 public static class JumpSectionBuilder
 {
@@ -48,6 +49,7 @@ public static class JumpSectionBuilder
         SetupPlayer();
         ReplaceLegacyEnemies();
         SetupRewardBox();
+        SetupStagePortal();
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         Debug.Log("점프 구간 구성 완료");
@@ -259,6 +261,22 @@ public static class JumpSectionBuilder
         for (int i = 0; i < pieces.Length; i++)
             array.GetArrayElementAtIndex(i).objectReferenceValue = pieces[i];
         so.ApplyModifiedProperties();
+    }
+
+    // 맨 오른쪽 포탈 : G키 상호작용으로 다음 스테이지 이동 (리메이크 전이라 원작 second_stage로 연결)
+    private static void SetupStagePortal()
+    {
+        GameObject portal = GameObject.Find("Portal");
+        if (portal != null)
+        {
+            var stagePortal = GetOrAdd<StagePortal>(portal);
+            var so = new SerializedObject(stagePortal);
+            so.FindProperty("nextSceneName").stringValue = "second_stage";
+            so.ApplyModifiedProperties();
+        }
+
+        GameObject player = GameObject.Find("sword_man");
+        if (player != null) GetOrAdd<PlayerInteractor>(player);
     }
 
     // Unity 오브젝트는 없을 때 가짜 null을 반환할 수 있어 ?? 연산자 대신 명시적으로 검사

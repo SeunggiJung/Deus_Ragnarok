@@ -42,6 +42,9 @@ public class PlayerController : BaseCharacter
     // 바라보는 방향 (localScale.x = 1 : 왼쪽, -1 : 오른쪽)
     public float FacingDir => transform.localScale.x < 0 ? 1f : -1f;
 
+    // 컷신 / 스테이지 이동 중 등 입력을 막아야 할 때
+    public bool InputLocked { get; set; }
+
     // 체공 중 점프 공격 가능 여부 (착지 시 다시 true)
     public bool CanAirAttack { get; set; } = true;
     // 체공 중 공중 구르기 가능 여부 (착지 시 다시 true)
@@ -86,7 +89,7 @@ public class PlayerController : BaseCharacter
 
     private void Update()
     {
-        if (IsDead) input.Clear();
+        if (IsDead || InputLocked) input.Clear();
         else input.Read();
 
         RegenStamina();
