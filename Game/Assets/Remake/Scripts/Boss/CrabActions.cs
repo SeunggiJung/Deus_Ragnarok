@@ -515,6 +515,10 @@ public class HeavyStrikeAction : BossAction
     private bool struck;
     private bool windowOpened;
 
+    // 2페이즈 : 충전이 빨라지고 카운터 창도 좁아진다
+    private float ChargeTime => CS.heavyChargeTime * (boss.IsPhase2 ? 0.8f : 1f);
+    private float Ratio => boss.IsPhase2 ? WindowRatio * 0.85f : WindowRatio;
+
     private CrabBossStats CS => (CrabBossStats)S;
 
     public HeavyStrikeAction(BossController boss) : base(boss) { }
@@ -528,7 +532,7 @@ public class HeavyStrikeAction : BossAction
         windowOpened = false;
 
         boss.PlayAction(BossController.AnimParams.Ability);   // 집게를 치켜드는 모션
-        boss.Telegraph.Show(TelegraphKind.Heavy, CS.heavyChargeTime);
+        boss.Telegraph.Show(TelegraphKind.Heavy, ChargeTime);
         Enter(Phase.Charge);
     }
 
@@ -539,7 +543,7 @@ public class HeavyStrikeAction : BossAction
         switch (phase)
         {
             case Phase.Charge:
-                if (!windowOpened && elapsed >= CS.heavyChargeTime * (1f - WindowRatio))
+                if (!windowOpened && elapsed >= ChargeTime * (1f - Ratio))
                 {
                     windowOpened = true;
                     boss.CounterWindowOpen = true;
@@ -547,7 +551,7 @@ public class HeavyStrikeAction : BossAction
                     Bounds b = boss.Body.bounds;
                     Fx.Ring(b.center, new Color(0.6f, 0.7f, 1f, 0.9f), b.size.x * 2f, b.size.x * 0.8f, 0.25f, 1f);
                 }
-                if (elapsed >= CS.heavyChargeTime)
+                if (elapsed >= ChargeTime)
                 {
                     boss.CounterWindowOpen = false;
                     boss.Telegraph.Hide();
