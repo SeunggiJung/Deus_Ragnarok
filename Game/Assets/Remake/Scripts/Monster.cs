@@ -85,8 +85,15 @@ public class Monster : BaseCharacter
         transform.localScale = new Vector3(Mathf.Abs(scale.x) * sign, scale.y, scale.z);
     }
 
+    // 스스로 움직일 때만 X축 이동을 허용하고, 멈춰 있을 때는 X축을 고정해
+    // 플레이어가 밀어도 밀리지 않도록 함 (Y축은 중력을 위해 항상 자유)
     public void SetVelocityX(float x)
     {
+        if (x == 0f)
+            rb.constraints |= RigidbodyConstraints2D.FreezePositionX;
+        else
+            rb.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
+
         rb.velocity = new Vector2(x, rb.velocity.y);
     }
     #endregion

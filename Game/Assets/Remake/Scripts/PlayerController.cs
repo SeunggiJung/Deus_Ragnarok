@@ -156,10 +156,11 @@ public class PlayerController : BaseCharacter
     #endregion
 
     #region Dodge
-    // 구르기 경로를 미리 계산해 실제 이동 거리를 반환.
+    // 구르기 경로를 미리 계산해 실제 이동 거리를 반환. (관통 기준 : 적의 중심을 넘어갈 수 있는가)
     // - 벽(Ground)이 있으면 벽 앞까지로 거리 제한
-    // - 경로상의 적은 구르기 거리 안에 완전히 통과할 수 있으면 관통(passThrough에 추가),
-    //   통과할 수 없으면 그 적 앞에서 멈추도록 거리 제한
+    // - 경로상의 적은 기본 구르기 거리 안에 "플레이어 중심이 적 중심을 넘어갈 수 있으면" 관통.
+    //   이때 적 몸을 완전히 빠져나갈 때까지 구르기 거리를 자동으로 연장(적 안에 끼지 않도록)
+    // - 적 중심까지 못 가거나, 연장해도 벽에 막혀 빠져나갈 수 없으면 그 적 앞에서 정지
     public float PlanDodge(float dir, List<Collider2D> passThrough)
     {
         passThrough.Clear();
@@ -168,15 +169,16 @@ public class PlayerController : BaseCharacter
         // 바닥과 닿지 않도록 높이를 살짝 줄인 몸통 크기로 수평 캐스트
         Vector2 castSize = new Vector2(b.size.x, b.size.y * 0.9f);
         Vector2 castDir = new Vector2(dir, 0f);
-        float distance = Stats.dodgeDistance;
+        float baseDistance = Stats.dodgeDistance;
+        float maxDistance = baseDistance * 2f; // 관통 시 연장할 수 있는 최대 거리
 
-        // 1. 벽 체크
-        RaycastHit2D wallHit = Physics2D.BoxCast(b.center, castSize, 0f, castDir, distance, whatIsGround);
-        if (wallHit.collider != null)
-            distance = wallHit.distance;
+        // 1. 벽 체크 (연장 최대치까지)
+        RaycastHit2D wallHit = Physics2D.BoxCast(b.center, castSize, 0f, castDir, maxDistance, whatIsGround);
+        float wallLimit = wallHit.collider != null ? wallHit.distance : maxDistance;
+        float distance = Mathf.Min(baseDistance, wallLimit);
 
         // 2. 경로상의 적 체크 (가까운 순서로)
-        RaycastHit2D[] enemyHits = Physics2D.BoxCastAll(b.center, castSize, 0f, castDir, distance, whatIsEnemy);
+        RaycastHit2D[] enemyHits = Physics2D.BoxCastAll(b.center, castSize, 0f, castDir, wallLimit, whatIsEnemy);
         Array.Sort(enemyHits, (a, c) => a.distance.CompareTo(c.distance));
 
         // 플레이어의 뒤쪽 끝 (구르기 방향의 반대편 가장자리)
@@ -184,6 +186,8 @@ public class PlayerController : BaseCharacter
 
         foreach (var hit in enemyHits)
         {
+            if (hit.distance >= distance) break; // 현재 계획된 경로 밖의 적
+
             BaseCharacter enemy = hit.collider.GetComponentInParent<BaseCharacter>();
             if (enemy != null && enemy.IsDead)
             {
@@ -191,25 +195,31 @@ public class PlayerController : BaseCharacter
                 continue;
             }
 
-            // 적의 먼 쪽 가장자리까지 플레이어 몸 전체가 넘어가려면 필요한 이동 거리
             Bounds e = hit.collider.bounds;
+            // 플레이어 중심이 적 중심에 도달하는 데 필요한 거리
+            float centerDistance = Mathf.Abs(e.center.x - b.center.x);
+            // 플레이어 몸 전체가 적의 먼 쪽 가장자리를 넘어가는 데 필요한 거리
             float enemyFarEdge = dir > 0 ? e.max.x : e.min.x;
             float clearDistance = Mathf.Abs(enemyFarEdge - playerBackEdge);
 
-            if (clearDistance <= distance)
+            if (centerDistance <= distance && clearDistance <= wallLimit)
             {
-                passThrough.Add(hit.collider);  // 끝까지 구르면 완전히 빠져나감 → 관통
-                Debug.Log($"[구르기] {hit.collider.name} 관통 : 빠져나가는 데 필요한 거리 {clearDistance:F2} ≤ 구르기 거리 {distance:F2}");
+                passThrough.Add(hit.collider);
+                Debug.Log($"[구르기] {hit.collider.name} 관통 : 적 중심까지 {centerDistance:F2} ≤ 구르기 거리 {distance:F2} → 빠져나갈 때까지 {Mathf.Max(distance, clearDistance):F2} 이동");
+                distance = Mathf.Max(distance, clearDistance);
             }
             else
             {
-                Debug.Log($"[구르기] {hit.collider.name} 앞에서 정지 : 빠져나가는 데 필요한 거리 {clearDistance:F2} > 구르기 거리 {distance:F2} → {hit.distance:F2}만 이동");
-                distance = hit.distance;        // 다 못 빠져나감 → 적 앞에서 정지
+                string reason = centerDistance > distance
+                    ? $"적 중심까지 {centerDistance:F2} > 구르기 거리 {distance:F2}"
+                    : $"뒤에 벽이 있어 빠져나갈 수 없음 (필요 {clearDistance:F2} > 벽까지 {wallLimit:F2})";
+                Debug.Log($"[구르기] {hit.collider.name} 앞에서 정지 : {reason} → {hit.distance:F2}만 이동");
+                distance = hit.distance;
                 break;
             }
         }
 
-        // Scene 뷰 확인용 기록 (초록 : 관통한 적, 빨강 : 정지한 위치)
+        // Scene 뷰 확인용 기록
         lastDodgeStart = b.center;
         lastDodgeEnd = b.center + (Vector3)(castDir * distance);
         lastDodgeSize = castSize;

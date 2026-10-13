@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-// 구르기. 진입 시 경로를 계산해 적을 관통할지 / 적 앞에서 멈출지 결정하고,
-// dodgeDuration 동안 계산된 거리만큼 일정하게 이동. 시작부터 dodgeInvincibleTime 동안 무적
+// 구르기. 진입 시 경로를 계산해 적을 관통할지 / 적 앞에서 멈출지 결정하고 계산된 거리만큼 일정하게 이동.
+// 시작부터 dodgeInvincibleTime 동안 무적, 적을 관통하는 구르기는 끝날 때까지 무적
+// 관통으로 거리가 연장되면 같은 속도를 유지하도록 시간도 비례해서 늘어남
 public class PlayerDodgeState : PlayerState
 {
     private readonly List<Collider2D> passThrough = new List<Collider2D>();
@@ -10,6 +11,8 @@ public class PlayerDodgeState : PlayerState
     private float startX;
     private float distance;
     private float elapsed;
+    private float duration;
+    private bool passingEnemy;
 
     public PlayerDodgeState(PlayerController player, StateMachine stateMachine, string animBoolName)
         : base(player, stateMachine, animBoolName) { }
@@ -26,6 +29,10 @@ public class PlayerDodgeState : PlayerState
         distance = player.PlanDodge(dir, passThrough);
         player.SetIgnoreCollision(passThrough, true);
 
+        float baseDistance = player.Stats.dodgeDistance;
+        duration = player.Stats.dodgeDuration * Mathf.Max(1f, distance / baseDistance);
+        passingEnemy = passThrough.Count > 0;
+
         startX = player.Rb.position.x;
         elapsed = 0f;
         player.ForceInvincible = true;
@@ -36,10 +43,11 @@ public class PlayerDodgeState : PlayerState
         base.Update();
         elapsed += Time.deltaTime;
 
-        if (elapsed >= player.Stats.dodgeInvincibleTime)
+        // 적 몸을 통과하는 중에 맞지 않도록 관통 구르기는 끝까지 무적 유지
+        if (!passingEnemy && elapsed >= player.Stats.dodgeInvincibleTime)
             player.ForceInvincible = false;
 
-        if (elapsed >= player.Stats.dodgeDuration)
+        if (elapsed >= duration)
         {
             if (!player.IsGrounded())
                 stateMachine.ChangeState(player.FallState);
@@ -55,7 +63,7 @@ public class PlayerDodgeState : PlayerState
         base.PhysicsUpdate();
 
         // 속도 대신 위치로 이동시켜 마찰 등에 상관없이 계산한 거리만큼 정확히 이동
-        float t = Mathf.Clamp01(elapsed / player.Stats.dodgeDuration);
+        float t = Mathf.Clamp01(elapsed / duration);
         player.SetVelocity(0f, player.Rb.velocity.y);
         player.Rb.MovePosition(new Vector2(startX + dir * distance * t, player.Rb.position.y));
     }

@@ -122,6 +122,56 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &49962883
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 49962885}
+  - component: {fileID: 49962884}
+  m_Layer: 0
+  m_Name: PlayerHUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &49962884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 49962883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acca3c21131bf51499d6b16a4c889163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  barSize: {x: 260, y: 22}
+  margin: {x: 20, y: 20}
+  spacing: 6
+  hpColor: {r: 0.85, g: 0.2, b: 0.2, a: 1}
+  staminaColor: {r: 0.95, g: 0.75, b: 0.2, a: 1}
+--- !u!4 &49962885
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 49962883}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &173049581
 GameObject:
   m_ObjectHideFlags: 0
@@ -1767,6 +1817,7 @@ GameObject:
   - component: {fileID: 567538962}
   - component: {fileID: 567538961}
   - component: {fileID: 567538963}
+  - component: {fileID: 567538964}
   m_Layer: 6
   m_Name: Golem
   m_TagString: Untagged
@@ -1856,7 +1907,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 4
+  m_Constraints: 5
 --- !u!70 &567538960
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -1986,6 +2037,23 @@ MonoBehaviour:
   hitFlashTime: 0.1
   blinkInterval: 0.08
   spriteFacesRight: 1
+--- !u!114 &567538964
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 567538953}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2de5752dff337ce439856e2534687c92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  size: {x: 1.6, y: 0.15}
+  heightOffset: 0.3
+  fillColor: {r: 0.85, g: 0.2, b: 0.2, a: 1}
+  backColor: {r: 0, g: 0, b: 0, a: 0.6}
+  sortingOrder: 50
 --- !u!1 &699853389
 GameObject:
   m_ObjectHideFlags: 0
@@ -8015,7 +8083,7 @@ MonoBehaviour:
     jumpKey: 32
     dodgeKey: 304
     attackMouseButton: 0
-  moveSpeed: 5
+  moveSpeed: 3
   jumpForce: 10
   whatIsGround:
     serializedVersion: 2
@@ -16145,3 +16213,4 @@ SceneRoots:
   - {fileID: 729276928}
   - {fileID: 1420790969}
   - {fileID: 1163275237}
+  - {fileID: 49962885}
