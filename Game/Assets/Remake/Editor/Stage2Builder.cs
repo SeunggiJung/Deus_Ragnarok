@@ -11,7 +11,7 @@ using UnityEngine.Tilemaps;
 // 원작 second_stage를 Assets/Remake/Scenes/Stage2.unity로 복사(원작 씬은 그대로)한 뒤 리메이크 시스템으로 교체
 // - 플레이어 / HUD : Player.prefab, PlayerHUD.prefab (1스테이지와 같은 조작 / UI), 카메라 대상 연결, 레거시 Canvas 비활성화
 // - 내려찍는 장애물(Rockhead x7) : RockHeadController → Crusher (시작 시간을 엇갈리게 해 리듬 패턴)
-// - 보스(Crab), 드래곤 : 레거시 Enemy / EnemyAI → Monster FSM + Stats 에셋 + 머리 위 체력바
+// - 보스(Crab) : CrabBossBuilder (Behavior Tree 보스) / 드래곤 : 레거시 Enemy / EnemyAI → Monster FSM + Stats 에셋 + 머리 위 체력바
 // - 보스방 입구 기둥(Trap) / 출구 문(Door) : Crab과 연동되는 BossArenaGate
 // - 검(key) : WeaponPickup, 색 조합 퍼즐(불 3 + 돌 3 → Door2) : ColorPuzzle / ColorFire / ColorStone
 // - 드래곤 등장(key2) : EncounterTrigger, 포탈 : 드래곤 처치 후 third_stage
@@ -36,7 +36,14 @@ public static class Stage2Builder
         SetupHud();
         SetupCrushers();
 
-        Monster crab = ConvertMonster("Boss", "Crab", "Enemy Attack 3", LoadOrCreateCrabStats());
+        // Crab : 레거시 Boss → Behavior Tree 보스(CrabBoss)
+        GameObject crabGo = FindInScene("Boss") ?? FindInScene("Crab");
+        if (crabGo != null)
+        {
+            crabGo.name = "Crab";
+            RemoveLegacyScripts(crabGo, "Enemy", "EnemyAI");
+        }
+        CrabBoss crab = CrabBossBuilder.Convert();
         Monster dragon = ConvertMonster("Dragon", "Dragon", "Dragon_attack", LoadOrCreateDragonStats());
 
         SetupArenaGates(crab);
@@ -264,7 +271,7 @@ public static class Stage2Builder
     #endregion
 
     #region Arena / Pickups / Puzzle / Portal
-    private static void SetupArenaGates(Monster crab)
+    public static void SetupArenaGates(CrabBoss crab)
     {
         if (crab == null) return;
         SetupGate(FindInScene("Trap") ?? FindInScene("CrabGate"), "CrabGate", crab, startsOpen: true, closeOnEngage: true);
@@ -280,18 +287,19 @@ public static class Stage2Builder
         if (gate == null) { Debug.LogError("보스방 입구 기둥(CrabGate)을 찾을 수 없습니다."); return; }
         GetOrAdd<DodgeLockZone>(gate);
         EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
-        Debug.Log($"구르기 잠금 구역 설정 : x < {gate.transform.position.x}");
+        var col = gate.GetComponent<Collider2D>();
+        Debug.Log($"구르기 잠금 구역 설정 : x < {(col != null ? col.bounds.center.x : gate.transform.position.x)}");
     }
 
-    private static void SetupGate(GameObject go, string name, Monster guardian, bool startsOpen, bool closeOnEngage)
+    private static void SetupGate(GameObject go, string name, BossController boss, bool startsOpen, bool closeOnEngage)
     {
         if (go == null) return;
         go.name = name;
         go.layer = LayerMask.NameToLayer("Ground");
         var gate = GetOrAdd<BossArenaGate>(go);
         var so = new SerializedObject(gate);
-        so.FindProperty("guardian").objectReferenceValue = guardian;
-        so.FindProperty("engageRange").floatValue = 14f;
+        so.FindProperty("boss").objectReferenceValue = boss;
+        so.FindProperty("guardian").objectReferenceValue = null;
         so.FindProperty("startsOpen").boolValue = startsOpen;
         so.FindProperty("closeOnEngage").boolValue = closeOnEngage;
         so.FindProperty("openOnDefeat").boolValue = true;

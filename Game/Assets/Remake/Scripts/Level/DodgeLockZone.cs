@@ -10,11 +10,21 @@ public class DodgeLockZone : MonoBehaviour
     private void OnEnable() { all.Add(this); }
     private void OnDisable() { all.Remove(this); }
 
+    // 기둥(타일맵)은 오브젝트 원점이 아니라 콜라이더 위치가 실제 경계 → 콜라이더 중심을 사용
+    private float LimitX
+    {
+        get
+        {
+            Collider2D col = GetComponent<Collider2D>();
+            return col != null ? col.bounds.center.x : transform.position.x;
+        }
+    }
+
     public static bool IsLocked(Vector2 position)
     {
         foreach (DodgeLockZone z in all)
         {
-            if (position.x < z.transform.position.x) return true;
+            if (position.x < z.LimitX) return true;
         }
         return false;
     }

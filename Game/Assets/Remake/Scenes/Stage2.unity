@@ -1160,8 +1160,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c60cb76b41ff9f54281e37748f402c91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boss: {fileID: 0}
-  guardian: {fileID: 1890048354}
+  boss: {fileID: 1890048354}
+  guardian: {fileID: 0}
   engageRange: 14
   startsOpen: 1
   closeOnEngage: 1
@@ -25726,8 +25726,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c60cb76b41ff9f54281e37748f402c91, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  boss: {fileID: 0}
-  guardian: {fileID: 1890048354}
+  boss: {fileID: 1890048354}
+  guardian: {fileID: 0}
   engageRange: 14
   startsOpen: 0
   closeOnEngage: 0
@@ -32039,7 +32039,6 @@ GameObject:
   - component: {fileID: 1890048347}
   - component: {fileID: 1890048353}
   - component: {fileID: 1890048354}
-  - component: {fileID: 1890048355}
   m_Layer: 6
   m_Name: Crab
   m_TagString: Untagged
@@ -32119,7 +32118,7 @@ Animator:
   m_GameObject: {fileID: 1890048346}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: baa67eee7fa8b9c4ba2715714aefac30, type: 2}
+  m_Controller: {fileID: 9100000, guid: 022584dd4f602c241a061896571d7ec4, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -32207,11 +32206,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1890048346}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a732414bb6658ea429dbeb7c7a3a5f89, type: 3}
+  m_Script: {fileID: 11500000, guid: cfa13435ec2346447818ec9f1b183e3c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stats: {fileID: 11400000, guid: 1d6c0d79aeb69a94d9dde561598cefd0, type: 2}
-  attackCheck: {fileID: 0}
+  stats: {fileID: 11400000, guid: c12ffce58729a404bb28171bf01e0e1d, type: 2}
+  attackCheck: {fileID: 1474420656}
   whatIsEnemy:
     serializedVersion: 2
     m_Bits: 128
@@ -32219,24 +32218,6 @@ MonoBehaviour:
   hitFlashTime: 0.1
   blinkInterval: 0.08
   spriteFacesRight: 1
-  attackStateName: Enemy Attack 3
---- !u!114 &1890048355
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1890048346}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2de5752dff337ce439856e2534687c92, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  size: {x: 1.6, y: 0.15}
-  heightOffset: 0.3
-  fillColor: {r: 0.85, g: 0.2, b: 0.2, a: 1}
-  backColor: {r: 0, g: 0, b: 0, a: 0.6}
-  sortingOrder: 50
 --- !u!1 &1936471614 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2183321564951531335, guid: 367acab6b4839d34f847dc791e026c4d, type: 3}

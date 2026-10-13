@@ -13,6 +13,7 @@ public class BossController : BaseCharacter
         public const string Melee = "melee";
         public const string Slam = "slam";
         public const string Throw = "throw";
+        public const string Grab = "grab";
         public const string Ability = "ability";
         public const string Hit = "hit";
         public const string Die = "die";
@@ -56,9 +57,12 @@ public class BossController : BaseCharacter
         Body = GetComponent<Collider2D>();
         initialConstraints = rb.constraints;
         poise = Stats.maxPoise;
-        tree = BossBehaviorTree.Build(this);
+        tree = BuildTree();
         anim.speed = AnimSpeed;
     }
+
+    // 보스마다 다른 행동 트리를 쓸 수 있도록 (Crab 등은 override)
+    protected virtual BTNode BuildTree() => BossBehaviorTree.Build(this);
 
     protected override bool IsValidStats(CharacterStats s) => s is BossStats;
     protected override CharacterStats CreateDefaultStats() => ScriptableObject.CreateInstance<BossStats>();
@@ -240,7 +244,7 @@ public class BossController : BaseCharacter
         anim.SetBool(AnimParams.Moving, false);
 
         // 남아있는 행동 트리거가 있으면 Any State 전이로 Die에서 다시 빠져나가 시체가 서 있는 문제가 생김 → 모두 해제
-        foreach (string trigger in new[] { AnimParams.Melee, AnimParams.Slam, AnimParams.Throw, AnimParams.Ability, AnimParams.Hit })
+        foreach (string trigger in new[] { AnimParams.Melee, AnimParams.Slam, AnimParams.Throw, AnimParams.Grab, AnimParams.Ability, AnimParams.Hit })
             anim.ResetTrigger(trigger);
         anim.SetTrigger(AnimParams.Die);
         rb.velocity = Vector2.zero;
