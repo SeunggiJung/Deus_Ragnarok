@@ -138,8 +138,6 @@ public static class Stage2SwordClimb
     private static void MoveSpawners()
     {
         Place("Spawner_S2_1", 138f, 4f);
-        Place("Spawner_S2_2", 158f, 3.7f);
-        Place("Spawner_S2_3", 178f, 4f);
     }
 
     private static void Place(string name, float x, float y)

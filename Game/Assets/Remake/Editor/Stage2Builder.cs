@@ -419,10 +419,13 @@ public static class Stage2Builder
 
     private static void SetupSpawners(Tilemap ground)
     {
-        // 보스 처치 후 ~ 퍼즐 사이 사냥 구간
+        // 검 이후 퍼즐 앞까지만 사냥 구간. 퍼즐 ~ 드래곤 보스방 사이에는 몬스터를 두지 않음
         CreateSpawner(ground, "Spawner_S2_1", "Assets/Remake/Prefabs/Golem.prefab", 95f, 2f);
-        CreateSpawner(ground, "Spawner_S2_2", "Assets/Remake/Prefabs/Witch.prefab", 120f, 1.7f);
-        CreateSpawner(ground, "Spawner_S2_3", "Assets/Remake/Prefabs/Golem.prefab", 132f, 2f);
+        foreach (string removed in new[] { "Spawner_S2_2", "Spawner_S2_3" })
+        {
+            GameObject old = FindInScene(removed);
+            if (old != null) Object.DestroyImmediate(old);
+        }
     }
 
     private static void CreateSpawner(Tilemap ground, string name, string prefabPath, float x, float heightAboveGround)
