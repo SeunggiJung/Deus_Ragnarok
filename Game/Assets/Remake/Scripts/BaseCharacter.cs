@@ -145,6 +145,18 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     // 현재 공격의 데미지 (크리티컬 등 상황별 배율은 자식 클래스에서)
     protected virtual float GetAttackDamage() => AttackDamage;
 
+    // 오브젝트 풀에서 재사용할 때 상태 초기화 (체력, 사망/무적 상태, 피격 연출)
+    protected virtual void ResetCharacter()
+    {
+        StopAllCoroutines();
+        IsDead = false;
+        hitInvincible = false;
+        ForceInvincible = false;
+        RestoreSpriteColor();
+        currentHp = MaxHp;
+        OnHpChanged?.Invoke(currentHp, MaxHp);
+    }
+
     // 최대 체력 증가 (늘어난 만큼 현재 체력도 회복)
     public void AddMaxHp(float amount)
     {

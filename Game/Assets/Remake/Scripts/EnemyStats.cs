@@ -12,7 +12,7 @@ public class EnemyStats : CharacterStats
     public float attackCooldown = 1.5f;
 
     [Header("Reward")]
-    public float expReward = 50f;       // 처치 시 플레이어가 얻는 경험치
+    public float expReward = 30f;       // 처치 시 플레이어가 얻는 경험치
 
     [Header("Hit / Death")]
     public float hitStunTime = 0.2f;    // 공격 중이 아닐 때 피격 경직 시간 (공격 중에는 경직 없음)

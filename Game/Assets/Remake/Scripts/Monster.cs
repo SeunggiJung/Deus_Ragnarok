@@ -25,6 +25,11 @@ public class Monster : BaseCharacter
     public Animator Anim => anim;
     public EnemyStats Stats => (EnemyStats)stats;
     public BaseCharacter Target { get; private set; }
+    public float FacingDir => Mathf.Sign(transform.localScale.x) * (spriteFacesRight ? 1f : -1f);
+
+    // 스포너(오브젝트 풀)가 지정하는 반환 처리. 없으면(씬에 직접 배치) 사망 후 Destroy
+    private Action<Monster> releaseToPool;
+    private RigidbodyConstraints2D initialConstraints;
     public float LastAttackTime { get; set; } = float.NegativeInfinity;
 
     protected override void Awake()
@@ -37,6 +42,8 @@ public class Monster : BaseCharacter
             if (p.name == "attackSpeed" && p.type == AnimatorControllerParameterType.Float)
                 anim.SetFloat("attackSpeed", 1f);
         }
+
+        initialConstraints = rb.constraints;
 
         StateMachine = new StateMachine();
         IdleState = new EnemyIdleState(this, StateMachine);
@@ -106,8 +113,59 @@ public class Monster : BaseCharacter
     public void Hit()
     {
         if (StateMachine.CurrentState == AttackState)
-            AnimationTrigger();
+            PerformAttack();
     }
+
+    // 실제 공격 방식. 기본은 근접 판정(OverlapCircle), 원거리 몬스터는 투사체 발사로 재정의
+    protected virtual void PerformAttack()
+    {
+        AnimationTrigger();
+    }
+
+    #region Pooling
+    // 스포너가 풀에서 꺼낼 때 호출 : 위치 지정 후 체력/물리/애니메이터/AI 상태를 처음처럼 초기화
+    public void Spawn(Vector3 position, Action<Monster> release)
+    {
+        releaseToPool = release;
+        transform.position = position;
+
+        foreach (var col in GetComponentsInChildren<Collider2D>(true))
+            col.enabled = true;
+        rb.simulated = true;
+        rb.velocity = Vector2.zero;
+        rb.constraints = initialConstraints;
+
+        anim.Rebind();
+        anim.Update(0f);
+        foreach (var p in anim.parameters)
+        {
+            if (p.name == "attackSpeed" && p.type == AnimatorControllerParameterType.Float)
+                anim.SetFloat("attackSpeed", 1f);
+        }
+
+        ResetCharacter();
+        LastAttackTime = float.NegativeInfinity;
+        if (Target == null)
+            Target = FindObjectOfType<PlayerController>();
+        StateMachine.Initialize(IdleState);
+    }
+
+    // 사망 연출이 끝난 뒤 풀로 반환 (풀이 없으면 제거)
+    public void DespawnAfter(float delay)
+    {
+        StartCoroutine(DespawnRoutine(delay));
+    }
+
+    private IEnumerator DespawnRoutine(float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (releaseToPool != null)
+            releaseToPool(this);
+        else
+            Destroy(gameObject);
+    }
+    #endregion
 
     // 공격 중에는 경직되지 않음 (슈퍼아머) → 맞으면서도 공격을 끝까지 내려침
     protected override void OnDamaged()

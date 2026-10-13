@@ -56,6 +56,7 @@ public class WorldHealthBar : MonoBehaviour
     private void OnEnable()
     {
         owner.OnHpChanged += UpdateBar;
+        if (barRoot != null) barRoot.gameObject.SetActive(!owner.IsDead);
     }
 
     private void Start()
@@ -66,6 +67,8 @@ public class WorldHealthBar : MonoBehaviour
     private void OnDisable()
     {
         owner.OnHpChanged -= UpdateBar;
+        // 풀로 반환되어 비활성화될 때 별도 오브젝트인 체력바도 숨김
+        if (barRoot != null) barRoot.gameObject.SetActive(false);
     }
 
     private void UpdateBar(float current, float max)
@@ -73,8 +76,8 @@ public class WorldHealthBar : MonoBehaviour
         float ratio = max > 0f ? Mathf.Clamp01(current / max) : 0f;
         fill.localScale = new Vector3(size.x * ratio, size.y, 1f);
 
-        if (owner.IsDead)
-            barRoot.gameObject.SetActive(false);
+        // 체력 0이면 숨기고, 풀에서 다시 꺼내 체력이 회복되면 다시 표시
+        barRoot.gameObject.SetActive(current > 0f);
     }
 
     private void LateUpdate()

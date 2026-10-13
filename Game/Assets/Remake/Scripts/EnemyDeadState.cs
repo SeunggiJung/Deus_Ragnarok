@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-// 사망. 사망 애니메이션 재생 후 deathDelay 뒤 제거 (이후 스폰/풀링 도입 시 비활성화로 교체 예정)
+// 사망. 사망 애니메이션 재생 후 deathDelay 뒤 풀로 반환 (스포너 없이 배치된 몬스터는 제거)
 public class EnemyDeadState : EnemyState
 {
     public EnemyDeadState(Monster enemy, StateMachine stateMachine) : base(enemy, stateMachine) { }
@@ -16,6 +16,6 @@ public class EnemyDeadState : EnemyState
             col.enabled = false;
         enemy.Rb.simulated = false;
 
-        Object.Destroy(enemy.gameObject, enemy.Stats.deathDelay);
+        enemy.DespawnAfter(enemy.Stats.deathDelay);
     }
 }
