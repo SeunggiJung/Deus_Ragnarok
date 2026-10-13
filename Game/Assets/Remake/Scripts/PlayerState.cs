@@ -11,19 +11,18 @@ public class PlayerState : IState
     public PlayerState(PlayerController player, StateMachine stateMachine, string animBoolName)
     {
         this.player = player;
-        this.player = player;
         this.stateMachine = stateMachine;
         this.animBoolName = animBoolName;
     }
 
     public virtual void Enter()
     {
-        player.GetComponent<Animator>().SetBool(animBoolName, true);
+        player.Anim.SetBool(animBoolName, true);
     }
 
     public virtual void Exit()
     {
-        player.GetComponent<Animator>().SetBool(animBoolName, false);
+        player.Anim.SetBool(animBoolName, false);
     }
     public virtual void HandleInput() { }
     public virtual void Update() { }
