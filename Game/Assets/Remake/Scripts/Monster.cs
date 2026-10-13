@@ -2,18 +2,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Monster : MonoBehaviour, IDamageable
+// 일반 몬스터. 체력/피격/무적 처리는 BaseCharacter에서 공통으로 담당
+public class Monster : BaseCharacter
 {
-    public float hp = 50f;
-    public void TakeDamage(float damage)
+    protected override void Die()
     {
-        hp -= damage;
-        Debug.Log($"몬스터가 {damage}만큼 맞았습니다. 남은 체력: {hp}");
-        if (hp <= 0) Die();
-    }
-    void Die()
-    {
-        Debug.Log("몬스터 사망");
+        Debug.Log($"{gameObject.name} 사망");
         Destroy(gameObject);
     }
 }

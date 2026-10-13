@@ -1976,7 +1976,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a732414bb6658ea429dbeb7c7a3a5f89, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hp: 50
+  stats: {fileID: 11400000, guid: e07c16d83b0e0b844857127437b04521, type: 2}
+  attackCheck: {fileID: 0}
+  whatIsEnemy:
+    serializedVersion: 2
+    m_Bits: 0
+  hitColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  hitFlashTime: 0.1
+  blinkInterval: 0.08
 --- !u!1 &699853389
 GameObject:
   m_ObjectHideFlags: 0
@@ -7990,12 +7997,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b04bfcc1131866a4a847a95bc1ced3ad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHp: 100
+  stats: {fileID: 11400000, guid: eb42cec441e6f2d4ba793b65d018fe7a, type: 2}
   attackCheck: {fileID: 274957777}
-  attackCheckRadius: 1
   whatIsEnemy:
     serializedVersion: 2
     m_Bits: 64
+  hitColor: {r: 1, g: 0.3, b: 0.3, a: 1}
+  hitFlashTime: 0.1
+  blinkInterval: 0.08
   moveSpeed: 5
 --- !u!1 &943553818
 GameObject:
