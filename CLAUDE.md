@@ -21,7 +21,8 @@
 | 원작 코드 / 씬 | `Game/Assets/Legacy/` — **수정하지 않는다** (참고용) |
 | 외부 에셋 팩 | `Game/Assets/External/` |
 | 노션 기록 페이지 | `326953f3dde980938dc2c424fa6e6779` ("Deus_Ragnarok 리팩토링 & 리마스터링 기록") |
-| 노션 작업 로그 (26.10.13) | `3f8953f3dde98132819ff31094f7ca14` |
+| 노션 작업 로그 (26.10.13, 1~27번) | `3f8953f3dde98132819ff31094f7ca14` |
+| 노션 작업 로그 (26.10.14, 1~8번) | `3f8953f3dde981bbb41ed5369aa5921e` (자정이 지나면 날짜별 새 페이지를 기록 페이지 루트 아래에 만들어 1번부터) |
 | 노션 트러블 슈팅 (26.10.13) | `3f8953f3dde9815bb914c5e6ec11f0d5` |
 
 ---
@@ -31,7 +32,7 @@
 1. 작업 단위가 끝날 때마다 **git 커밋 + push** (push 자동 허용됨). 커밋 메시지는 "무엇을 / 왜"를 한국어로, 마지막 줄에 Co-Authored-By.
    - `Game/Assets/External/Low_Swordman/3.Prefab/sword_man.prefab`은 Unity 버전 업그레이드로 자동 재직렬화된 변경 → **커밋하지 않음**
    - 사용자가 직접 수정한 파일은 함부로 커밋 / 되돌리지 않고 먼저 언급
-2. 작업 후 **노션 기록** : 작업 로그 페이지에 `### N. 제목` 섹션을 끝에 추가(현재 34번까지. 2스테이지 초기 구성 작업은 25번 이전에 일부 누락), 문제 해결은 트러블 슈팅 페이지에 `### N.` 추가(현재 6번까지). 기존 양식(불릿 + 코드블록 + 원작 대비 변경점) 유지
+2. 작업 후 **노션 기록** : **날짜별 작업 로그 페이지**에 `### N. 제목` 섹션을 끝에 추가(현재 26.10.14 페이지 8번까지. 2스테이지 초기 구성 작업은 26.10.13 페이지에 일부 누락), 문제 해결은 트러블 슈팅 페이지에 `### N.` 추가(현재 6번까지). 기존 양식(불릿 + 코드블록 + 원작 대비 변경점) 유지
 3. 스크립트 인코딩 : **UTF-8 with BOM + CRLF** (`Game/.editorconfig`). 새 파일 작성 후 반드시 변환
 4. 원작 씬은 건드리지 않고 **Remake 씬에서 작업** (`RemakeTest.unity` = 1스테이지, `Stage2.unity` = 2스테이지)
 5. 씬 구성은 가능한 한 **에디터 도구(`Tools/Deus/...`)로 재현 가능하게** 만들고, 여러 번 실행해도 결과가 같도록(idempotent) 작성
@@ -72,7 +73,7 @@
 - **프리팹** : `Prefabs/Player.prefab`, `Prefabs/PlayerHUD.prefab` (RemakeTest의 오브젝트에서 생성, `Tools/Deus/Build Player Prefabs`)
 
 ### 4.3 몬스터
-- `Monster`(BaseCharacter) : FSM `Idle → Chase → Attack → (Hit) → Dead`, 공격 중 슈퍼아머, 멈춰 있을 땐 X축 고정(밀리지 않음), `attackStateName`(애니메이터 공격 상태 이름 : Golem `Attack`, Crab `Enemy Attack 3`, Dragon `Dragon_attack`), 애니메이션 이벤트 `Hit()` → `PerformAttack()`
+- `Monster`(BaseCharacter) : FSM `Idle → Chase → Attack → (Hit) → Dead`, 공격 중 슈퍼아머, 멈춰 있을 땐 X축 고정(밀리지 않음), `attackStateName`(애니메이터 공격 상태 이름 : Golem `Attack`. Crab / Dragon은 이제 BT 보스라 `Monster`를 쓰지 않음), 애니메이션 이벤트 `Hit()` → `PerformAttack()`
 - `RangedMonster` : `PerformAttack`만 투사체 발사로 교체 (마녀)
 - `MonsterSpawner` : `UnityEngine.Pool.ObjectPool`, 사망 → 풀 반환 → `respawnDelay` 뒤 재사용 (`Monster.Spawn`이 상태 전부 초기화)
 - `Projectile` / `ProjectilePool` : 진행 방향 회전, 대상이 무적이면 통과
@@ -116,7 +117,7 @@
 ### 2스테이지 — `Assets/Remake/Scenes/Stage2.unity` (원작 second_stage 복사본)
 - `Stage 2 - Build Sword Climb` : 보스 문 뒤 → 검까지의 길. 원작은 텔레포트로 오르던 지형 → 점프 + 공중 구르기로 오르는 계단 발판 10개(쉬운 도약 틈 1 / 구르기 도약 틈 3 번갈아, x 90~133), 검 발판에서 오른쪽으로 내려가면 지면(x 134~). 체크포인트3은 중간 발판, 퍼즐 이후 몬스터 없음(스포너는 `Spawner_S2_1` 하나)
 - `Build Crab Boss` / `Build Dragon Boss` : 각각 Behavior Tree 보스로 변환 (Build Stage 2에 포함)
-- `Build Stage 2` : 씬 복사/열기 → Player/HUD 프리팹 배치 + 카메라 대상 연결 + 레거시 Canvas 끔 → Rockhead x7 → `Crusher` → Boss(Crab)/Dragon → Monster FSM(`CrabStats`, `DragonStats`) → 보스방 Trap/Door → 검 → 색 퍼즐(Stone1=흰색, Stone2=자홍, Stone3=주황 / 빨강+파랑=자홍, 파랑+초록=주황, 초록+빨강=흰색 / 노랑 불은 갈색·청록·라임 오답 조합) → key2 = 드래곤 등장 트리거 → 포탈(드래곤 처치 후 `third_stage`) → 체크포인트 5, 스포너 3
+- `Build Stage 2` : 씬 복사/열기 → Player/HUD 프리팹 배치 + 카메라 대상 연결 + 레거시 Canvas 끔 → Rockhead x7 → `Crusher` → Crab(`CrabBossBuilder`) / Dragon(`DragonBossBuilder`) BT 보스 → 보스방 Trap/Door → 검 → 색 퍼즐(Stone1=흰색, Stone2=자홍, Stone3=주황 / 빨강+파랑=자홍, 파랑+초록=주황, 초록+빨강=흰색 / 노랑 불은 갈색·청록·라임 오답 조합) → key2 = 드래곤 등장 트리거 → 포탈(드래곤 처치 후 `third_stage`) → 체크포인트 5, 스포너 1(`Spawner_S2_1`, x 138)
 - 빌드 설정에 RemakeTest, Stage2 추가됨
 
 ---
