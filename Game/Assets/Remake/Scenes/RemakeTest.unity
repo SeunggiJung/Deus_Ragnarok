@@ -8006,6 +8006,11 @@ MonoBehaviour:
   hitFlashTime: 0.1
   blinkInterval: 0.08
   moveSpeed: 5
+  jumpForce: 10
+  whatIsGround:
+    serializedVersion: 2
+    m_Bits: 256
+  groundCheckDistance: 0.05
 --- !u!1 &943553818
 GameObject:
   m_ObjectHideFlags: 0
