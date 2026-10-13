@@ -44,7 +44,10 @@ public static class HuntingFieldBuilder
             return;
         }
         if (tilemap.HasTile(new Vector3Int(newLeftX, TileMaxY, 0)))
-            return; // 이미 확장됨
+        {
+            RebuildCollider(tilemap); // 이미 확장됨 (충돌 외곽선만 갱신)
+            return;
+        }
 
         int height = TileMaxY - TileMinY + 1;
         var edge = new TileBase[height];
@@ -62,6 +65,31 @@ public static class HuntingFieldBuilder
             TileBase[] column = x == newLeftX ? edge : fill;
             for (int i = 0; i < height; i++)
                 tilemap.SetTile(new Vector3Int(x, TileMinY + i, 0), column[i]);
+        }
+
+        RebuildCollider(tilemap);
+    }
+
+    // 지면 충돌은 CompositeCollider2D가 미리 계산해 씬에 저장한 외곽선을 사용함.
+    // 스크립트로 타일을 바꾸면 외곽선이 확장 전 상태로 남아 새 구간에 바닥 판정이 없으므로 직접 다시 계산
+    private static void RebuildCollider(Tilemap tilemap)
+    {
+        var tilemapCollider = tilemap.GetComponent<TilemapCollider2D>();
+        if (tilemapCollider != null)
+        {
+            // 껐다 켜서 타일 충돌 모양을 전부 다시 생성 (ProcessTilemapChanges만으로는 갱신되지 않는 경우가 있음)
+            tilemapCollider.enabled = false;
+            tilemapCollider.enabled = true;
+            tilemapCollider.ProcessTilemapChanges();
+        }
+        Physics2D.SyncTransforms();
+
+        var composite = tilemap.GetComponent<CompositeCollider2D>();
+        if (composite != null)
+        {
+            Undo.RecordObject(composite, "Build Hunting Field");
+            composite.GenerateGeometry();
+            Debug.Log($"지면 충돌 외곽선 재계산 : x {composite.bounds.min.x:F0} ~ {composite.bounds.max.x:F0}");
         }
     }
 
