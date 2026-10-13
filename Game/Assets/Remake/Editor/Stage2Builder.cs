@@ -11,7 +11,7 @@ using UnityEngine.Tilemaps;
 // 원작 second_stage를 Assets/Remake/Scenes/Stage2.unity로 복사(원작 씬은 그대로)한 뒤 리메이크 시스템으로 교체
 // - 플레이어 / HUD : Player.prefab, PlayerHUD.prefab (1스테이지와 같은 조작 / UI), 카메라 대상 연결, 레거시 Canvas 비활성화
 // - 내려찍는 장애물(Rockhead x7) : RockHeadController → Crusher (시작 시간을 엇갈리게 해 리듬 패턴)
-// - 보스(Crab) : CrabBossBuilder (Behavior Tree 보스) / 드래곤 : 레거시 Enemy / EnemyAI → Monster FSM + Stats 에셋 + 머리 위 체력바
+// - 보스 2종 : Crab → CrabBossBuilder, 드래곤 → DragonBossBuilder (둘 다 Behavior Tree 보스, 보스 체력바는 보스마다 하나씩)
 // - 보스방 입구 기둥(Trap) / 출구 문(Door) : Crab과 연동되는 BossArenaGate
 // - 검(key) : WeaponPickup, 색 조합 퍼즐(불 3 + 돌 3 → Door2) : ColorPuzzle / ColorFire / ColorStone
 // - 드래곤 등장(key2) : EncounterTrigger, 포탈 : 드래곤 처치 후 third_stage
@@ -45,7 +45,7 @@ public static class Stage2Builder
             RemoveLegacyScripts(crabGo, "Enemy", "EnemyAI");
         }
         CrabBoss crab = CrabBossBuilder.Convert();
-        Monster dragon = ConvertMonster("Dragon", "Dragon", "Dragon_attack", LoadOrCreateDragonStats());
+        DragonBoss dragon = DragonBossBuilder.Convert();   // Behavior Tree 보스
 
         SetupArenaGates(crab);
         SetupSword();
@@ -324,6 +324,7 @@ public static class Stage2Builder
         SetupFire("fire_red", PuzzleColor.Red, puzzle);
         SetupFire("fire_blue", PuzzleColor.Blue, puzzle);
         SetupFire("fire_green", PuzzleColor.Green, puzzle);
+        SetupYellowFire(puzzle);
 
         // 원작 조합표 : Stone1 = 흰색, Stone2 = 자홍, Stone3 = 주황
         var stones = new List<ColorStone>
@@ -342,6 +343,30 @@ public static class Stage2Builder
         GameObject door2 = FindInScene("Door2");
         so.FindProperty("door").objectReferenceValue = door2 != null ? door2.transform : null;
         so.ApplyModifiedProperties();
+    }
+
+    // 노랑 불 : 초록 불을 복제해 불꽃 색만 바꿈 (어떤 색과도 조합되지 않는 미끼). 이미 있으면 재사용
+    private static void SetupYellowFire(ColorPuzzle puzzle)
+    {
+        GameObject yellow = FindInScene("fire_yellow");
+        GameObject green = FindInScene("fire_green");
+        if (yellow == null && green != null)
+        {
+            yellow = Object.Instantiate(green, green.transform.parent);
+            yellow.name = "fire_yellow";
+            // 빨강 → 파랑 → 초록 간격만큼 오른쪽에 배치
+            GameObject blue = FindInScene("fire_blue");
+            float spacing = blue != null ? green.transform.position.x - blue.transform.position.x : 3.8f;
+            yellow.transform.position = green.transform.position + new Vector3(spacing, 0f, 0f);
+        }
+        if (yellow == null) return;
+
+        foreach (var ps in yellow.GetComponentsInChildren<ParticleSystem>(true))
+        {
+            var main = ps.main;
+            main.startColor = ColorPuzzle.ToColor(PuzzleColor.Yellow);
+        }
+        SetupFire("fire_yellow", PuzzleColor.Yellow, puzzle);
     }
 
     private static void SetupFire(string name, PuzzleColor color, ColorPuzzle puzzle)
@@ -370,7 +395,7 @@ public static class Stage2Builder
         return stone;
     }
 
-    private static void SetupDragonEncounter(Monster dragon)
+    private static void SetupDragonEncounter(BaseCharacter dragon)
     {
         GameObject trigger = FindInScene("key2") ?? FindInScene("DragonTrigger");
         if (trigger == null || dragon == null) return;
@@ -384,7 +409,7 @@ public static class Stage2Builder
         so.ApplyModifiedProperties();
     }
 
-    private static void SetupPortal(Monster dragon)
+    private static void SetupPortal(BaseCharacter dragon)
     {
         GameObject portal = FindInScene("Portal");
         if (portal == null) return;

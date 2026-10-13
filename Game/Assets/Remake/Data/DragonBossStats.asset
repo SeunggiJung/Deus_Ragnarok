@@ -1,0 +1,123 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40456aaf7288a3048a2456c5a7c31df7, type: 3}
+  m_Name: DragonBossStats
+  m_EditorClassIdentifier: 
+  maxHp: 900
+  invincibleTime: 0.15
+  attackDamage: 24
+  attackRadius: 2.4
+  bossName: Dragon
+  expReward: 600
+  moveSpeed: 2.6
+  baseAnimSpeed: 1
+  detectRange: 40
+  attackRecovery: 0.9
+  meleeRange: 3.4
+  meleeCooldown: 1.8
+  meleeTelegraph: 0.35
+  slamRange: 4
+  slamCooldown: 6
+  slamDamage: 20
+  slamArea: {x: 8, y: 3}
+  slamHitTime: 0.5
+  chargeMinRange: 5
+  chargeMaxRange: 12
+  chargeCooldown: 7
+  chargeTelegraph: 0.6
+  chargeSpeed: 11
+  chargeDistance: 10
+  chargeDamage: 18
+  chargeTelegraphTint: {r: 1, g: 0.6, b: 0.2, a: 1}
+  throwMinRange: 5
+  throwMaxRange: 14
+  throwCooldown: 4
+  throwDamage: 12
+  throwSpeed: 9
+  throwLifetime: 2
+  throwRadius: 0.35
+  throwReleaseTime: 0.55
+  phase2SpreadAngle: 12
+  projectileSprite: {fileID: 0}
+  projectileColor: {r: 1, g: 1, b: 1, a: 1}
+  guardHitCount: 3
+  guardWindow: 2
+  guardDuration: 1.5
+  guardDamageMultiplier: 0.2
+  guardCooldown: 12
+  guardTint: {r: 0.6, g: 0.8, b: 1, a: 1}
+  maxPoise: 150
+  poiseRegenDelay: 3
+  staggerTime: 1.5
+  staggerTint: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+  phase2Threshold: 0.5
+  roarTime: 1.3
+  phase2CooldownMultiplier: 0.7
+  phase2MoveMultiplier: 1.3
+  phase2AnimSpeed: 1.2
+  roarTint: {r: 1, g: 0.3, b: 0.3, a: 1}
+  phase2Tint: {r: 1, g: 0.8, b: 0.8, a: 1}
+  deathSlowMotionScale: 0.3
+  deathSlowMotionDuration: 0.6
+  shatterDelay: 0.35
+  shatterGrid: 8
+  shatterForce: 8
+  shardLifetime: 1.5
+  breathMinRange: 3
+  breathMaxRange: 13
+  breathCooldown: 9
+  breathChargeTime: 2
+  breathWindowRatio: 0.4
+  breathDuration: 0.8
+  breathLength: 9
+  breathHeight: 1.8
+  breathTickDamage: 9
+  breathTickInterval: 0.25
+  breathRecovery: 0.8
+  counterStaggerTime: 3
+  rainMinRange: 0
+  rainMaxRange: 22
+  rainCooldown: 12
+  rainCount: 4
+  rainInterval: 0.55
+  rainWarnTime: 1
+  rainRadius: 1.7
+  rainDamage: 22
+  rainSpread: 3.5
+  seizeRange: 7
+  seizeCooldown: 13
+  seizeRadius: 4.6
+  seizeTimeLimit: 1.5
+  seizeLungeSpeed: 22
+  seizeLiftHeight: 3.2
+  seizeLiftTime: 0.45
+  seizeSlamTime: 0.12
+  seizeDamage: 38
+  seizePlayerKnockback: 5
+  seizeBossKnockback: 2.5
+  seizeBossStagger: 1.5
+  seizeMissRecovery: 1
+  breathFrames:
+  - {fileID: 21300000, guid: e0b16a377f17da741be514a884ceeca3, type: 3}
+  - {fileID: 21300000, guid: b5591859471ec5043a8d9b0823b8e199, type: 3}
+  - {fileID: 21300000, guid: eff13b04babefe640978fb93720719c6, type: 3}
+  fireballFrames:
+  - {fileID: 21300000, guid: 0869b1e96aac6d34cb086976dc7af826, type: 3}
+  - {fileID: 21300000, guid: e29ecfc679eed7f4886ea00aa8f39cb0, type: 3}
+  - {fileID: 21300000, guid: 77f084663dedae54bbc26660c4568bd7, type: 3}
+  explosionFrames:
+  - {fileID: 21300000, guid: 9c56ef6f982e8914daf8714d5bcd9cea, type: 3}
+  - {fileID: 21300000, guid: 10aa3a116ac3b5b48a4baafd59720ea2, type: 3}
+  - {fileID: 21300000, guid: c7306be4ce3c0a0469c3a9a2a2362408, type: 3}
+  - {fileID: 21300000, guid: a08cb5e6da786564db16cfaba3ffe0cc, type: 3}
+  - {fileID: 21300000, guid: c485bf7f98f24494887a0db2d3fa19d9, type: 3}
+  - {fileID: 21300000, guid: 59d6a0740f5fa2d43bace77687889e18, type: 3}

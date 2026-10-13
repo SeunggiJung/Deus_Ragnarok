@@ -172,6 +172,14 @@ public class PlayerController : BaseCharacter
         OnStaminaChanged?.Invoke(CurrentStamina, MaxStamina);
     }
 
+    // 스태미너를 즉시 0으로 (보스의 내려찍기 등). 회복 대기 시간도 새로 시작
+    public void DrainStamina()
+    {
+        CurrentStamina = 0f;
+        lastStaminaUseTime = Time.time;
+        OnStaminaChanged?.Invoke(CurrentStamina, MaxStamina);
+    }
+
     public void RefillStamina()
     {
         CurrentStamina = MaxStamina;

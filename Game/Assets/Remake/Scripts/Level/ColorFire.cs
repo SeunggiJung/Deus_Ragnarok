@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-// 색 조합 퍼즐의 불. G키로 기본색(빨강 / 파랑 / 초록)을 담음
+// 색 조합 퍼즐의 불. G키로 기본색(빨강 / 파랑 / 초록 / 노랑)을 담음
 [RequireComponent(typeof(Collider2D))]
 public class ColorFire : MonoBehaviour, IInteractable
 {

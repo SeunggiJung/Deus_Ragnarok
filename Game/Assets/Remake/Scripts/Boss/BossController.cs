@@ -83,6 +83,9 @@ public class BossController : BaseCharacter
         anim.speed = AnimSpeed;
     }
 
+    // 등장 연출 중에는 전투를 시작하지 않도록 보스마다 제한할 수 있음
+    protected virtual bool CanEngage => true;
+
     // 보스마다 다른 행동 트리를 쓸 수 있도록 (Crab 등은 override)
     protected virtual BTNode BuildTree() => BossBehaviorTree.Build(this);
 
@@ -111,6 +114,7 @@ public class BossController : BaseCharacter
 
         if (!Engaged)
         {
+            if (!CanEngage) return;
             if (Target == null || Target.IsDead || DistanceToTarget > Stats.detectRange) return;
             Engaged = true;
             OnEngaged?.Invoke();
@@ -267,6 +271,15 @@ public class BossController : BaseCharacter
 
     // 그로기 : 실행 중인 패턴을 즉시 끊고 staggerTime 동안 무방비
     private void Stagger() => Stagger(Stats.staggerTime);
+
+    // 행동 노드 안에서 그로기를 걸 때 사용 : 트리를 Tick하는 도중에 Abort하지 않도록 다음 프레임에 적용
+    public void StaggerFor(float duration) => StartCoroutine(StaggerNextFrame(duration));
+
+    private IEnumerator StaggerNextFrame(float duration)
+    {
+        yield return null;
+        if (!IsDead) Stagger(duration);
+    }
 
     private void Stagger(float duration)
     {

@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-public enum PuzzleColor { None, Red, Blue, Green, Magenta, Orange, White }
+public enum PuzzleColor { None, Red, Blue, Green, Magenta, Orange, White, Yellow }
 
 // 2스테이지 색 조합 퍼즐.
 // 불(ColorFire)에서 G키로 기본색을 2개 담으면 섞인 색이 되고, 맞는 색을 돌(ColorStone)에 G키로 넣으면 불이 켜짐.
@@ -12,6 +12,7 @@ public enum PuzzleColor { None, Red, Blue, Green, Magenta, Orange, White }
 // - 원작 : 플레이어 코드 안에 태그(cup, stone) 판정 + 리스트 + switch로 구현, 담는 순서까지 맞아야 조합 성공
 // - 변경 : 퍼즐 로직을 별도 컴포넌트로 분리, 불 / 돌은 IInteractable로 G키 상호작용, 순서와 상관없이 조합
 //   (조합표는 원작 유지 : 빨강+파랑=자홍, 파랑+초록=주황, 초록+빨강=흰색)
+// - 추가 : 불이 3개일 때는 아무 두 개나 섞어도 정답이 나오므로 노랑 불을 하나 더 두고, 노랑은 어떤 색과도 조합이 안 됨 (실패)
 public class ColorPuzzle : MonoBehaviour
 {
     [SerializeField] private ColorStone[] stones;
@@ -54,7 +55,22 @@ public class ColorPuzzle : MonoBehaviour
         pendingPrimary = PuzzleColor.None;
         SetHeld(mixed);
         if (mixed == PuzzleColor.None)
-            Debug.Log("[퍼즐] 조합 실패 (같은 색을 두 번 담음)");
+        {
+            Debug.Log("[퍼즐] 조합 실패");
+            StartCoroutine(ShowFail());
+        }
+    }
+
+    // 조합 실패 표시 : 잠깐 회색 "Failed"를 띄움
+    private IEnumerator ShowFail()
+    {
+        if (heldOrb == null) yield break;
+        heldOrb.gameObject.SetActive(true);
+        heldOrb.color = new Color(0.5f, 0.5f, 0.5f);
+        heldLabel.text = "Failed";
+        heldLabel.color = new Color(0.7f, 0.7f, 0.7f);
+        yield return new WaitForSeconds(1f);
+        if (Held == PuzzleColor.None) heldOrb.gameObject.SetActive(false);
     }
 
     // 돌에 색을 넣음. 맞으면 true
@@ -138,6 +154,7 @@ public class ColorPuzzle : MonoBehaviour
             case PuzzleColor.Red: return new Color(1f, 0.25f, 0.2f);
             case PuzzleColor.Blue: return new Color(0.3f, 0.5f, 1f);
             case PuzzleColor.Green: return new Color(0.25f, 0.95f, 0.35f);
+            case PuzzleColor.Yellow: return new Color(1f, 0.92f, 0.15f);
             case PuzzleColor.Magenta: return new Color(1f, 0.25f, 0.9f);
             case PuzzleColor.Orange: return new Color(1f, 0.64f, 0f);
             case PuzzleColor.White: return Color.white;
