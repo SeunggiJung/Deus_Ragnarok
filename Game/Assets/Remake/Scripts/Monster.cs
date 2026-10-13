@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,12 +8,12 @@ public class Monster : MonoBehaviour, IDamageable
     public void TakeDamage(float damage, Vector2 knockbackForce)
     {
         hp -= damage;
-        Debug.Log($"¸ó½ºÅÍ°¡ {damage}¸¸Å­ ¸Â¾Ò½À´Ï´Ù. ³²Àº Ã¼·Â: {hp}");
+        Debug.Log($"ëª¬ìŠ¤í„°ê°€ {damage}ë§Œí¼ ë§ì•˜ìŠµë‹ˆë‹¤. ë‚¨ì€ ì²´ë ¥: {hp}");
         if (hp <= 0) Die();
     }
     void Die()
     {
-        Debug.Log("¸ó½ºÅÍ »ç¸Á");
+        Debug.Log("ëª¬ìŠ¤í„° ì‚¬ë§");
         Destroy(gameObject);
     }
 }

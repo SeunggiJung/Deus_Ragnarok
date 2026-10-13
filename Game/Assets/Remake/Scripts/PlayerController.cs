@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
@@ -7,7 +7,7 @@ public class PlayerController : BaseCharacter
 {
     public StateMachine StateMachine { get; private set; }
 
-    // ÇÃ·¹ÀÌ¾îÀÇ °¢ »óÅÂµé
+    // í”Œë ˆì´ì–´ì˜ ê° ìƒíƒœë“¤
     public PlayerMoveState MoveState { get; private set; }
     public PlayerIdleState IdleState { get; private set; }
     public PlayerAttackState AttackState { get; private set; }
@@ -21,7 +21,7 @@ public class PlayerController : BaseCharacter
         base.Awake();
         StateMachine = new StateMachine();
         this.attackCheckRadius = 1.2f;
-        // »óÅÂ °´Ã¼ »ı¼º (ÀÌÈÄ ±¸Çö)
+        // ìƒíƒœ ê°ì²´ ìƒì„± (ì´í›„ êµ¬í˜„)
         IdleState = new PlayerIdleState(this, StateMachine, "Idle");
         MoveState = new PlayerMoveState(this, StateMachine, "Move");
         AttackState = new PlayerAttackState(this, StateMachine, "Attack");
@@ -48,11 +48,11 @@ public class PlayerController : BaseCharacter
     }
 
     public void CheckFlip(float _xInput)
-    {   //localScale.x = 1 : ¿ŞÂÊ, -1 : ¿À¸¥ÂÊ
-        if (_xInput > 0 && transform.localScale.x > 0) // ÀÔ·ÂÀÌ ¿À¸¥ÂÊÀÏ ¶§, player characterÀÇ ¹æÇâÀÌ ¿ŞÂÊÀÌ¸é
+    {   //localScale.x = 1 : ì™¼ìª½, -1 : ì˜¤ë¥¸ìª½
+        if (_xInput > 0 && transform.localScale.x > 0) // ì…ë ¥ì´ ì˜¤ë¥¸ìª½ì¼ ë•Œ, player characterì˜ ë°©í–¥ì´ ì™¼ìª½ì´ë©´
             transform.localScale = new Vector3(-1, 1, 1);
-        else if (_xInput < 0 && transform.localScale.x < 0) // ÀÔ·ÂÀÌ ¿ŞÂÊÀÏ ¶§, player characterÀÇ ¹æÇâÀÌ ¿À¸¥ÂÊÀÌ¸é
+        else if (_xInput < 0 && transform.localScale.x < 0) // ì…ë ¥ì´ ì™¼ìª½ì¼ ë•Œ, player characterì˜ ë°©í–¥ì´ ì˜¤ë¥¸ìª½ì´ë©´
             transform.localScale = new Vector3(1, 1, 1);
     }
-    protected override void Die() { /* »ç¸Á ·ÎÁ÷ */ }
+    protected override void Die() { /* ì‚¬ë§ ë¡œì§ */ }
 }

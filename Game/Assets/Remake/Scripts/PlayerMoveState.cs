@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,13 +9,13 @@ public class PlayerMoveState : PlayerState
 
     public override void HandleInput()
     {
-        // ÀÔ·ÂÀÌ ¾øÀ¸¸é IdleState·Î º¯°æ
+        // ì…ë ¥ì´ ì—†ìœ¼ë©´ IdleStateë¡œ ë³€ê²½
         float xInput = Input.GetAxisRaw("Horizontal");
         if (xInput == 0)
         {
             stateMachine.ChangeState(player.IdleState);
         }
-        if (Input.GetKeyDown(KeyCode.Z)) // ¶Ç´Â ¿øÇÏ´Â °ø°İ Å°
+        if (Input.GetKeyDown(KeyCode.Z)) // ë˜ëŠ” ì›í•˜ëŠ” ê³µê²© í‚¤
         {
             stateMachine.ChangeState(player.AttackState);
         }
@@ -26,7 +26,7 @@ public class PlayerMoveState : PlayerState
         base.PhysicsUpdate();
 
         float xInput = Input.GetAxisRaw("Horizontal");
-        // ºÎµå·¯¿î ÀÌµ¿ Ã³¸®¸¦ À§ÇØ PlayerControllerÀÇ ÇÔ¼ö È£Ãâ
+        // ë¶€ë“œëŸ¬ìš´ ì´ë™ ì²˜ë¦¬ë¥¼ ìœ„í•´ PlayerControllerì˜ í•¨ìˆ˜ í˜¸ì¶œ
         player.SetVelocity(xInput * player.moveSpeed, player.Rb.velocity.y);
         player.CheckFlip(xInput);
     }

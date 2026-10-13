@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,18 +6,18 @@ public class StateMachine
 {
     public IState CurrentState { get; private set; }
 
-    // Ã³À½ ½ÃÀÛÇÒ »óÅÂ ¼³Á¤ (¿¹: IdleState)
+    // ì²˜ìŒ ì‹œì‘í•  ìƒíƒœ ì„¤ì • (ì˜ˆ: IdleState)
     public void Initialize(IState startingState)
     {
         CurrentState = startingState;
         CurrentState.Enter();
     }
 
-    // »óÅÂ º¯°æ (¿¹: Idle -> Move)
+    // ìƒíƒœ ë³€ê²½ (ì˜ˆ: Idle -> Move)
     public void ChangeState(IState newState)
     {
-        CurrentState.Exit(); // ÀÌÀü »óÅÂ Á¾·á
+        CurrentState.Exit(); // ì´ì „ ìƒíƒœ ì¢…ë£Œ
         CurrentState = newState;
-        CurrentState.Enter(); // »õ »óÅÂ ½ÃÀÛ
+        CurrentState.Enter(); // ìƒˆ ìƒíƒœ ì‹œì‘
     }
 }

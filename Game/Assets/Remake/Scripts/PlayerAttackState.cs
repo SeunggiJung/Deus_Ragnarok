@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,13 +10,15 @@ public class PlayerAttackState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        // °ø°Ý ½ÃÀÛ ½Ã ¼Óµµ¸¦ 0À¸·Î ¸¸µé¾î Á¦ÀÚ¸®¿¡¼­ °ø°ÝÇÏ°Ô ÇÔ
+        // ê³µê²© ì‹œìž‘ ì‹œ ì†ë„ë¥¼ 0ìœ¼ë¡œ ë§Œë“¤ì–´ ì œìžë¦¬ì—ì„œ ê³µê²©í•˜ê²Œ í•¨
         player.SetVelocity(0, player.Rb.velocity.y);
     }
 
     public override void Update()
     {
         base.Update();
+
+        // ì• ë‹ˆë©”ì´ì…˜ì˜ ìž¬ìƒë¥ ì´ 100%ê°€ ëœë‹¤ë©´ Idle ìƒíƒœë¡œ ì „í™˜
         if (player.Anim.GetCurrentAnimatorStateInfo(0).normalizedTime >= 1.0f)
         {
             stateMachine.ChangeState(player.IdleState);

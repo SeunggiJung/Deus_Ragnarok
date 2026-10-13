@@ -1,12 +1,12 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public interface IState
 {
-    void Enter();       // »óÅÂ ÁøÀÔ ½Ã (¾Ö´Ï¸ŞÀÌ¼Ç Àç»ı µî)
-    void HandleInput(); // ÀÔ·Â Ã¼Å©
-    void Update();      // ·ÎÁ÷ ¾÷µ¥ÀÌÆ®
-    void PhysicsUpdate(); // ¹°¸® ¿¬»ê (FixedUpdate ´ë¿ë)
-    void Exit();        // »óÅÂ Å»Ãâ ½Ã
+    void Enter();       // ìƒíƒœ ì§„ì… ì‹œ (ì• ë‹ˆë©”ì´ì…˜ ì¬ìƒ ë“±)
+    void HandleInput(); // ì…ë ¥ ì²´í¬
+    void Update();      // ë¡œì§ ì—…ë°ì´íŠ¸
+    void PhysicsUpdate(); // ë¬¼ë¦¬ ì—°ì‚° (FixedUpdate ëŒ€ìš©)
+    void Exit();        // ìƒíƒœ íƒˆì¶œ ì‹œ
 }

@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,7 +13,7 @@ public class PlayerIdleState : PlayerState
         {
             stateMachine.ChangeState(player.MoveState);
         }
-        if (Input.GetKeyDown(KeyCode.Z)) // ¶Ç´Â ¿øÇÏ´Â °ø°İ Å°
+        if (Input.GetKeyDown(KeyCode.Z)) // ë˜ëŠ” ì›í•˜ëŠ” ê³µê²© í‚¤
         {
             stateMachine.ChangeState(player.AttackState);
         }

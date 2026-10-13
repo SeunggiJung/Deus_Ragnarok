@@ -1,9 +1,9 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-// ¸ğµç Ä³¸¯ÅÍ(ÇÃ·¹ÀÌ¾î, ¸ó½ºÅÍ, º¸½º)ÀÇ °øÅë Á¶»ó
+// ëª¨ë“  ìºë¦­í„°(í”Œë ˆì´ì–´, ëª¬ìŠ¤í„°, ë³´ìŠ¤)ì˜ ê³µí†µ ì¡°ìƒ
 public abstract class BaseCharacter : MonoBehaviour, IDamageable
 {
     [Header("Stats")]
@@ -16,13 +16,13 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     protected SpriteRenderer spriteRenderer;
 
     [Header("Attack Info")]
-    public Transform attackCheck;      // ÆÇÁ¤ Áß½ÉÁ¡ (Ä³¸¯ÅÍ ¾ÕÂÊ ºó ¿ÀºêÁ§Æ®)
-    public float attackCheckRadius;    // ÆÇÁ¤ ¹üÀ§ ¹İÁö¸§
-    public LayerMask whatIsEnemy;      // °ø°İ ´ë»ó ·¹ÀÌ¾î (Monster ¶Ç´Â Player)
+    public Transform attackCheck;      // íŒì • ì¤‘ì‹¬ì  (ìºë¦­í„° ì•ìª½ ë¹ˆ ì˜¤ë¸Œì íŠ¸)
+    public float attackCheckRadius;    // íŒì • ë²”ìœ„ ë°˜ì§€ë¦„
+    public LayerMask whatIsEnemy;      // ê³µê²© ëŒ€ìƒ ë ˆì´ì–´ (Monster ë˜ëŠ” Player)
 
     protected virtual void Awake()
     {
-        // °øÅë ÄÄÆ÷³ÍÆ® ÃÊ±âÈ­
+        // ê³µí†µ ì»´í¬ë„ŒíŠ¸ ì´ˆê¸°í™”
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
         spriteRenderer = GetComponent<SpriteRenderer>();
@@ -35,36 +35,36 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         currentHp -= damage;
         Debug.Log($"{gameObject.name} took {damage} damage. HP: {currentHp}");
 
-        // ³Ë¹é ·ÎÁ÷ (¹°¸®)
+        // ë„‰ë°± ë¡œì§ (ë¬¼ë¦¬)
         rb.AddForce(knockbackForce, ForceMode2D.Impulse);
 
         if (currentHp <= 0) Die();
     }
-    // ¾Ö´Ï¸ŞÀÌ¼Ç ÀÌº¥Æ®¿¡¼­ È£ÃâÇÒ ÇÔ¼ö
+    // ì• ë‹ˆë©”ì´ì…˜ ì´ë²¤íŠ¸ì—ì„œ í˜¸ì¶œí•  í•¨ìˆ˜
     public virtual void AnimationTrigger()
     {
-        // ÁÖº¯ÀÇ IDamageableÀ» °¡Áø ¿ÀºêÁ§Æ®µéÀ» Å½»ö
+        // ì£¼ë³€ì˜ IDamageableì„ ê°€ì§„ ì˜¤ë¸Œì íŠ¸ë“¤ì„ íƒìƒ‰
         Collider2D[] colliders = Physics2D.OverlapCircleAll(attackCheck.position, attackCheckRadius, whatIsEnemy);
 
         foreach (var hit in colliders)
         {
-            // »ó´ë¹æÀÌ IDamageableÀ» °¡Áö°í ÀÖ´ÂÁö È®ÀÎ (ÀÎÅÍÆäÀÌ½ºÀÇ Èû!)
+            // ìƒëŒ€ë°©ì´ IDamageableì„ ê°€ì§€ê³  ìˆëŠ”ì§€ í™•ì¸ (ì¸í„°í˜ì´ìŠ¤ì˜ í˜!)
             IDamageable damageable = hit.GetComponent<IDamageable>();
 
             if (damageable != null)
             {
-                // µ¥¹ÌÁö Àü´Ş (°ø°İ ¹æÇâ¿¡ µû¸¥ ³Ë¹é Æ÷ÇÔ)
+                // ë°ë¯¸ì§€ ì „ë‹¬ (ê³µê²© ë°©í–¥ì— ë”°ë¥¸ ë„‰ë°± í¬í•¨)
                 Vector2 knockback = new Vector2(transform.localScale.x * 2f, 1f);
                 damageable.TakeDamage(10f, knockback);
             }
         }
     }
 
-    // ¿¡µğÅÍ ºä¿¡¼­ ÆÇÁ¤ ¹üÀ§¸¦ ½Ã°¢ÀûÀ¸·Î È®ÀÎÇÏ±â À§ÇÔ
+    // ì—ë””í„° ë·°ì—ì„œ íŒì • ë²”ìœ„ë¥¼ ì‹œê°ì ìœ¼ë¡œ í™•ì¸í•˜ê¸° ìœ„í•¨
     protected virtual void OnDrawGizmos()
     {
         if (attackCheck != null)
             Gizmos.DrawWireSphere(attackCheck.position, attackCheckRadius);
     }
-    protected abstract void Die(); // Á×´Â µ¿ÀÛÀº ÀÚ½Ä Å¬·¡½º¿¡¼­ Á¤ÀÇ
+    protected abstract void Die(); // ì£½ëŠ” ë™ì‘ì€ ìì‹ í´ë˜ìŠ¤ì—ì„œ ì •ì˜
 }

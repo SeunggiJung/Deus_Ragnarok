@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,7 +6,7 @@ public class PlayerState : IState
 {
     protected PlayerController player;
     protected StateMachine stateMachine;
-    protected string animBoolName; // ¾Ö´Ï¸ŞÀÌÅÍÀÇ ÆÄ¶ó¹ÌÅÍ ÀÌ¸§
+    protected string animBoolName; // ì• ë‹ˆë©”ì´í„°ì˜ íŒŒë¼ë¯¸í„° ì´ë¦„
 
     public PlayerState(PlayerController player, StateMachine stateMachine, string animBoolName)
     {
