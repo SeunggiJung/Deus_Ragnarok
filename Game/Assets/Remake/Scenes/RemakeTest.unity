@@ -153,11 +153,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
+  progression: {fileID: 0}
   barSize: {x: 260, y: 22}
   margin: {x: 20, y: 20}
   spacing: 6
   hpColor: {r: 0.85, g: 0.2, b: 0.2, a: 1}
   staminaColor: {r: 0.95, g: 0.75, b: 0.2, a: 1}
+  expColor: {r: 0.3, g: 0.6, b: 1, a: 1}
 --- !u!4 &49962885
 Transform:
   m_ObjectHideFlags: 0
@@ -188,9 +190,9 @@ MonoBehaviour:
   player: {fileID: 0}
   threshold: 0.2
   color: {r: 0.8, g: 0, b: 0, a: 1}
-  innerRadius: 0.55
+  innerRadius: 0.7
   minAlpha: 0.25
-  maxAlpha: 0.75
+  maxAlpha: 0.6
   pulseSpeed: 1.5
   fadeSpeed: 3
 --- !u!1 &173049581
@@ -3220,6 +3222,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 887058956}
+    - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 887058958}
     - targetCorrespondingSourceObject: {fileID: 6767065318607765198, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 414876453}
@@ -8104,12 +8109,24 @@ MonoBehaviour:
     jumpKey: 32
     dodgeKey: 304
     attackMouseButton: 0
-  moveSpeed: 3
+  moveSpeed: 3.5
   jumpHeight: 1.4
   whatIsGround:
     serializedVersion: 2
     m_Bits: 256
   groundCheckDistance: 0.05
+--- !u!114 &887058958
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231353589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8362d2f2db977384e9bc4d8f9ed82fff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &943553818
 GameObject:
   m_ObjectHideFlags: 0

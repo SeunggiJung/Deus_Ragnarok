@@ -26,4 +26,10 @@ MonoBehaviour:
   dodgeDistance: 3
   dodgeDuration: 0.35
   dodgeInvincibleTime: 0.3
+  baseExpToNext: 50
+  expGrowth: 1.5
+  pointsPerLevel: 1
+  hpPerPoint: 10
+  attackPerPoint: 2
+  staminaPerPoint: 10
   hitStunTime: 0.3

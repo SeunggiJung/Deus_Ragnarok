@@ -11,6 +11,9 @@ public class EnemyStats : CharacterStats
     public float attackRange = 2f;      // 이 거리 안이면 공격 시도 (수평 거리 기준)
     public float attackCooldown = 1.5f;
 
+    [Header("Reward")]
+    public float expReward = 50f;       // 처치 시 플레이어가 얻는 경험치
+
     [Header("Hit / Death")]
     public float hitStunTime = 0.2f;    // 공격 중이 아닐 때 피격 경직 시간 (공격 중에는 경직 없음)
     public float deathDelay = 1.5f;     // 사망 애니메이션 후 오브젝트 제거까지 시간

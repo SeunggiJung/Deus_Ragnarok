@@ -14,9 +14,9 @@ public class LowHealthVignette : MonoBehaviour
     [Header("Look")]
     [SerializeField] private Color color = new Color(0.8f, 0f, 0f, 1f);
     [Range(0f, 1f)]
-    [SerializeField] private float innerRadius = 0.55f;   // 이 안쪽은 투명 (0 : 중앙, 1 : 가장자리)
+    [SerializeField] private float innerRadius = 0.7f;    // 이 안쪽은 투명 (0 : 중앙, 1 : 가장자리)
     [SerializeField] private float minAlpha = 0.25f;      // 맥동 최저 투명도
-    [SerializeField] private float maxAlpha = 0.75f;      // 맥동 최고 투명도
+    [SerializeField] private float maxAlpha = 0.6f;       // 맥동 최고 투명도
     [SerializeField] private float pulseSpeed = 1.5f;     // 초당 맥동 횟수 (체력이 낮을수록 최대 2배까지 빨라짐)
     [SerializeField] private float fadeSpeed = 3f;        // 켜지고 꺼질 때의 전환 속도
 

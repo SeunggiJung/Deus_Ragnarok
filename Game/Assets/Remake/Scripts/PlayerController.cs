@@ -47,6 +47,8 @@ public class PlayerController : BaseCharacter
 
     // 스태미너 (UI 등 외부에서 구독 : 현재값, 최대값)
     public float CurrentStamina { get; private set; }
+    private float bonusMaxStamina;
+    public float MaxStamina => Stats.maxStamina + bonusMaxStamina;
     public event Action<float, float> OnStaminaChanged;
     private float lastStaminaUseTime;
 
@@ -57,7 +59,7 @@ public class PlayerController : BaseCharacter
         if (whatIsGround.value == 0)
             whatIsGround = LayerMask.GetMask("Ground");
 
-        CurrentStamina = Stats.maxStamina;
+        CurrentStamina = MaxStamina;
 
         StateMachine = new StateMachine();
         // 상태 객체 생성 (Jump와 Fall은 같은 애니메이션을 공유)
@@ -130,11 +132,11 @@ public class PlayerController : BaseCharacter
     {
         if (StateMachine.CurrentState == JumpAttackState)
         {
-            float damage = stats.attackDamage * Stats.criticalMultiplier;
+            float damage = AttackDamage * Stats.criticalMultiplier;
             Debug.Log($"크리티컬! (점프 공격 x{Stats.criticalMultiplier}) 데미지 {damage}");
             return damage;
         }
-        return stats.attackDamage;
+        return AttackDamage;
     }
 
     #region Stamina
@@ -145,17 +147,25 @@ public class PlayerController : BaseCharacter
 
         CurrentStamina -= cost;
         lastStaminaUseTime = Time.time;
-        OnStaminaChanged?.Invoke(CurrentStamina, Stats.maxStamina);
+        OnStaminaChanged?.Invoke(CurrentStamina, MaxStamina);
         return true;
     }
 
     private void RegenStamina()
     {
-        if (IsDead || CurrentStamina >= Stats.maxStamina) return;
+        if (IsDead || CurrentStamina >= MaxStamina) return;
         if (Time.time - lastStaminaUseTime < Stats.staminaRegenDelay) return;
 
-        CurrentStamina = Mathf.Min(Stats.maxStamina, CurrentStamina + Stats.staminaRegen * Time.deltaTime);
-        OnStaminaChanged?.Invoke(CurrentStamina, Stats.maxStamina);
+        CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + Stats.staminaRegen * Time.deltaTime);
+        OnStaminaChanged?.Invoke(CurrentStamina, MaxStamina);
+    }
+
+    // 최대 스태미너 증가 (늘어난 만큼 현재 스태미너도 회복)
+    public void AddMaxStamina(float amount)
+    {
+        bonusMaxStamina += amount;
+        CurrentStamina += amount;
+        OnStaminaChanged?.Invoke(CurrentStamina, MaxStamina);
     }
     #endregion
 

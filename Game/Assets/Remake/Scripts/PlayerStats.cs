@@ -20,6 +20,14 @@ public class PlayerStats : CharacterStats
     public float dodgeDuration = 0.35f;
     public float dodgeInvincibleTime = 0.3f; // 구르기 시작부터 무적이 유지되는 시간
 
+    [Header("Level")]
+    public float baseExpToNext = 50f;   // Lv1 → Lv2에 필요한 경험치
+    public float expGrowth = 1.5f;      // 레벨마다 필요 경험치 배율
+    public int pointsPerLevel = 1;      // 레벨업 시 얻는 스탯 포인트
+    public float hpPerPoint = 10f;
+    public float attackPerPoint = 2f;
+    public float staminaPerPoint = 10f;
+
     [Header("Hit")]
     public float hitStunTime = 0.3f;         // 피격 경직 시간
 }

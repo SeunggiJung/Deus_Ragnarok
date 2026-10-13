@@ -11,7 +11,11 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     [SerializeField] protected CharacterStats stats;
     protected float currentHp;
     public float CurrentHp => currentHp;
-    public float MaxHp => stats.maxHp;
+    // 레벨업 등으로 얻은 추가 수치. Stats 에셋(SO)은 여러 캐릭터가 공유하는 원본이므로 직접 수정하지 않고 여기에 더함
+    protected float bonusMaxHp;
+    protected float bonusAttack;
+    public float MaxHp => stats.maxHp + bonusMaxHp;
+    public float AttackDamage => stats.attackDamage + bonusAttack;
     public bool IsDead { get; private set; }
 
     // 피격 후 무적(hitInvincible)과 구르기 등 상태에 의한 무적(ForceInvincible)을 분리해
@@ -60,7 +64,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
             stats = CreateDefaultStats();
         }
 
-        currentHp = stats.maxHp;
+        currentHp = MaxHp;
     }
 
     // 자식 클래스가 PlayerStats / EnemyStats 등 자신에게 맞는 타입을 요구할 수 있도록
@@ -74,7 +78,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
 
         currentHp = Mathf.Max(0f, currentHp - damage);
         Debug.Log($"{gameObject.name} took {damage} damage. HP: {currentHp}");
-        OnHpChanged?.Invoke(currentHp, stats.maxHp);
+        OnHpChanged?.Invoke(currentHp, MaxHp);
 
         if (currentHp <= 0)
         {
@@ -139,7 +143,20 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     }
 
     // 현재 공격의 데미지 (크리티컬 등 상황별 배율은 자식 클래스에서)
-    protected virtual float GetAttackDamage() => stats.attackDamage;
+    protected virtual float GetAttackDamage() => AttackDamage;
+
+    // 최대 체력 증가 (늘어난 만큼 현재 체력도 회복)
+    public void AddMaxHp(float amount)
+    {
+        bonusMaxHp += amount;
+        currentHp += amount;
+        OnHpChanged?.Invoke(currentHp, MaxHp);
+    }
+
+    public void AddAttack(float amount)
+    {
+        bonusAttack += amount;
+    }
 
     // 애니메이션 이벤트에서 호출할 함수
     public virtual void AnimationTrigger()

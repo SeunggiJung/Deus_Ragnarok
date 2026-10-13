@@ -21,5 +21,6 @@ MonoBehaviour:
   loseRange: 9
   attackRange: 2
   attackCooldown: 1.5
+  expReward: 50
   hitStunTime: 0.2
   deathDelay: 1.5

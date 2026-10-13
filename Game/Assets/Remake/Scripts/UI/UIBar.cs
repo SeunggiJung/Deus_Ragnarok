@@ -9,6 +9,12 @@ public class UIBar : MonoBehaviour
     [SerializeField] private Text label;
     [SerializeField] private string labelPrefix;
 
+    // 라벨 앞 문구 변경 (예 : 경험치 바의 "LV 3 EXP")
+    public void SetPrefix(string prefix)
+    {
+        labelPrefix = prefix;
+    }
+
     public void Set(float current, float max)
     {
         float ratio = max > 0f ? Mathf.Clamp01(current / max) : 0f;
@@ -29,7 +35,9 @@ public class UIBar : MonoBehaviour
         rootRect.pivot = new Vector2(0f, 1f);
         rootRect.anchoredPosition = anchoredPos;
         rootRect.sizeDelta = size;
-        root.GetComponent<Image>().color = new Color(0f, 0f, 0f, 0.6f);
+        var rootImage = root.GetComponent<Image>();
+        rootImage.color = new Color(0f, 0f, 0f, 0.6f);
+        rootImage.raycastTarget = false; // 게이지 위를 클릭해도 공격 입력이 막히지 않도록
 
         var fillGo = new GameObject("Fill", typeof(RectTransform), typeof(Image));
         var fillRect = fillGo.GetComponent<RectTransform>();
@@ -38,24 +46,34 @@ public class UIBar : MonoBehaviour
         fillRect.anchorMax = Vector2.one;
         fillRect.offsetMin = new Vector2(2f, 2f);
         fillRect.offsetMax = new Vector2(-2f, -2f);
-        fillGo.GetComponent<Image>().color = fillColor;
+        var fillImage = fillGo.GetComponent<Image>();
+        fillImage.color = fillColor;
+        fillImage.raycastTarget = false;
 
-        var labelGo = new GameObject("Label", typeof(RectTransform), typeof(Text));
-        var labelRect = labelGo.GetComponent<RectTransform>();
-        labelRect.SetParent(rootRect, false);
-        labelRect.anchorMin = Vector2.zero;
-        labelRect.anchorMax = Vector2.one;
-        labelRect.offsetMin = labelRect.offsetMax = Vector2.zero;
-        var text = labelGo.GetComponent<Text>();
-        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        text.fontSize = 14;
-        text.alignment = TextAnchor.MiddleCenter;
-        text.color = Color.white;
+        Text text = CreateText(rootRect, "Label", 14);
 
         var bar = root.AddComponent<UIBar>();
         bar.fill = fillRect;
         bar.label = text;
         bar.labelPrefix = labelPrefix;
         return bar;
+    }
+
+    // 부모 영역을 꽉 채우는 가운데 정렬 텍스트 생성 (HUD 공용)
+    public static Text CreateText(RectTransform parent, string name, int fontSize)
+    {
+        var go = new GameObject(name, typeof(RectTransform), typeof(Text));
+        var rect = go.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+        rect.anchorMin = Vector2.zero;
+        rect.anchorMax = Vector2.one;
+        rect.offsetMin = rect.offsetMax = Vector2.zero;
+        var text = go.GetComponent<Text>();
+        text.font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        text.fontSize = fontSize;
+        text.alignment = TextAnchor.MiddleCenter;
+        text.color = Color.white;
+        text.raycastTarget = false;
+        return text;
     }
 }
