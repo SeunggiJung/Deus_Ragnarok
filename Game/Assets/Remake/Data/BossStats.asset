@@ -1,0 +1,65 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 162d493a732773248b6d3d43687fc391, type: 3}
+  m_Name: BossStats
+  m_EditorClassIdentifier: 
+  maxHp: 400
+  invincibleTime: 0.15
+  attackDamage: 15
+  attackRadius: 1.8
+  bossName: Reinforced Golem
+  expReward: 200
+  moveSpeed: 2.2
+  detectRange: 10
+  meleeRange: 3
+  meleeCooldown: 1.2
+  slamRange: 4
+  slamCooldown: 6
+  slamDamage: 20
+  slamArea: {x: 8, y: 3}
+  slamHitTime: 0.5
+  chargeMinRange: 5
+  chargeMaxRange: 12
+  chargeCooldown: 7
+  chargeTelegraph: 0.6
+  chargeSpeed: 11
+  chargeDistance: 10
+  chargeDamage: 18
+  chargeTelegraphTint: {r: 1, g: 0.6, b: 0.2, a: 1}
+  throwMinRange: 5
+  throwMaxRange: 14
+  throwCooldown: 4
+  throwDamage: 12
+  throwSpeed: 9
+  throwLifetime: 2
+  throwRadius: 0.35
+  throwReleaseTime: 0.55
+  phase2SpreadAngle: 12
+  projectileSprite: {fileID: 4829263394173993237, guid: 17d4906971d6bda4e933ec3e391815ea, type: 3}
+  projectileColor: {r: 1, g: 1, b: 1, a: 1}
+  guardHitCount: 3
+  guardWindow: 2
+  guardDuration: 1.5
+  guardDamageMultiplier: 0.2
+  guardCooldown: 10
+  guardTint: {r: 0.6, g: 0.8, b: 1, a: 1}
+  maxPoise: 80
+  poiseRegenDelay: 3
+  staggerTime: 1.5
+  staggerTint: {r: 0.6, g: 0.6, b: 0.6, a: 1}
+  phase2Threshold: 0.5
+  roarTime: 1.3
+  phase2CooldownMultiplier: 0.7
+  phase2MoveMultiplier: 1.3
+  phase2AnimSpeed: 1.2
+  roarTint: {r: 1, g: 0.3, b: 0.3, a: 1}
+  phase2Tint: {r: 1, g: 0.8, b: 0.8, a: 1}

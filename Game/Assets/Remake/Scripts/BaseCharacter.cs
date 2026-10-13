@@ -42,6 +42,8 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     [SerializeField] private float blinkInterval = 0.08f;
 
     private Color[] originalColors;
+    // 상태 연출용 색 (보스 돌진 예고, 방어 자세 등). 피격 플래시가 끝나면 이 색으로 복귀
+    private Color tint = Color.white;
 
     protected virtual void Awake()
     {
@@ -130,8 +132,8 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     {
         for (int i = 0; i < spriteRenderers.Length; i++)
         {
-            Color c = originalColors[i];
-            c.a = originalColors[i].a * alpha;
+            Color c = originalColors[i] * tint;
+            c.a *= alpha;
             spriteRenderers[i].color = c;
         }
     }
@@ -139,11 +141,19 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     private void RestoreSpriteColor()
     {
         for (int i = 0; i < spriteRenderers.Length; i++)
-            spriteRenderers[i].color = originalColors[i];
+            spriteRenderers[i].color = originalColors[i] * tint;
     }
 
     // 현재 공격의 데미지 (크리티컬 등 상황별 배율은 자식 클래스에서)
     protected virtual float GetAttackDamage() => AttackDamage;
+
+    // 상태 연출용 색 지정 (피격 플래시 중이면 플래시가 끝난 뒤 적용됨)
+    public void SetTint(Color color)
+    {
+        tint = color;
+        if (!hitInvincible)
+            RestoreSpriteColor();
+    }
 
     // 오브젝트 풀에서 재사용할 때 상태 초기화 (체력, 사망/무적 상태, 피격 연출)
     protected virtual void ResetCharacter()
@@ -152,6 +162,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         IsDead = false;
         hitInvincible = false;
         ForceInvincible = false;
+        tint = Color.white;
         RestoreSpriteColor();
         currentHp = MaxHp;
         OnHpChanged?.Invoke(currentHp, MaxHp);

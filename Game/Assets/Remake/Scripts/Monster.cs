@@ -8,9 +8,6 @@ public class Monster : BaseCharacter
 {
     public StateMachine StateMachine { get; private set; }
 
-    // 몬스터가 죽으면 알림 (경험치 지급 등). 몬스터는 누가 듣는지 모름
-    public static event Action<Monster> OnKilled;
-
     public EnemyIdleState IdleState { get; private set; }
     public EnemyChaseState ChaseState { get; private set; }
     public EnemyAttackState AttackState { get; private set; }
@@ -177,7 +174,7 @@ public class Monster : BaseCharacter
     protected override void Die()
     {
         StateMachine.ChangeState(DeadState);
-        OnKilled?.Invoke(this);
+        CombatEvents.RaiseEnemyKilled(this, Stats.expReward); // 몬스터는 누가 경험치를 받는지 모름
     }
 
     protected override void OnDrawGizmos()

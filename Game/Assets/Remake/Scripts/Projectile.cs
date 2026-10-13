@@ -49,12 +49,14 @@ public class Projectile : MonoBehaviour
 
         spriteRenderer.sprite = sprite != null ? sprite : GetOrbSprite();
         spriteRenderer.color = color;
-        spriteRenderer.flipX = direction.x < 0f;
-        // 스프라이트 크기를 반지름에 맞춤 (기본 구체 스프라이트는 1유닛 지름)
+        // 진행 방향으로 회전 (오른쪽을 향한 스프라이트 기준, 조준 발사도 자연스럽게 보이도록)
+        transform.rotation = Quaternion.FromToRotation(Vector3.right, direction);
+        // 스프라이트 높이를 지름에 맞추고 비율 유지 (길쭉한 에너지탄도 찌그러지지 않도록)
         float diameter = radius * 2f;
         Vector2 spriteSize = spriteRenderer.sprite.bounds.size;
-        transform.localScale = new Vector3(diameter / spriteSize.x, diameter / spriteSize.y, 1f);
-        circle.radius = spriteSize.x * 0.5f;
+        float scale = diameter / spriteSize.y;
+        transform.localScale = new Vector3(scale, scale, 1f);
+        circle.radius = spriteSize.y * 0.5f;
     }
 
     private void FixedUpdate()

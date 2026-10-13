@@ -6,8 +6,11 @@ public class PlayerStats : CharacterStats
 {
     [Header("Stamina")]
     public float maxStamina = 70f;
-    public float staminaRegen = 10f;        // 초당 회복량
+    public float staminaRegen = 10f;        // 초당 기본 회복량
     public float staminaRegenDelay = 0.7f;  // 마지막 소모 후 회복 시작까지 대기 시간
+    public float staminaFastRegenTime = 1.5f;   // 마지막 소모 후 이 시간이 지나면 빠른 회복
+    public float staminaRegenMultiplier = 1.5f; // 대기 시간 ~ staminaFastRegenTime 구간 배율
+    public float staminaFastRegenMultiplier = 3f; // staminaFastRegenTime 이후 배율
     public float attackCost = 6f;
     public float jumpCost = 3f;
     public float dodgeCost = 15f;

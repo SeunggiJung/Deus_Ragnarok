@@ -19,6 +19,9 @@ MonoBehaviour:
   maxStamina: 70
   staminaRegen: 10
   staminaRegenDelay: 0.7
+  staminaFastRegenTime: 1.5
+  staminaRegenMultiplier: 1.5
+  staminaFastRegenMultiplier: 3
   attackCost: 6
   jumpCost: 3
   dodgeCost: 15

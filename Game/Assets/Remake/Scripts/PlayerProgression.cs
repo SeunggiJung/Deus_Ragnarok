@@ -3,7 +3,7 @@ using UnityEngine;
 
 public enum StatType { Hp, Attack, Stamina }
 
-// 경험치 / 레벨 / 스탯 포인트. 몬스터 처치 이벤트(Monster.OnKilled)를 구독해 경험치를 얻고,
+// 경험치 / 레벨 / 스탯 포인트. 적 처치 이벤트(CombatEvents.OnEnemyKilled)를 구독해 경험치를 얻고,
 // 레벨업 시 받은 포인트를 체력 / 공격력 / 스태미너 중 원하는 곳에 투자
 [RequireComponent(typeof(PlayerController))]
 public class PlayerProgression : MonoBehaviour
@@ -29,18 +29,18 @@ public class PlayerProgression : MonoBehaviour
 
     private void OnEnable()
     {
-        Monster.OnKilled += HandleMonsterKilled;
+        CombatEvents.OnEnemyKilled += HandleEnemyKilled;
     }
 
     private void OnDisable()
     {
-        Monster.OnKilled -= HandleMonsterKilled;
+        CombatEvents.OnEnemyKilled -= HandleEnemyKilled;
     }
 
-    private void HandleMonsterKilled(Monster monster)
+    private void HandleEnemyKilled(BaseCharacter enemy, float expReward)
     {
         if (player.IsDead) return;
-        AddExp(monster.Stats.expReward);
+        AddExp(expReward);
     }
 
     public void AddExp(float amount)

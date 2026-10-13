@@ -156,9 +156,15 @@ public class PlayerController : BaseCharacter
     private void RegenStamina()
     {
         if (IsDead || CurrentStamina >= MaxStamina) return;
-        if (Time.time - lastStaminaUseTime < Stats.staminaRegenDelay) return;
+        float sinceLastUse = Time.time - lastStaminaUseTime;
+        if (sinceLastUse < Stats.staminaRegenDelay) return;
 
-        CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + Stats.staminaRegen * Time.deltaTime);
+        // 쉬는 시간이 길어질수록 빠르게 회복 (원작 Sword_Man의 단계별 회복 방식 계승)
+        float multiplier = sinceLastUse < Stats.staminaFastRegenTime
+            ? Stats.staminaRegenMultiplier
+            : Stats.staminaFastRegenMultiplier;
+
+        CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + Stats.staminaRegen * multiplier * Time.deltaTime);
         OnStaminaChanged?.Invoke(CurrentStamina, MaxStamina);
     }
 
