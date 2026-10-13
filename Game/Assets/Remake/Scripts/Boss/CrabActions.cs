@@ -501,3 +501,100 @@ public class LeapSlamAction : BossAction
         boss.Anim.ResetTrigger(BossController.AnimParams.Ability);
     }
 }
+
+// 기 모아 강타. 기를 모으는 동안(파랑 별 + 수축 링) 보스는 무방비 → 링이 몸에 닿기 직전 30% 구간(카운터 창)에
+// 플레이어가 점프 공격을 맞추면 패턴이 끊기고 긴 그로기. 놓치면 앞쪽에 큰 한 방 (구르기 무적으로 회피)
+public class HeavyStrikeAction : BossAction
+{
+    private enum Phase { Charge, Strike, Recover }
+    private const float WindowRatio = 0.3f;   // BossTelegraph가 임박 점멸을 시작하는 시점(70%)과 맞춤
+
+    private Phase phase;
+    private float phaseStart;
+    private float dir;
+    private bool struck;
+    private bool windowOpened;
+
+    private CrabBossStats CS => (CrabBossStats)S;
+
+    public HeavyStrikeAction(BossController boss) : base(boss) { }
+
+    protected override void OnStart()
+    {
+        boss.StopMoving();
+        boss.FaceTarget();
+        dir = boss.FacingDir;
+        struck = false;
+        windowOpened = false;
+
+        boss.PlayAction(BossController.AnimParams.Ability);   // 집게를 치켜드는 모션
+        boss.Telegraph.Show(TelegraphKind.Heavy, CS.heavyChargeTime);
+        Enter(Phase.Charge);
+    }
+
+    protected override NodeState OnUpdate()
+    {
+        float elapsed = Time.time - phaseStart;
+
+        switch (phase)
+        {
+            case Phase.Charge:
+                if (!windowOpened && elapsed >= CS.heavyChargeTime * (1f - WindowRatio))
+                {
+                    windowOpened = true;
+                    boss.CounterWindowOpen = true;
+                    // 카운터 창이 열렸다는 신호
+                    Bounds b = boss.Body.bounds;
+                    Fx.Ring(b.center, new Color(0.6f, 0.7f, 1f, 0.9f), b.size.x * 2f, b.size.x * 0.8f, 0.25f, 1f);
+                }
+                if (elapsed >= CS.heavyChargeTime)
+                {
+                    boss.CounterWindowOpen = false;
+                    boss.Telegraph.Hide();
+                    boss.HitEventHandler = Strike;
+                    boss.PlayAction(BossController.AnimParams.Melee);
+                    Enter(Phase.Strike);
+                }
+                return NodeState.Running;
+
+            case Phase.Strike:
+                // 공격 애니메이션 Hit 이벤트에서 판정. 이벤트가 없어도 갇히지 않도록 제한 시간
+                if (struck || elapsed > 1.2f) Enter(Phase.Recover);
+                return NodeState.Running;
+
+            default: // Recover
+                return elapsed >= CS.heavyRecovery ? NodeState.Success : NodeState.Running;
+        }
+    }
+
+    private void Enter(Phase next)
+    {
+        phase = next;
+        phaseStart = Time.time;
+    }
+
+    private void Strike()
+    {
+        if (struck) return;
+        struck = true;
+
+        Bounds b = boss.Body.bounds;
+        Vector2 center = new Vector2(b.center.x + dir * (b.extents.x + CS.heavyArea.x * 0.35f), b.center.y);
+        boss.DamageArea(center, CS.heavyArea, CS.heavyDamage);
+
+        Vector2 feet = new Vector2(b.center.x + dir * (b.extents.x + 1f), b.min.y);
+        Fx.Ring(feet, new Color(0.7f, 0.8f, 1f, 0.95f), 1.5f, 6f, 0.35f);
+        Fx.Burst(feet, new Vector2(dir, 0.6f), 90f, new Color(0.6f, 0.7f, 1f), 18, 5f, 11f, 0.12f, 0.3f, 0.6f, 1.5f);
+        Fx.Burst(feet, Vector2.up, 150f, new Color(0.75f, 0.65f, 0.5f, 0.7f), 12, 1.5f, 4f, 0.5f, 0.9f, 0.7f, 0f, hard: false);
+    }
+
+    protected override void OnStop()
+    {
+        boss.CounterWindowOpen = false;
+        boss.HitEventHandler = null;
+        boss.Telegraph.Hide();
+        boss.StopMoving();
+        boss.Anim.ResetTrigger(BossController.AnimParams.Ability);
+        boss.Anim.ResetTrigger(BossController.AnimParams.Melee);
+    }
+}

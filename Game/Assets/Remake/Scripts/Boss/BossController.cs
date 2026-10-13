@@ -49,6 +49,13 @@ public class BossController : BaseCharacter
     public bool IsGuarding { get; set; }
     public bool IsStaggered => Time.time < staggerEndTime;
 
+    // 카운터 : 이 창이 열려 있는 동안 플레이어의 점프 공격에 맞으면 긴 그로기 (기 모으는 패턴의 타이밍 보상)
+    public bool CounterWindowOpen { get; set; }
+    public event Action OnCountered;
+    protected virtual float CounterStaggerTime => Stats.staggerTime * 2f;
+    private bool PlayerIsJumpAttacking =>
+        Target is PlayerController p && p.StateMachine.CurrentState == p.JumpAttackState;
+
     // UI 등 외부 구독용
     public event Action OnEngaged;
     public event Action OnPhase2;
@@ -218,7 +225,30 @@ public class BossController : BaseCharacter
     {
         if (IsGuarding) damage *= Stats.guardDamageMultiplier;
         pendingDamage = damage;
+
+        bool counter = CounterWindowOpen && !IsDead && PlayerIsJumpAttacking;
         base.TakeDamage(damage);
+        if (counter && !IsDead) Counter();
+    }
+
+    // 타이밍 맞춘 점프 공격 : 실행 중인 패턴을 끊고 긴 그로기 + 연출
+    private void Counter()
+    {
+        CounterWindowOpen = false;
+        Stagger(CounterStaggerTime);
+
+        Bounds b = Body.bounds;
+        Fx.Ring(b.center, new Color(1f, 0.95f, 0.5f, 1f), b.size.x * 0.6f, b.size.x * 2.2f, 0.4f, 1f);
+        Fx.Burst(b.center, Vector2.up, 360f, new Color(1f, 0.9f, 0.4f), 26, 5f, 12f, 0.12f, 0.3f, 0.7f, 1f);
+
+        // 그로기 동안 머리 위에서 반짝이는 입자
+        var go = new GameObject("GroggyFx");
+        var follow = go.AddComponent<FxFollow>();
+        follow.Init(transform, new Vector2(0f, b.max.y - transform.position.y + 0.8f), CounterStaggerTime);
+        Fx.Trail(go.transform, new Color(1f, 0.9f, 0.4f, 0.9f), 30f, 0.3f, 0.6f, new Vector2(0f, 1f), hard: true);
+
+        OnCountered?.Invoke();
+        Debug.Log($"[Boss] 카운터! 그로기 {CounterStaggerTime}초");
     }
     private float pendingDamage;
 
@@ -236,18 +266,21 @@ public class BossController : BaseCharacter
     }
 
     // 그로기 : 실행 중인 패턴을 즉시 끊고 staggerTime 동안 무방비
-    private void Stagger()
+    private void Stagger() => Stagger(Stats.staggerTime);
+
+    private void Stagger(float duration)
     {
         tree.Abort();
+        CounterWindowOpen = false;
         poise = Stats.maxPoise;
-        staggerEndTime = Time.time + Stats.staggerTime;
+        staggerEndTime = Time.time + duration;
         wasStaggered = true;
         IsGuarding = false;
         StopMoving();
         anim.speed = AnimSpeed;
         anim.SetTrigger(AnimParams.Hit);
         SetTint(Stats.staggerTint);
-        Debug.Log($"[Boss] 그로기! ({Stats.staggerTime}초)");
+        Debug.Log($"[Boss] 그로기! ({duration}초)");
     }
 
     protected override void Die()

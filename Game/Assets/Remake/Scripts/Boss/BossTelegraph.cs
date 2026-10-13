@@ -1,13 +1,13 @@
 ﻿using UnityEngine;
 
-public enum TelegraphKind { Pound, Grab, Leap, Charge, Guard, Melee, Spikes, Bolt }
+public enum TelegraphKind { Pound, Grab, Leap, Charge, Guard, Melee, Spikes, Bolt, Heavy }
 
 // 보스 패턴 예고 연출. 몸 색 변화는 보스가 붉은 계열이면 구분이 안 되므로,
 // 몸 색과 무관하게 눈에 띄는 별도 신호를 몸 주변에 띄운다.
 //  1) 몸을 감싸며 줄어드는 링 : 링이 몸에 닿는 순간이 공격 타이밍
 //  2) 머리 위 아이콘 : 패턴 종류 (느낌표 = 잡기 / ▼ = 바닥 찍기 / ▲ = 도약 / >> = 돌진 / 방패 = 방어)
 //  3) 패턴 고유 색 : 주황 = 바닥 찍기, 노랑 = 잡기(구르기!), 보라 = 도약, 청록 = 돌진, 하늘 = 방어,
-//     흰색 X = 근접 연타, 연두 ▼ = 지면 가시, 분홍 조준점 = 에너지탄
+//     흰색 X = 근접 연타, 연두 ▼ = 지면 가시, 분홍 조준점 = 에너지탄, 파랑 별 = 기 모아 강타(점프 공격 카운터)
 //  4) 일부 패턴은 기를 모으는 파티클
 // 사용 : boss.Telegraph.Show(kind, 공격까지 남은 시간) → 공격이 시작되면 Hide()
 public class BossTelegraph : MonoBehaviour
@@ -33,6 +33,7 @@ public class BossTelegraph : MonoBehaviour
             case TelegraphKind.Melee: return new Color(1f, 1f, 1f);
             case TelegraphKind.Spikes: return new Color(0.5f, 1f, 0.4f);
             case TelegraphKind.Bolt: return new Color(1f, 0.45f, 0.9f);
+            case TelegraphKind.Heavy: return new Color(0.45f, 0.55f, 1f);
             default: return new Color(0.6f, 0.85f, 1f);
         }
     }
@@ -48,6 +49,7 @@ public class BossTelegraph : MonoBehaviour
             case TelegraphKind.Melee: return Fx.Icon.Cross;
             case TelegraphKind.Spikes: return Fx.Icon.DownArrow;
             case TelegraphKind.Bolt: return Fx.Icon.Target;
+            case TelegraphKind.Heavy: return Fx.Icon.Star;
             default: return Fx.Icon.Shield;
         }
     }
@@ -63,7 +65,7 @@ public class BossTelegraph : MonoBehaviour
         ring = NewRenderer("TelegraphRing", Fx.Ring(), 40);
         icon = NewRenderer("TelegraphIcon", Fx.IconSprite(IconOf(kind)), 41);
 
-        if (kind == TelegraphKind.Leap || kind == TelegraphKind.Pound)
+        if (kind == TelegraphKind.Leap || kind == TelegraphKind.Pound || kind == TelegraphKind.Heavy)
         {
             float radius = BodySize() * 0.9f;
             gather = Fx.Gather(new Color(color.r, color.g, color.b, 0.9f), radius, duration * 0.6f, kind == TelegraphKind.Leap ? 60f : 35f, 0.35f);

@@ -18,6 +18,15 @@ public class CrabBossStats : BossStats
     public Color waveColor = new Color(1f, 0.55f, 0.2f, 0.9f);
     public Color poundTelegraphTint = new Color(1f, 0.4f, 0.4f);
 
+    [Header("Heavy Strike (기 모아 강타) - 타이밍 맞춘 점프 공격으로 카운터")]
+    public float heavyRange = 7f;
+    public float heavyCooldown = 10f;
+    public float heavyChargeTime = 1.6f;        // 기 모으는 시간 (끝 30%가 카운터 창)
+    public float heavyDamage = 40f;
+    public Vector2 heavyArea = new Vector2(4.5f, 3f);
+    public float heavyRecovery = 0.9f;
+    public float counterStaggerTime = 3f;       // 카운터 성공 시 그로기 시간
+
     [Header("Leap Slam (도약 내려찍기)")]
     public float leapMinRange = 2f;
     public float leapMaxRange = 18f;

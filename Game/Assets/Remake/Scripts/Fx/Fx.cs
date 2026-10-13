@@ -6,10 +6,10 @@
 // - Ring : 바닥에 퍼지는 충격 링
 public static class Fx
 {
-    public enum Icon { Exclamation, DownArrow, UpArrow, Chevron, Shield, Cross, Target }
+    public enum Icon { Exclamation, DownArrow, UpArrow, Chevron, Shield, Cross, Target, Star }
 
     private static Sprite circle, ring, square, spike;
-    private static readonly Sprite[] icons = new Sprite[7];
+    private static readonly Sprite[] icons = new Sprite[8];
     private static Material softMaterial, hardMaterial;
 
     #region Sprites
@@ -140,6 +140,12 @@ public static class Fx
             {
                 if (x < 2 || x > 13 || y < 2 || y > 13) return false;
                 return Mathf.Abs(x - y) <= 1.2f || Mathf.Abs(x + y - 15f) <= 1.2f;
+            }
+            case Icon.Star:        // 별 : 기 모아 강타
+            {
+                float dx = Mathf.Abs(x - 7.5f), dy = Mathf.Abs(y - 7.5f);
+                float d = Mathf.Sqrt(dx * dx + dy * dy);
+                return d <= 7f && (dx <= 1.2f || dy <= 1.2f || (Mathf.Abs(dx - dy) <= 1f && d <= 5f));
             }
             case Icon.Target:      // 조준점 : 에너지탄
             {
@@ -336,4 +342,36 @@ public class FxRingPulse : MonoBehaviour
         transform.localScale = new Vector3(width, width * squash, 1f);
         sr.color = new Color(color.r, color.g, color.b, color.a * (1f - t));
     }
+}
+
+// 대상을 따라다니다가 duration 뒤에 사라지는 오브젝트 (그로기 별빛 등)
+public class FxFollow : MonoBehaviour
+{
+    private Transform target;
+    private Vector2 offset;
+    private float endTime;
+
+    public void Init(Transform target, Vector2 offset, float duration)
+    {
+        this.target = target;
+        this.offset = offset;
+        endTime = Time.time + duration;
+        Follow();
+    }
+
+    private void LateUpdate()
+    {
+        if (target == null || Time.time >= endTime)
+        {
+            // 입자가 자연스럽게 사라지도록 방출만 멈추고 잠시 뒤 제거
+            foreach (var ps in GetComponentsInChildren<ParticleSystem>())
+                ps.Stop(true, ParticleSystemStopBehavior.StopEmitting);
+            Destroy(gameObject, 1f);
+            enabled = false;
+            return;
+        }
+        Follow();
+    }
+
+    private void Follow() => transform.position = (Vector2)target.position + offset;
 }

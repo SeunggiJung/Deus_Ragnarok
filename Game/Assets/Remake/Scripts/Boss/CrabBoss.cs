@@ -5,6 +5,8 @@ public class CrabBoss : BossController
 {
     public CrabBossStats CrabStats => (CrabBossStats)Stats;
 
+    protected override float CounterStaggerTime => CrabStats.counterStaggerTime;
+
     protected override BTNode BuildTree() => CrabBossBehaviorTree.Build(this);
     protected override bool IsValidStats(CharacterStats s) => s is CrabBossStats;
     protected override CharacterStats CreateDefaultStats() => ScriptableObject.CreateInstance<CrabBossStats>();
