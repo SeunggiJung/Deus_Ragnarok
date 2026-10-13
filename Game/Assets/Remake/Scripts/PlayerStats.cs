@@ -34,7 +34,8 @@ public class PlayerStats : CharacterStats
     [Header("Potion")]
     public float potionHealAmount = 50f;   // 총 회복량
     public float potionHealDuration = 5f;  // 이 시간에 걸쳐 나눠서 회복
-    public float potionCooldown = 5f;
+    public float potionCooldown = 10f;
+    public float potionHitPauseTime = 1f;  // 피격 시 회복이 멈추는 시간 (남은 회복량은 유지)
 
     [Header("Hit")]
     public float hitStunTime = 0.3f;         // 피격 경직 시간

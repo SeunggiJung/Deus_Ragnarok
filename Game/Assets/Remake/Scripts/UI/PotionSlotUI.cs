@@ -2,7 +2,7 @@
 using UnityEngine.UI;
 
 // 화면 왼쪽 아래 포션 슬롯. 쿨타임 동안 시계 방향으로 걷히는 어두운 덮개와 남은 초를 표시,
-// 회복 중에는 슬롯 테두리가 초록색으로 빛남
+// 회복 중에는 슬롯 테두리가 초록색으로 빛나고, 피격으로 회복이 멈추면 붉은색으로 표시
 public class PotionSlotUI : MonoBehaviour
 {
     [SerializeField] private PlayerPotion potion;
@@ -16,6 +16,7 @@ public class PotionSlotUI : MonoBehaviour
 
     private static readonly Color BorderIdle = new Color(0.15f, 0.15f, 0.15f, 0.85f);
     private static readonly Color BorderHealing = new Color(0.3f, 0.9f, 0.4f, 1f);
+    private static readonly Color BorderPaused = new Color(0.9f, 0.25f, 0.2f, 1f);
 
     private void Awake()
     {
@@ -88,7 +89,11 @@ public class PotionSlotUI : MonoBehaviour
         cooldownOverlay.fillAmount = potion.Cooldown > 0f ? remaining / potion.Cooldown : 0f;
         cooldownText.text = remaining > 0f ? Mathf.CeilToInt(remaining).ToString() : "";
 
-        if (potion.IsHealing)
+        if (potion.IsHealPaused)
+        {
+            border.color = BorderPaused;
+        }
+        else if (potion.IsHealing)
         {
             // 회복 중 : 테두리가 초록색으로 맥동
             float pulse = 0.6f + 0.4f * Mathf.Sin(Time.time * 6f);

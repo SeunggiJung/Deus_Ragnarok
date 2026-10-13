@@ -37,5 +37,6 @@ MonoBehaviour:
   staminaPerPoint: 10
   potionHealAmount: 50
   potionHealDuration: 5
-  potionCooldown: 5
+  potionCooldown: 10
+  potionHitPauseTime: 1
   hitStunTime: 0.3

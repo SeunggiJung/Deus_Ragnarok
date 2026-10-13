@@ -1,11 +1,15 @@
 ﻿using System.Collections;
 using UnityEngine;
 
-// 보스방 입구 기둥. 보스가 플레이어를 처음 인식(전투 시작)하면 아래로 떨어져 입구를 막고,
-// 보스를 처치하면 다시 올라가 열림. 닫힌 위치는 기둥 아래 바닥을 찾아 자동 계산
+// 보스방 문 / 기둥. 보스 이벤트에 맞춰 열리고 닫힘
+// - 입구 기둥 (startsOpen = true) : 위에 떠 있다가 전투 시작 시 떨어져 막고, 처치 후 다시 올라감.
+//   닫힌 위치는 기둥 아래 바닥을 찾아 자동 계산
+// - 출구 문 (startsOpen = false) : 처음부터 막혀 있다가 처치 후 위로 올라가 열림
 public class BossArenaGate : MonoBehaviour
 {
     [SerializeField] private BossController boss;
+    [SerializeField] private bool startsOpen = true;
+    [SerializeField] private bool closeOnEngage = true;
     [SerializeField] private float closeDuration = 0.45f;  // 떨어지는 시간 (가속하며 낙하)
     [SerializeField] private bool openOnDefeat = true;
     [SerializeField] private float openDelay = 2f;         // 처치 후 열리기까지 대기
@@ -30,22 +34,33 @@ public class BossArenaGate : MonoBehaviour
             rb.velocity = Vector2.zero;
         }
         gateCollider = GetComponent<Collider2D>();
-        openPosition = transform.position;
     }
 
     private void Start()
     {
-        closedPosition = FindClosedPosition();
+        Vector2 current = transform.position;
+        if (startsOpen)
+        {
+            openPosition = current;
+            closedPosition = FindClosedPosition(current);
+        }
+        else
+        {
+            // 닫힌 상태에서 시작 : 문 높이만큼 위로 올라간 위치가 열린 위치
+            closedPosition = current;
+            float height = gateCollider != null ? gateCollider.bounds.size.y : 1f;
+            openPosition = current + Vector2.up * (height + 0.5f);
+        }
     }
 
     // 기둥 아래쪽 바닥까지의 거리만큼 내려간 위치
-    private Vector2 FindClosedPosition()
+    private Vector2 FindClosedPosition(Vector2 from)
     {
         Bounds b = gateCollider != null ? gateCollider.bounds : new Bounds(transform.position, Vector3.one);
         Vector2 origin = new Vector2(b.center.x, b.min.y - 0.05f);
         RaycastHit2D hit = Physics2D.Raycast(origin, Vector2.down, 50f, LayerMask.GetMask("Ground"));
         float drop = hit.collider != null ? hit.distance + 0.05f : 0f;
-        return openPosition + Vector2.down * drop;
+        return from + Vector2.down * drop;
     }
 
     private void OnEnable()
@@ -64,7 +79,8 @@ public class BossArenaGate : MonoBehaviour
 
     private void Close()
     {
-        Move(closedPosition, closeDuration, 0f, accelerate: true);
+        if (closeOnEngage)
+            Move(closedPosition, closeDuration, 0f, accelerate: true);
     }
 
     private void HandleBossDefeated()

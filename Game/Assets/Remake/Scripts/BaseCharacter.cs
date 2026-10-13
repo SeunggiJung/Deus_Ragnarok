@@ -26,6 +26,8 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
 
     // UI 등 외부에서 구독 (현재 체력, 최대 체력)
     public event Action<float, float> OnHpChanged;
+    // 실제로 피해를 받았을 때 (받은 피해량). 무적 등으로 무시된 공격은 호출되지 않음
+    public event Action<float> DamageTaken;
 
     [Header("Components")]
     protected Rigidbody2D rb;
@@ -81,6 +83,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         currentHp = Mathf.Max(0f, currentHp - damage);
         Debug.Log($"{gameObject.name} took {damage} damage. HP: {currentHp}");
         OnHpChanged?.Invoke(currentHp, MaxHp);
+        DamageTaken?.Invoke(damage);
 
         if (currentHp <= 0)
         {
