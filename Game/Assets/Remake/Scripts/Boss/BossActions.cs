@@ -187,6 +187,7 @@ public class ChargeAction : BossAction
         phase = Phase.Telegraph;
         phaseStart = Time.time;
         hitTarget = false;
+        boss.Telegraph.Show(TelegraphKind.Charge, S.chargeTelegraph * (boss.IsPhase2 ? 0.75f : 1f));
     }
 
     protected override NodeState OnUpdate()
@@ -202,6 +203,7 @@ public class ChargeAction : BossAction
                 if (elapsed >= S.chargeTelegraph * (boss.IsPhase2 ? 0.75f : 1f))
                 {
                     boss.RestoreTint();
+                    boss.Telegraph.Hide();
                     boss.Anim.SetBool(BossController.AnimParams.Moving, true);
                     boss.Anim.speed = boss.AnimSpeed * 2f;
                     startX = boss.transform.position.x;
@@ -262,6 +264,7 @@ public class ChargeAction : BossAction
         boss.StopMoving();
         boss.Anim.speed = boss.AnimSpeed;
         boss.RestoreTint();
+        boss.Telegraph.Hide();
     }
 }
 
@@ -279,6 +282,7 @@ public class GuardAction : BossAction
         boss.IsGuarding = true;
         boss.SetTint(S.guardTint);
         endTime = Time.time + S.guardDuration;
+        boss.Telegraph.Show(TelegraphKind.Guard, S.guardDuration);
     }
 
     protected override NodeState OnUpdate() => Time.time >= endTime ? NodeState.Success : NodeState.Running;
@@ -286,6 +290,7 @@ public class GuardAction : BossAction
     protected override void OnStop()
     {
         boss.IsGuarding = false;
+        boss.Telegraph.Hide();
         boss.ClearPressure();
         boss.RestoreTint();
         boss.Anim.ResetTrigger(BossController.AnimParams.Ability);

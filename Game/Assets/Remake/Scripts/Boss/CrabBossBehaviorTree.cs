@@ -7,6 +7,7 @@
 // │   ├─ (쿨다운) [근접]               → 집게 연타
 // │   ├─ (쿨다운) [가까움]             → 바닥 찍기 (발밑 + 좌우 충격파, 점프 / 구르기로 회피)
 // │   ├─ (쿨다운) [가까움]             → 잡기 (예고 → 돌진 → 잡히면 제압 + 큰 피해, 구르기로만 회피)
+// │   ├─ (쿨다운) [중거리]             → 도약 내려찍기 (기 모음 → 높이 도약 → 바닥 장판 → 장판 위로 내려찍음)
 // │   └─ (쿨다운) [원거리]             → 돌진
 // └─ 추적
 public static class CrabBossBehaviorTree
@@ -47,6 +48,12 @@ public static class CrabBossBehaviorTree
                     new Sequence(
                         new Condition(() => boss.DistanceToTarget <= s.grabRange),
                         new GrabAction(boss),
+                        Recovery(boss))),
+
+                new Cooldown(() => s.leapCooldown * boss.CooldownScale,
+                    new Sequence(
+                        new Condition(() => boss.DistanceToTarget >= s.leapMinRange && boss.DistanceToTarget <= s.leapMaxRange),
+                        new LeapSlamAction(boss),
                         Recovery(boss))),
 
                 new Cooldown(() => s.chargeCooldown * boss.CooldownScale,

@@ -27,6 +27,21 @@ public class BossController : BaseCharacter
     public Rigidbody2D Rb => rb;
     public Animator Anim => anim;
     public Collider2D Body { get; private set; }
+
+    // 패턴 예고 연출 (몸 색 변화가 잘 안 보이는 보스를 위해 링 / 아이콘 표시). 처음 쓸 때 붙임
+    private BossTelegraph telegraph;
+    public BossTelegraph Telegraph
+    {
+        get
+        {
+            if (telegraph == null)
+            {
+                telegraph = GetComponent<BossTelegraph>();
+                if (telegraph == null) telegraph = gameObject.AddComponent<BossTelegraph>();
+            }
+            return telegraph;
+        }
+    }
     public BaseCharacter Target { get; private set; }
 
     public bool Engaged { get; private set; }

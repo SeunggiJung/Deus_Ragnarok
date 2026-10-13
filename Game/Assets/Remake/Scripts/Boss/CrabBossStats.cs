@@ -18,6 +18,20 @@ public class CrabBossStats : BossStats
     public Color waveColor = new Color(1f, 0.55f, 0.2f, 0.9f);
     public Color poundTelegraphTint = new Color(1f, 0.4f, 0.4f);
 
+    [Header("Leap Slam (도약 내려찍기)")]
+    public float leapMinRange = 2f;
+    public float leapMaxRange = 18f;
+    public float leapCooldown = 11f;
+    public float leapGatherTime = 1.0f;         // 기 모으는 시간 (예고)
+    public float leapHeight = 14f;              // 화면 밖으로 사라질 만큼 높이
+    public float leapRiseTime = 0.45f;
+    public float leapTrackTime = 1.6f;          // 장판이 플레이어를 따라다니는 시간
+    public float leapTrackSpeed = 9f;
+    public float leapLockTime = 0.8f;           // 장판 고정 후 내려찍기까지 (이 동안 피해야 함)
+    public float leapFallTime = 0.18f;
+    public float leapRadius = 3.4f;             // 장판 반지름
+    public float leapDamage = 32f;
+
     [Header("Grab (잡기)")]
     public float grabRange = 7f;
     public float grabCooldown = 9f;
