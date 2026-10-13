@@ -25,18 +25,16 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         // 공통 컴포넌트 초기화
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponent<Animator>();
-        spriteRenderer = GetComponent<SpriteRenderer>();
+        // 플레이어처럼 스프라이트가 자식(body, Leg 등)에 나뉘어 있는 경우도 있어 자식까지 탐색
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         currentHp = maxHp;
     }
 
-    public virtual void TakeDamage(float damage, Vector2 knockbackForce)
+    public virtual void TakeDamage(float damage)
     {
         currentHp -= damage;
         Debug.Log($"{gameObject.name} took {damage} damage. HP: {currentHp}");
-
-        // 넉백 로직 (물리)
-        rb.AddForce(knockbackForce, ForceMode2D.Impulse);
 
         if (currentHp <= 0) Die();
     }
@@ -53,9 +51,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
 
             if (damageable != null)
             {
-                // 데미지 전달 (공격 방향에 따른 넉백 포함)
-                Vector2 knockback = new Vector2(transform.localScale.x * 2f, 1f);
-                damageable.TakeDamage(10f, knockback);
+                damageable.TakeDamage(10f);
             }
         }
     }

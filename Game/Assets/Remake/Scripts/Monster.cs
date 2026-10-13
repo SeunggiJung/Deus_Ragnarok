@@ -5,7 +5,7 @@ using UnityEngine;
 public class Monster : MonoBehaviour, IDamageable
 {
     public float hp = 50f;
-    public void TakeDamage(float damage, Vector2 knockbackForce)
+    public void TakeDamage(float damage)
     {
         hp -= damage;
         Debug.Log($"몬스터가 {damage}만큼 맞았습니다. 남은 체력: {hp}");
