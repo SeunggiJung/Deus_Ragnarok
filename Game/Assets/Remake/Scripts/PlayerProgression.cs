@@ -62,6 +62,17 @@ public class PlayerProgression : MonoBehaviour
         OnExpChanged?.Invoke(Exp, ExpToNext);
     }
 
+    // 이전 스테이지에서 이어받은 진행 상황 적용 (PlayerSession)
+    public void Restore(int level, float exp, int statPoints)
+    {
+        Level = Mathf.Max(1, level);
+        Exp = exp;
+        StatPoints = statPoints;
+        OnLevelUp?.Invoke(Level);
+        OnExpChanged?.Invoke(Exp, ExpToNext);
+        OnStatPointsChanged?.Invoke(StatPoints);
+    }
+
     // 남은 경험치를 한 번에 채워 즉시 레벨업 (레벨업 아이템)
     public void LevelUpInstantly()
     {

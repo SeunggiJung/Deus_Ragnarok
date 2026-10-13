@@ -25,7 +25,7 @@ public class EnemyAttackState : EnemyState
 
         // 플레이어와 같은 방식 : 실제로 Attack 상태에 들어간 뒤 끝났는지 확인
         AnimatorStateInfo info = enemy.Anim.GetCurrentAnimatorStateInfo(0);
-        bool inAttack = info.IsName("Attack");
+        bool inAttack = info.IsName(enemy.AttackStateName);
         if (inAttack) started = true;
 
         bool finished = started && (!inAttack || info.normalizedTime >= 1f);

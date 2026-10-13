@@ -23,12 +23,18 @@ public class PlayerRespawn : MonoBehaviour
         respawnPoint = point;
     }
 
+    // 함정 등에 맞았을 때 마지막 체크포인트로 이동 (피해는 호출한 쪽에서 처리)
+    public void ReturnToCheckpoint()
+    {
+        transform.position = respawnPoint;
+        player.SetVelocity(0f, 0f);
+    }
+
     private void Update()
     {
         if (player.IsDead || transform.position.y > fallY) return;
 
-        transform.position = respawnPoint;
-        player.SetVelocity(0f, 0f);
+        ReturnToCheckpoint();
         player.ForceInvincible = false; // 공중 구르기 도중 떨어진 경우에도 피해를 받도록
         player.TakeDamage(player.MaxHp * fallDamageRatio);
         Debug.Log($"낙사 : 체크포인트 {respawnPoint}로 복귀, 체력 -{player.MaxHp * fallDamageRatio}");

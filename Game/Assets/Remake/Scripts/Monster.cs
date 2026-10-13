@@ -18,6 +18,11 @@ public class Monster : BaseCharacter
     [Tooltip("localScale.x가 양수일 때 스프라이트가 오른쪽을 보면 체크")]
     [SerializeField] private bool spriteFacesRight = true;
 
+    [Header("Animator")]
+    [Tooltip("attack 트리거로 진입하는 애니메이터 공격 상태 이름 (몬스터마다 다름 : Golem 'Attack', Crab 'Enemy Attack 3' 등)")]
+    [SerializeField] private string attackStateName = "Attack";
+    public string AttackStateName => attackStateName;
+
     public Rigidbody2D Rb => rb;
     public Animator Anim => anim;
     public EnemyStats Stats => (EnemyStats)stats;

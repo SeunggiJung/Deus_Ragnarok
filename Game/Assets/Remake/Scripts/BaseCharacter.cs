@@ -14,6 +14,8 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     // 레벨업 등으로 얻은 추가 수치. Stats 에셋(SO)은 여러 캐릭터가 공유하는 원본이므로 직접 수정하지 않고 여기에 더함
     protected float bonusMaxHp;
     protected float bonusAttack;
+    public float BonusMaxHp => bonusMaxHp;
+    public float BonusAttack => bonusAttack;
     public float MaxHp => stats.maxHp + bonusMaxHp;
     public float AttackDamage => stats.attackDamage + bonusAttack;
     public bool IsDead { get; private set; }
@@ -28,6 +30,8 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     public event Action<float, float> OnHpChanged;
     // 실제로 피해를 받았을 때 (받은 피해량). 무적 등으로 무시된 공격은 호출되지 않음
     public event Action<float> DamageTaken;
+    // 사망 시 (보스방 문, 포탈 잠금 해제 등 외부에서 구독)
+    public event Action OnDied;
 
     [Header("Components")]
     protected Rigidbody2D rb;
@@ -93,6 +97,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
             RestoreSpriteColor();
             hitInvincible = false;
             Die();
+            OnDied?.Invoke();
             return;
         }
 

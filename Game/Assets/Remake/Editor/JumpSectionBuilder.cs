@@ -263,7 +263,7 @@ public static class JumpSectionBuilder
         so.ApplyModifiedProperties();
     }
 
-    // 맨 오른쪽 포탈 : G키 상호작용으로 다음 스테이지 이동 (리메이크 전이라 원작 second_stage로 연결)
+    // 맨 오른쪽 포탈 : G키 상호작용으로 다음 스테이지(Stage2) 이동
     private static void SetupStagePortal()
     {
         GameObject portal = GameObject.Find("Portal");
@@ -271,7 +271,7 @@ public static class JumpSectionBuilder
         {
             var stagePortal = GetOrAdd<StagePortal>(portal);
             var so = new SerializedObject(stagePortal);
-            so.FindProperty("nextSceneName").stringValue = "second_stage";
+            so.FindProperty("nextSceneName").stringValue = "Stage2"; // 리메이크 2스테이지 (Tools/Deus/Build Stage 2)
             so.ApplyModifiedProperties();
         }
 

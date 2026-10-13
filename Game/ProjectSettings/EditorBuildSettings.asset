@@ -26,4 +26,10 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Legacy/Scenes/Ending.unity
     guid: 0a8038a66daacab439b9bc9962f4e4d8
+  - enabled: 1
+    path: Assets/Remake/Scenes/RemakeTest.unity
+    guid: 3368d5c96befd3f4da84f2d7ad89aab2
+  - enabled: 1
+    path: Assets/Remake/Scenes/Stage2.unity
+    guid: a33baf7a3b394884dac5e021caf3e5ec
   m_configObjects: {}

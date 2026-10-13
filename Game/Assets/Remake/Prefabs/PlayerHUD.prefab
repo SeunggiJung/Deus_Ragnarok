@@ -1,0 +1,109 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3255595447788559035
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4611224294875981082}
+  - component: {fileID: 5142834697520880570}
+  - component: {fileID: 1845002498911069923}
+  - component: {fileID: 7064549018029916886}
+  - component: {fileID: 3551268428637839718}
+  m_Layer: 0
+  m_Name: PlayerHUD
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4611224294875981082
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3255595447788559035}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5142834697520880570
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3255595447788559035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: acca3c21131bf51499d6b16a4c889163, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  progression: {fileID: 0}
+  barSize: {x: 260, y: 22}
+  margin: {x: 20, y: 20}
+  spacing: 6
+  hpColor: {r: 0.85, g: 0.2, b: 0.2, a: 1}
+  staminaColor: {r: 0.95, g: 0.75, b: 0.2, a: 1}
+  expColor: {r: 0.3, g: 0.6, b: 1, a: 1}
+--- !u!114 &1845002498911069923
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3255595447788559035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53382f5c7fba25240a18a55eecc374c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  threshold: 0.2
+  color: {r: 0.8, g: 0, b: 0, a: 1}
+  innerRadius: 0.7
+  minAlpha: 0.25
+  maxAlpha: 0.6
+  pulseSpeed: 1.5
+  fadeSpeed: 3
+--- !u!114 &7064549018029916886
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3255595447788559035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 090a95d00d1dbb84c9f5552253db86a6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  boss: {fileID: 0}
+  size: {x: 800, y: 24}
+  bottomMargin: 60
+  fillColor: {r: 0.75, g: 0.1, b: 0.1, a: 1}
+--- !u!114 &3551268428637839718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3255595447788559035}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b70e1b2177798a4b9b37fd18cffa993, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  potion: {fileID: 0}
+  slotSize: 72
+  margin: {x: 20, y: 20}
+  keyLabel: 1

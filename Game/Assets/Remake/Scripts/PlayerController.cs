@@ -53,6 +53,7 @@ public class PlayerController : BaseCharacter
     // 스태미너 (UI 등 외부에서 구독 : 현재값, 최대값)
     public float CurrentStamina { get; private set; }
     private float bonusMaxStamina;
+    public float BonusMaxStamina => bonusMaxStamina;
     public float MaxStamina => Stats.maxStamina + bonusMaxStamina;
     public event Action<float, float> OnStaminaChanged;
     private float lastStaminaUseTime;
@@ -168,6 +169,12 @@ public class PlayerController : BaseCharacter
             : Stats.staminaFastRegenMultiplier;
 
         CurrentStamina = Mathf.Min(MaxStamina, CurrentStamina + Stats.staminaRegen * multiplier * Time.deltaTime);
+        OnStaminaChanged?.Invoke(CurrentStamina, MaxStamina);
+    }
+
+    public void RefillStamina()
+    {
+        CurrentStamina = MaxStamina;
         OnStaminaChanged?.Invoke(CurrentStamina, MaxStamina);
     }
 

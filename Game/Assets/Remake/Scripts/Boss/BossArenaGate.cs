@@ -8,6 +8,10 @@ using UnityEngine;
 public class BossArenaGate : MonoBehaviour
 {
     [SerializeField] private BossController boss;
+    [Tooltip("BT 보스가 아닌 일반 몬스터가 보스방 주인일 때 (boss가 비어있을 때 사용)")]
+    [SerializeField] private BaseCharacter guardian;
+    [Tooltip("guardian 사용 시 플레이어가 이 거리 안에 들어오면 전투 시작으로 간주")]
+    [SerializeField] private float engageRange = 12f;
     [SerializeField] private bool startsOpen = true;
     [SerializeField] private bool closeOnEngage = true;
     [SerializeField] private float closeDuration = 0.45f;  // 떨어지는 시간 (가속하며 낙하)
@@ -21,9 +25,12 @@ public class BossArenaGate : MonoBehaviour
     private Vector2 closedPosition;
     private Coroutine moving;
 
+    private Transform player;
+    private bool engaged;
+
     private void Awake()
     {
-        if (boss == null)
+        if (boss == null && guardian == null)
             boss = FindObjectOfType<BossController>();
 
         // 레거시 Trap은 중력으로 떨어지는 구조였으므로 코드로 정확히 움직이도록 Kinematic으로 전환
@@ -65,16 +72,47 @@ public class BossArenaGate : MonoBehaviour
 
     private void OnEnable()
     {
-        if (boss == null) return;
-        boss.OnEngaged += Close;
-        boss.OnDefeated += HandleBossDefeated;
+        if (boss != null)
+        {
+            boss.OnEngaged += Close;
+            boss.OnDefeated += HandleBossDefeated;
+        }
+        else if (guardian != null)
+        {
+            guardian.OnDied += HandleBossDefeated;
+        }
     }
 
     private void OnDisable()
     {
-        if (boss == null) return;
-        boss.OnEngaged -= Close;
-        boss.OnDefeated -= HandleBossDefeated;
+        if (boss != null)
+        {
+            boss.OnEngaged -= Close;
+            boss.OnDefeated -= HandleBossDefeated;
+        }
+        else if (guardian != null)
+        {
+            guardian.OnDied -= HandleBossDefeated;
+        }
+    }
+
+    // 일반 몬스터 보스 : 플레이어가 engageRange 안에 들어오면 전투 시작
+    private void Update()
+    {
+        if (boss != null || guardian == null || engaged || guardian.IsDead) return;
+
+        if (player == null)
+        {
+            var pc = FindObjectOfType<PlayerController>();
+            if (pc == null) return;
+            player = pc.transform;
+        }
+
+        if (Mathf.Abs(player.position.x - guardian.transform.position.x) <= engageRange)
+        {
+            engaged = true;
+            Close();
+        }
     }
 
     private void Close()
