@@ -15,6 +15,7 @@ using UnityEngine.Tilemaps;
 // - 보스방 입구 기둥(Trap) / 출구 문(Door) : Crab과 연동되는 BossArenaGate
 // - 검(key) : WeaponPickup, 색 조합 퍼즐(불 3 + 돌 3 → Door2) : ColorPuzzle / ColorFire / ColorStone
 // - 드래곤 등장(key2) : EncounterTrigger, 포탈 : 드래곤 처치 후 third_stage
+// - 검 가는 길 : 텔레포트용 지형 → 점프 + 공중 구르기 계단 발판 (Stage2SwordClimb)
 // - 체크포인트, 사냥용 스포너
 // 메뉴 : Tools/Deus/Build Stage 2  (어느 씬에서 실행해도 Stage2 씬을 열고 구성, 여러 번 실행해도 결과 동일)
 public static class Stage2Builder
@@ -53,6 +54,7 @@ public static class Stage2Builder
         SetupPortal(dragon);
         SetupCheckpoints(ground);
         SetupSpawners(ground);
+        Stage2SwordClimb.Build();   // 검 가는 길 (체크포인트 / 스포너 위치를 덮어씀)
 
         EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
         EditorSceneManager.SaveScene(SceneManager.GetActiveScene());
