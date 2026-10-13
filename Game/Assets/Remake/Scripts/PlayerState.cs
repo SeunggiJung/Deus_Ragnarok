@@ -31,6 +31,7 @@ public class PlayerState : IState
     protected bool TryDodge()
     {
         if (!player.Input.DodgePressed) return false;
+        if (Crusher.IsInDangerZone(player.transform.position)) return false; // 내려찍는 장애물 구역에서는 구르기 불가
 
         bool grounded = player.IsGrounded();
         if (!grounded && !player.CanAirDodge) return false;
