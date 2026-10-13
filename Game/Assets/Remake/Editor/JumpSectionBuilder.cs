@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using System.Linq;
+using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -9,6 +10,7 @@ using UnityEngine.Tilemaps;
 // - 낭떠러지(x 79 ~ 103) : 원작은 순간이동으로 건너뛰던 구간 → 떨어지는 / 움직이는 발판 6개로 점프 구간 구성
 // - 원작 점프맵 발판 : Trap2 / Trap4 → 떨어지는 발판, Trap3 → 위아래 왕복 (레거시 trap.cs 비활성화)
 // - 체크포인트 3곳 + 플레이어 낙사 복귀(PlayerRespawn), 플레이어의 레거시 Sword_Man 제거
+// - 보상 상자 : 공격으로 부수면 LV+1 아이템 드롭 (BreakableBox)
 // 메뉴 : Tools/Deus/Build Jump Section  (RemakeTest 씬에서 실행, 여러 번 실행해도 결과 동일)
 public static class JumpSectionBuilder
 {
@@ -45,6 +47,7 @@ public static class JumpSectionBuilder
         SetupCheckpoints();
         SetupPlayer();
         ReplaceLegacyEnemies();
+        SetupRewardBox();
 
         EditorSceneManager.MarkSceneDirty(EditorSceneManager.GetActiveScene());
         Debug.Log("점프 구간 구성 완료");
@@ -227,6 +230,34 @@ public static class JumpSectionBuilder
         so.FindProperty("prefab").objectReferenceValue = AssetDatabase.LoadAssetAtPath<Monster>("Assets/Remake/Prefabs/Golem.prefab");
         so.FindProperty("maxAlive").intValue = 1;
         so.FindProperty("respawnDelay").floatValue = 15f;
+        so.ApplyModifiedProperties();
+    }
+
+    // 점프맵 중간의 보상 상자 : 원작은 닿으면 레벨업 선택창 → 공격해서 부수면 LV+1 아이템 드롭
+    private static void SetupRewardBox()
+    {
+        GameObject box = GameObject.Find("box");
+        if (box == null) box = GameObject.Find("RewardBox");
+        if (box == null) return;
+
+        box.name = "RewardBox";
+        box.layer = LayerMask.NameToLayer("Enemy"); // 플레이어 공격 판정(whatIsEnemy = Enemy) 대상이 되도록
+
+        // 레거시 trigger.cs : 매 프레임 Trap3을 밀어 올리고, trigger 태그에 닿으면 엔딩 씬을 불러오던 스크립트
+        foreach (var mb in box.GetComponents<MonoBehaviour>())
+        {
+            if (mb != null && mb.GetType().Name == "trigger")
+                Undo.DestroyObjectImmediate(mb);
+        }
+
+        var breakable = GetOrAdd<BreakableBox>(box);
+        var pieces = AssetDatabase.LoadAllAssetsAtPath("Assets/External/Pixel Adventure 1/Assets/Items/Boxes/Box3/Break (28x24).png")
+            .OfType<Sprite>().OrderBy(sp => sp.name).ToArray();
+        var so = new SerializedObject(breakable);
+        SerializedProperty array = so.FindProperty("breakPieces");
+        array.arraySize = pieces.Length;
+        for (int i = 0; i < pieces.Length; i++)
+            array.GetArrayElementAtIndex(i).objectReferenceValue = pieces[i];
         so.ApplyModifiedProperties();
     }
 

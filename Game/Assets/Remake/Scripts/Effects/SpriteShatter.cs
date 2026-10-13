@@ -56,6 +56,39 @@ public static class SpriteShatter
     }
 }
 
+public static class SpriteDebris
+{
+    // 미리 준비된 조각 스프라이트(예 : 상자 Break 시트)를 중심에서 사방으로 흩뿌림
+    public static void Spawn(Sprite[] pieces, Vector2 center, Vector3 scale, int sortingOrder, float force, float lifetime)
+    {
+        if (pieces == null) return;
+
+        for (int i = 0; i < pieces.Length; i++)
+        {
+            if (pieces[i] == null) continue;
+
+            var go = new GameObject("Debris");
+            go.transform.position = center;
+            go.transform.localScale = scale;
+
+            var sr = go.AddComponent<SpriteRenderer>();
+            sr.sprite = pieces[i];
+            sr.sortingOrder = sortingOrder + 1;
+
+            // 조각마다 다른 방향으로 (위쪽 반원에 고르게 분산)
+            float angle = Mathf.Lerp(30f, 150f, pieces.Length > 1 ? i / (float)(pieces.Length - 1) : 0.5f) + Random.Range(-15f, 15f);
+            Vector2 dir = new Vector2(Mathf.Cos(angle * Mathf.Deg2Rad), Mathf.Sin(angle * Mathf.Deg2Rad));
+
+            var rb = go.AddComponent<Rigidbody2D>();
+            rb.gravityScale = 2f;
+            rb.velocity = dir * force * Random.Range(0.8f, 1.2f);
+            rb.angularVelocity = Random.Range(-360f, 360f);
+
+            go.AddComponent<ShardFade>().Init(lifetime, null);
+        }
+    }
+}
+
 // 파편이 서서히 투명해지다가 사라짐
 public class ShardFade : MonoBehaviour
 {
