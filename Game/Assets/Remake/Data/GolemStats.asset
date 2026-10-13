@@ -9,10 +9,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e06a6975a5da49a4fb5308afd94fdbab, type: 3}
+  m_Script: {fileID: 11500000, guid: cca9e5fb0484ea246a7f8982c045ff36, type: 3}
   m_Name: GolemStats
   m_EditorClassIdentifier: 
   maxHp: 50
   invincibleTime: 0.3
-  attackDamage: 10
-  attackRadius: 1
+  attackDamage: 12
+  attackRadius: 1.2
+  moveSpeed: 1.5
+  detectRange: 6
+  loseRange: 9
+  attackRange: 2
+  attackCooldown: 1.5
+  hitStunTime: 0.2
+  deathDelay: 1.5

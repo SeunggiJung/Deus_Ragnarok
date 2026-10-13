@@ -1786,7 +1786,8 @@ Transform:
   m_LocalPosition: {x: 5, y: 1, z: 4.470796}
   m_LocalScale: {x: 10, y: 12, z: 0}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1921006439}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &567538955
@@ -1841,7 +1842,7 @@ Rigidbody2D:
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
+  m_Mass: 20
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
@@ -1855,7 +1856,7 @@ Rigidbody2D:
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 5
+  m_Constraints: 4
 --- !u!70 &567538960
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -1980,10 +1981,11 @@ MonoBehaviour:
   attackCheck: {fileID: 0}
   whatIsEnemy:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   hitColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   hitFlashTime: 0.1
   blinkInterval: 0.08
+  spriteFacesRight: 1
 --- !u!1 &699853389
 GameObject:
   m_ObjectHideFlags: 0
@@ -3092,6 +3094,10 @@ PrefabInstance:
     - target: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       propertyPath: m_Name
       value: sword_man
+      objectReference: {fileID: 0}
+    - target: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+      propertyPath: m_Layer
+      value: 7
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects:
@@ -8005,6 +8011,10 @@ MonoBehaviour:
   hitColor: {r: 1, g: 0.3, b: 0.3, a: 1}
   hitFlashTime: 0.1
   blinkInterval: 0.08
+  input:
+    jumpKey: 32
+    dodgeKey: 304
+    attackMouseButton: 0
   moveSpeed: 5
   jumpForce: 10
   whatIsGround:
@@ -15115,6 +15125,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6769196856783303408, guid: 0dbef1e426f80cc4a9e36e614be3a9f0, type: 3}
   m_PrefabInstance: {fileID: 4895392984027317343}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1921006438
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1921006439}
+  m_Layer: 6
+  m_Name: AttackCheck
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1921006439
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1921006438}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0.1, y: -0.02, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 567538954}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1975772419
 GameObject:
   m_ObjectHideFlags: 0
