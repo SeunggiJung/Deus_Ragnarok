@@ -95,8 +95,21 @@ public class MeleeComboAction : BossAnimAction
 {
     public MeleeComboAction(BossController boss) : base(boss, BossController.AnimParams.Melee, "Melee") { }
 
-    protected override void OnBegin() => boss.HitEventHandler = boss.MeleeHit;
-    protected override void OnEnd() => boss.HitEventHandler = null;
+    protected override void OnBegin()
+    {
+        boss.Telegraph.Show(TelegraphKind.Melee, S.meleeTelegraph);
+        boss.HitEventHandler = () =>
+        {
+            boss.Telegraph.Hide();   // 첫 타격에서 예고 종료
+            boss.MeleeHit();
+        };
+    }
+
+    protected override void OnEnd()
+    {
+        boss.HitEventHandler = null;
+        boss.Telegraph.Hide();
+    }
 }
 
 // 지면 가시 (Attack_1). 내려찍는 동작의 작은 가시가 예고, 진행률 slamHitTime에 큰 가시가 솟으며 주변 광역 피해
@@ -106,12 +119,20 @@ public class SlamAction : BossAnimAction
 
     public SlamAction(BossController boss) : base(boss, BossController.AnimParams.Slam, "Slam") { }
 
-    protected override void OnBegin() => erupted = false;
+    protected override void OnBegin()
+    {
+        erupted = false;
+        // 클립 길이 1.17초 중 가시가 솟기까지
+        boss.Telegraph.Show(TelegraphKind.Spikes, 1.1667f * S.slamHitTime / boss.AnimSpeed);
+    }
+
+    protected override void OnEnd() => boss.Telegraph.Hide();
 
     protected override void OnAnimUpdate(float t)
     {
         if (erupted || t < S.slamHitTime) return;
         erupted = true;
+        boss.Telegraph.Hide();
 
         Vector2 area = S.slamArea * (boss.IsPhase2 ? 1.25f : 1f);
         boss.DamageArea(boss.FeetPosition + Vector2.up * area.y * 0.5f, area, S.slamDamage);
@@ -125,12 +146,20 @@ public class ThrowAction : BossAnimAction
 
     public ThrowAction(BossController boss) : base(boss, BossController.AnimParams.Throw, "Throw") { }
 
-    protected override void OnBegin() => released = false;
+    protected override void OnBegin()
+    {
+        released = false;
+        // 클립 길이 0.83초 중 발사까지
+        boss.Telegraph.Show(TelegraphKind.Bolt, 0.8333f * S.throwReleaseTime / boss.AnimSpeed);
+    }
+
+    protected override void OnEnd() => boss.Telegraph.Hide();
 
     protected override void OnAnimUpdate(float t)
     {
         if (released || t < S.throwReleaseTime) return;
         released = true;
+        boss.Telegraph.Hide();
 
         Vector2 firePoint = boss.attackCheck != null ? (Vector2)boss.attackCheck.position : (Vector2)boss.transform.position;
         Vector2 aim = TargetCenter() - firePoint;

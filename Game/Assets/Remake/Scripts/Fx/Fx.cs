@@ -6,10 +6,10 @@
 // - Ring : 바닥에 퍼지는 충격 링
 public static class Fx
 {
-    public enum Icon { Exclamation, DownArrow, UpArrow, Chevron, Shield }
+    public enum Icon { Exclamation, DownArrow, UpArrow, Chevron, Shield, Cross, Target }
 
     private static Sprite circle, ring, square, spike;
-    private static readonly Sprite[] icons = new Sprite[5];
+    private static readonly Sprite[] icons = new Sprite[7];
     private static Material softMaterial, hardMaterial;
 
     #region Sprites
@@ -135,6 +135,16 @@ public static class Fx
                 foreach (int off in new[] { 1, 8 })
                     if (x >= off && x <= off + 6 && Mathf.Abs((x - off) - (6f - d)) <= 1.1f && d <= 6f) return true;
                 return false;
+            }
+            case Icon.Cross:       // X : 근접 연타
+            {
+                if (x < 2 || x > 13 || y < 2 || y > 13) return false;
+                return Mathf.Abs(x - y) <= 1.2f || Mathf.Abs(x + y - 15f) <= 1.2f;
+            }
+            case Icon.Target:      // 조준점 : 에너지탄
+            {
+                float d = Vector2.Distance(new Vector2(x, y), new Vector2(7.5f, 7.5f));
+                return (d >= 4.3f && d <= 6.3f) || d <= 1.6f;
             }
             default:               // 방패
             {

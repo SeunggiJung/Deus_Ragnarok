@@ -28,7 +28,7 @@ public class CrabBossStats : BossStats
     public float leapTrackTime = 1.6f;          // 장판이 플레이어를 따라다니는 시간
     public float leapTrackSpeed = 9f;
     public float leapLockTime = 0.8f;           // 장판 고정 후 내려찍기까지 (이 동안 피해야 함)
-    public float leapFallTime = 0.18f;
+    public float leapFallTime = 0.1f;
     public float leapRadius = 3.4f;             // 장판 반지름
     public float leapDamage = 32f;
 

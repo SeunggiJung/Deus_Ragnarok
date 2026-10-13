@@ -19,6 +19,7 @@ public class BossStats : CharacterStats
     [Header("Melee Combo (Attack_2)")]
     public float meleeRange = 3f;
     public float meleeCooldown = 1.2f;
+    public float meleeTelegraph = 0.35f;     // 첫 타격 전 예고 표시 시간 (첫 Hit 이벤트가 오면 바로 사라짐)
 
     [Header("Ground Spikes (Attack_1)")]
     public float slamRange = 4f;             // 이 거리 안이면 사용
