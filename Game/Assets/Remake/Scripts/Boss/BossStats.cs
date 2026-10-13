@@ -9,8 +9,12 @@ public class BossStats : CharacterStats
     public float expReward = 200f;
 
     [Header("Movement")]
-    public float moveSpeed = 2.2f;
+    public float moveSpeed = 1.5f;
+    public float baseAnimSpeed = 0.9f;       // 1페이즈 애니메이션(공격 동작) 속도 배율
     public float detectRange = 10f;          // 이 거리 안에 들어오면 전투 시작 (이후 계속 추적)
+
+    [Header("Pacing")]
+    public float attackRecovery = 0.8f;      // 공격 패턴이 끝난 뒤 다음 행동까지 쉬는 시간 (플레이어 반격 타이밍)
 
     [Header("Melee Combo (Attack_2)")]
     public float meleeRange = 3f;
@@ -68,4 +72,12 @@ public class BossStats : CharacterStats
     public float phase2AnimSpeed = 1.2f;
     public Color roarTint = new Color(1f, 0.3f, 0.3f);
     public Color phase2Tint = new Color(1f, 0.8f, 0.8f);
+
+    [Header("Death")]
+    public float deathSlowMotionScale = 0.3f;
+    public float deathSlowMotionDuration = 0.6f; // 실제 시간 기준
+    public float shatterDelay = 0.35f;           // 사망 모션 시작 후 부서지기까지
+    public int shatterGrid = 8;                  // 가로 / 세로 조각 수
+    public float shatterForce = 6f;
+    public float shardLifetime = 1.5f;
 }

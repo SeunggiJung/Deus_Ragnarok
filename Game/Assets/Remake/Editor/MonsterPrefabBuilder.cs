@@ -65,7 +65,9 @@ public static class MonsterPrefabBuilder
                 UnityEngine.Object.DestroyImmediate(mb);
         }
 
-        var monster = (Monster)(go.GetComponent(monsterType) ?? go.AddComponent(monsterType));
+        // Unity 오브젝트는 없을 때 가짜 null을 반환할 수 있어 ?? 연산자 대신 명시적으로 검사
+        Component existing = go.GetComponent(monsterType);
+        var monster = (Monster)(existing != null ? existing : go.AddComponent(monsterType));
         var so = new SerializedObject(monster);
         so.FindProperty("stats").objectReferenceValue = stats;
         so.FindProperty("whatIsEnemy").intValue = LayerMask.GetMask("Player");

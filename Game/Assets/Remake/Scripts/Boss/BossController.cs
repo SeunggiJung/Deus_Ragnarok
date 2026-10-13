@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -56,6 +57,7 @@ public class BossController : BaseCharacter
         initialConstraints = rb.constraints;
         poise = Stats.maxPoise;
         tree = BossBehaviorTree.Build(this);
+        anim.speed = AnimSpeed;
     }
 
     protected override bool IsValidStats(CharacterStats s) => s is BossStats;
@@ -105,7 +107,7 @@ public class BossController : BaseCharacter
     #region Helpers for BT
     public float CooldownScale => IsPhase2 ? Stats.phase2CooldownMultiplier : 1f;
     public float MoveSpeed => Stats.moveSpeed * (IsPhase2 ? Stats.phase2MoveMultiplier : 1f);
-    public float AnimSpeed => IsPhase2 ? Stats.phase2AnimSpeed : 1f;
+    public float AnimSpeed => IsPhase2 ? Stats.phase2AnimSpeed : Stats.baseAnimSpeed;
 
     public float DistanceToTarget => Target != null
         ? Mathf.Abs(Target.transform.position.x - transform.position.x)
@@ -236,6 +238,10 @@ public class BossController : BaseCharacter
         IsGuarding = false;
         anim.speed = 1f;
         anim.SetBool(AnimParams.Moving, false);
+
+        // 남아있는 행동 트리거가 있으면 Any State 전이로 Die에서 다시 빠져나가 시체가 서 있는 문제가 생김 → 모두 해제
+        foreach (string trigger in new[] { AnimParams.Melee, AnimParams.Slam, AnimParams.Throw, AnimParams.Ability, AnimParams.Hit })
+            anim.ResetTrigger(trigger);
         anim.SetTrigger(AnimParams.Die);
         rb.velocity = Vector2.zero;
 
@@ -246,6 +252,34 @@ public class BossController : BaseCharacter
         CombatEvents.RaiseEnemyKilled(this, Stats.expReward);
         OnDefeated?.Invoke();
         Debug.Log($"[Boss] {Stats.bossName} 처치");
+
+        StartCoroutine(DeathSequence());
+    }
+
+    // 사망 연출 : 슬로모션 → 무너지는 모션 도중 파편으로 부서짐 → 제거
+    private IEnumerator DeathSequence()
+    {
+        Time.timeScale = Stats.deathSlowMotionScale;
+        yield return new WaitForSecondsRealtime(Stats.deathSlowMotionDuration);
+        Time.timeScale = 1f;
+
+        yield return new WaitForSeconds(Stats.shatterDelay);
+
+        foreach (var sr in spriteRenderers)
+        {
+            if (sr == null || !sr.enabled) continue;
+            SpriteShatter.Shatter(sr, Stats.shatterGrid, Stats.shatterGrid, Stats.shatterForce, Stats.shardLifetime);
+            sr.enabled = false;
+        }
+
+        yield return new WaitForSeconds(Stats.shardLifetime + 0.5f);
+        Destroy(gameObject);
+    }
+
+    private void OnDestroy()
+    {
+        // 슬로모션 도중 씬이 바뀌거나 제거돼도 시간 배율이 남지 않도록
+        if (IsDead) Time.timeScale = 1f;
     }
 
     protected override void OnDrawGizmos()

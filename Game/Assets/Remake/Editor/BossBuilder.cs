@@ -144,7 +144,7 @@ public static class BossBuilder
                 Object.DestroyImmediate(mb);
         }
 
-        var boss = go.GetComponent<BossController>() ?? go.AddComponent<BossController>();
+        var boss = GetOrAdd<BossController>(go);
         var so = new SerializedObject(boss);
         so.FindProperty("stats").objectReferenceValue = stats;
         so.FindProperty("whatIsEnemy").intValue = LayerMask.GetMask("Player");
@@ -169,5 +169,12 @@ public static class BossBuilder
         PrefabUtility.SaveAsPrefabAsset(go, PrefabPath);
         Object.DestroyImmediate(go);
         Debug.Log($"보스 프리팹 생성 : {PrefabPath}");
+    }
+
+    // Unity 오브젝트는 없을 때 가짜 null을 반환할 수 있어 ?? 연산자 대신 명시적으로 검사
+    private static T GetOrAdd<T>(GameObject go) where T : Component
+    {
+        T component = go.GetComponent<T>();
+        return component != null ? component : go.AddComponent<T>();
     }
 }
