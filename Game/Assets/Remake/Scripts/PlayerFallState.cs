@@ -12,7 +12,7 @@ public class PlayerFallState : PlayerAirState
 
         if (player.IsGrounded())
         {
-            if (Input.GetAxisRaw("Horizontal") != 0)
+            if (player.Input.MoveX != 0)
                 stateMachine.ChangeState(player.MoveState);
             else
                 stateMachine.ChangeState(player.IdleState);

@@ -10,7 +10,7 @@ public class PlayerAirState : PlayerState
     {
         base.PhysicsUpdate();
 
-        float xInput = Input.GetAxisRaw("Horizontal");
+        float xInput = player.Input.MoveX;
         player.SetVelocity(xInput * player.moveSpeed, player.Rb.velocity.y);
         player.CheckFlip(xInput);
     }

@@ -11,7 +11,7 @@ public class PlayerIdleState : PlayerGroundedState
         base.HandleInput();
         if (stateMachine.CurrentState != this) return; // 공격/점프/낙하로 이미 전환됨
 
-        if (Input.GetAxisRaw("Horizontal") != 0)
+        if (player.Input.MoveX != 0)
         {
             stateMachine.ChangeState(player.MoveState);
         }

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,8 +10,18 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     [Header("Stats")]
     [SerializeField] protected CharacterStats stats;
     protected float currentHp;
+    public float CurrentHp => currentHp;
+    public float MaxHp => stats.maxHp;
     public bool IsDead { get; private set; }
-    public bool IsInvincible { get; private set; }
+
+    // 피격 후 무적(hitInvincible)과 구르기 등 상태에 의한 무적(ForceInvincible)을 분리해
+    // 한쪽이 끝나면서 다른 쪽 무적까지 풀어버리는 일이 없도록 함
+    private bool hitInvincible;
+    public bool ForceInvincible { get; set; }
+    public bool IsInvincible => hitInvincible || ForceInvincible;
+
+    // UI 등 외부에서 구독 (현재 체력, 최대 체력)
+    public event Action<float, float> OnHpChanged;
 
     [Header("Components")]
     protected Rigidbody2D rb;
@@ -39,37 +50,54 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         for (int i = 0; i < spriteRenderers.Length; i++)
             originalColors[i] = spriteRenderers[i].color;
 
-        if (stats == null)
+        // 인스펙터에서 연결하지 않았다면 이름이 AttackCheck인 자식을 사용
+        if (attackCheck == null)
+            attackCheck = transform.Find("AttackCheck");
+
+        if (!IsValidStats(stats))
         {
-            Debug.LogError($"{gameObject.name}: CharacterStats가 할당되지 않아 기본값을 사용합니다.", this);
-            stats = ScriptableObject.CreateInstance<CharacterStats>();
+            Debug.LogError($"{gameObject.name}: 알맞은 Stats 에셋이 할당되지 않아 기본값을 사용합니다.", this);
+            stats = CreateDefaultStats();
         }
 
         currentHp = stats.maxHp;
     }
+
+    // 자식 클래스가 PlayerStats / EnemyStats 등 자신에게 맞는 타입을 요구할 수 있도록
+    protected virtual bool IsValidStats(CharacterStats s) => s != null;
+    protected virtual CharacterStats CreateDefaultStats() => ScriptableObject.CreateInstance<CharacterStats>();
 
     public virtual void TakeDamage(float damage)
     {
         // 사망 후 중복 피격, 무적 시간 중 연속 피격 방지
         if (IsDead || IsInvincible) return;
 
-        currentHp -= damage;
+        currentHp = Mathf.Max(0f, currentHp - damage);
         Debug.Log($"{gameObject.name} took {damage} damage. HP: {currentHp}");
+        OnHpChanged?.Invoke(currentHp, stats.maxHp);
 
         if (currentHp <= 0)
         {
             IsDead = true;
+            // 진행 중인 피격 연출을 정리하고 원래 색으로 복구
+            StopAllCoroutines();
+            RestoreSpriteColor();
+            hitInvincible = false;
             Die();
             return;
         }
 
         StartCoroutine(HitRoutine());
+        OnDamaged();
     }
+
+    // 피격 후 살아있을 때 호출 (경직 상태 전환 등은 자식 클래스에서)
+    protected virtual void OnDamaged() { }
 
     // 피격 시 붉게 번쩍인 뒤, 무적 시간 동안 깜빡임
     private IEnumerator HitRoutine()
     {
-        IsInvincible = true;
+        hitInvincible = true;
 
         SetSpriteColor(hitColor);
         yield return new WaitForSeconds(hitFlashTime);
@@ -85,7 +113,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         }
 
         RestoreSpriteColor();
-        IsInvincible = false;
+        hitInvincible = false;
     }
 
     private void SetSpriteColor(Color color)
