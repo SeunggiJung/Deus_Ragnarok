@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 // 스프라이트 프레임 애니메이션 이펙트 (폭발, 불줄기 조각 등). 반복하지 않으면 마지막 프레임 후 제거
 public class FxSpriteAnim : MonoBehaviour

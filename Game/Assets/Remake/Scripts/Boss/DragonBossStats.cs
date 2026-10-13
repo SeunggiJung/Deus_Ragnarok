@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 // 2스테이지 드래곤 보스 수치. 공통 보스 수치(BossStats)에 화염 브레스 / 화염구 비 / 붙잡아 내려찍기 수치를 더함
 [CreateAssetMenu(fileName = "NewDragonBossStats", menuName = "Deus/Dragon Boss Stats")]

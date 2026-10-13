@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine;
 
-public enum PuzzleColor { None, Red, Blue, Green, Magenta, Orange, White, Yellow }
+public enum PuzzleColor { None, Red, Blue, Green, Magenta, Orange, White, Yellow, Brown, Cyan, Lime }
 
 // 2스테이지 색 조합 퍼즐.
 // 불(ColorFire)에서 G키로 기본색을 2개 담으면 섞인 색이 되고, 맞는 색을 돌(ColorStone)에 G키로 넣으면 불이 켜짐.
@@ -12,7 +12,8 @@ public enum PuzzleColor { None, Red, Blue, Green, Magenta, Orange, White, Yellow
 // - 원작 : 플레이어 코드 안에 태그(cup, stone) 판정 + 리스트 + switch로 구현, 담는 순서까지 맞아야 조합 성공
 // - 변경 : 퍼즐 로직을 별도 컴포넌트로 분리, 불 / 돌은 IInteractable로 G키 상호작용, 순서와 상관없이 조합
 //   (조합표는 원작 유지 : 빨강+파랑=자홍, 파랑+초록=주황, 초록+빨강=흰색)
-// - 추가 : 불이 3개일 때는 아무 두 개나 섞어도 정답이 나오므로 노랑 불을 하나 더 두고, 노랑은 어떤 색과도 조합이 안 됨 (실패)
+// - 추가 : 불이 3개일 때는 아무 두 개나 섞어도 정답이 나오므로 노랑 불을 하나 더 둠.
+//   노랑 조합(빨강+노랑=갈색, 파랑+노랑=청록, 초록+노랑=라임)은 돌이 요구하지 않는 색이라 돌에 넣으면 실패 → 6가지 중 3가지만 정답
 public class ColorPuzzle : MonoBehaviour
 {
     [SerializeField] private ColorStone[] stones;
@@ -138,6 +139,9 @@ public class ColorPuzzle : MonoBehaviour
         if (Pair(a, b, PuzzleColor.Red, PuzzleColor.Blue)) return PuzzleColor.Magenta;
         if (Pair(a, b, PuzzleColor.Blue, PuzzleColor.Green)) return PuzzleColor.Orange;
         if (Pair(a, b, PuzzleColor.Green, PuzzleColor.Red)) return PuzzleColor.White;
+        if (Pair(a, b, PuzzleColor.Red, PuzzleColor.Yellow)) return PuzzleColor.Brown;
+        if (Pair(a, b, PuzzleColor.Blue, PuzzleColor.Yellow)) return PuzzleColor.Cyan;
+        if (Pair(a, b, PuzzleColor.Green, PuzzleColor.Yellow)) return PuzzleColor.Lime;
         return PuzzleColor.None;
     }
 
@@ -145,7 +149,8 @@ public class ColorPuzzle : MonoBehaviour
         (a == x && b == y) || (a == y && b == x);
 
     public static bool IsMixed(PuzzleColor c) =>
-        c == PuzzleColor.Magenta || c == PuzzleColor.Orange || c == PuzzleColor.White;
+        c == PuzzleColor.Magenta || c == PuzzleColor.Orange || c == PuzzleColor.White ||
+        c == PuzzleColor.Brown || c == PuzzleColor.Cyan || c == PuzzleColor.Lime;
 
     public static Color ToColor(PuzzleColor c)
     {
@@ -155,6 +160,9 @@ public class ColorPuzzle : MonoBehaviour
             case PuzzleColor.Blue: return new Color(0.3f, 0.5f, 1f);
             case PuzzleColor.Green: return new Color(0.25f, 0.95f, 0.35f);
             case PuzzleColor.Yellow: return new Color(1f, 0.92f, 0.15f);
+            case PuzzleColor.Brown: return new Color(0.65f, 0.38f, 0.18f);
+            case PuzzleColor.Cyan: return new Color(0.2f, 0.9f, 0.9f);
+            case PuzzleColor.Lime: return new Color(0.7f, 1f, 0.2f);
             case PuzzleColor.Magenta: return new Color(1f, 0.25f, 0.9f);
             case PuzzleColor.Orange: return new Color(1f, 0.64f, 0f);
             case PuzzleColor.White: return Color.white;
