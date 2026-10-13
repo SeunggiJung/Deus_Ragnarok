@@ -1,7 +1,7 @@
 # Deus_Ragnarok 리팩토링 & 리마스터링 — 작업 인수인계 문서
 
 > 다른 AI 모델 / 다른 세션이 이 프로젝트를 이어서 작업할 때 가장 먼저 읽는 문서.
-> 마지막 갱신 : 2026-10-13 (커밋 `6901e19` 기준)
+> 마지막 갱신 : 2026-10-14 (커밋 `7c46f46` 기준)
 
 ---
 
@@ -31,7 +31,7 @@
 1. 작업 단위가 끝날 때마다 **git 커밋 + push** (push 자동 허용됨). 커밋 메시지는 "무엇을 / 왜"를 한국어로, 마지막 줄에 Co-Authored-By.
    - `Game/Assets/External/Low_Swordman/3.Prefab/sword_man.prefab`은 Unity 버전 업그레이드로 자동 재직렬화된 변경 → **커밋하지 않음**
    - 사용자가 직접 수정한 파일은 함부로 커밋 / 되돌리지 않고 먼저 언급
-2. 작업 후 **노션 기록** : 작업 로그 페이지에 `### N. 제목` 섹션을 끝에 추가(현재 24번까지), 문제 해결은 트러블 슈팅 페이지에 `### N.` 추가(현재 6번까지). 기존 양식(불릿 + 코드블록 + 원작 대비 변경점) 유지
+2. 작업 후 **노션 기록** : 작업 로그 페이지에 `### N. 제목` 섹션을 끝에 추가(현재 34번까지. 2스테이지 초기 구성 작업은 25번 이전에 일부 누락), 문제 해결은 트러블 슈팅 페이지에 `### N.` 추가(현재 6번까지). 기존 양식(불릿 + 코드블록 + 원작 대비 변경점) 유지
 3. 스크립트 인코딩 : **UTF-8 with BOM + CRLF** (`Game/.editorconfig`). 새 파일 작성 후 반드시 변환
 4. 원작 씬은 건드리지 않고 **Remake 씬에서 작업** (`RemakeTest.unity` = 1스테이지, `Stage2.unity` = 2스테이지)
 5. 씬 구성은 가능한 한 **에디터 도구(`Tools/Deus/...`)로 재현 가능하게** 만들고, 여러 번 실행해도 결과가 같도록(idempotent) 작성
@@ -82,10 +82,14 @@
 - `Boss/BossController` : 강인도(누적 피해 80 → 그로기 1.5s, 트리 Abort), 2페이즈(체력 50%), 방어 자세(2초에 3회 피격), 사망 시 슬로모션 + `SpriteShatter` 파편
 - `Boss/BossBehaviorTree` : 포효 > 방어+반격 > RandomSelector[연타 / 지면 가시 / 돌진 / 에너지탄](각 패턴 뒤 0.8s 숨 고르기) > 추적
 - `Boss/BossActions` : 패턴 노드들. 보스 전용 애니메이터 `Animations/Boss/Boss.controller`(에셋 팩의 미사용 모션 연결)
+- **보스 공통 연출** : `Boss/BossTelegraph`(수축 링 + 머리 위 아이콘 + 패턴별 색 : 주황 ▼ 바닥 찍기 / 노랑 ! 잡기 / 보라 ▲ 도약 / 청록 >> 돌진 / 하늘 방패 방어 / 흰 X 근접 / 연두 ▼ 지면 가시 / 분홍 조준점 에너지탄 / 파랑 별 카운터 가능), `Boss/GroundZone`(바닥 공격 장판 : 추적 → Lock → 차오름), `Fx/Fx`(코드 생성 스프라이트 / Burst / Gather / Trail / Ring), `Fx/FxSpriteAnim`
+- **카운터 규칙** : 기를 모으는 패턴의 후반 구간(`CounterWindowOpen`)에 플레이어가 점프 공격(`JumpAttackState`)으로 맞히면 패턴이 끊기고 긴 그로기(`CounterStaggerTime`). `BossController.StaggerFor(duration)`는 행동 노드 안에서 그로기를 걸 때 사용(다음 프레임 적용)
+- **Crab (2스테이지 보스, 체력 500)** : `CrabBoss` / `CrabBossStats` / `CrabBossBehaviorTree` / `CrabActions` / `Editor/CrabBossBuilder`. 패턴 : 집게 연타, 바닥 찍기(발밑 + 좌우 충격파), 잡기(구르기로만 회피), 기 모아 강타(후반 40%에 점프 공격 카운터 → 3초 그로기, 2페이즈는 충전 0.8배 / 창 0.85배), 도약 내려찍기(장판 추적 → 내려찍기, 2페이즈 2연속), 돌진 / 방어 / 포효(공통 노드 재사용)
+- **Dragon (2스테이지 최종 보스, 체력 900)** : `DragonBoss` / `DragonBossStats` / `DragonBossBehaviorTree` / `DragonActions` / `Editor/DragonBossBuilder`(에셋 팩 PNG 프레임으로 모션 클립 생성, 컨트롤러 `Animations/Boss/DragonBoss.controller`). 패턴 : 발톱(공통 근접 노드), 화염 브레스(후반 40% 카운터, 2페이즈 2연속), 화염구 비(장판 + 낙하), 붙잡아 내려찍기(제한 시간 안에 범위 밖으로 못 나가면 잡혀서 들어올려진 뒤 내려찍힘 → 서로 반대로 날아가고 보스 그로기 1.5초 / 플레이어 스태미너 0). 등장 연출 동안은 `CanEngage`로 전투 지연. 보스 체력바는 보스마다 하나(`BossHealthBar.boss`)
 - `Boss/BossArenaGate` : 입구 기둥(전투 시작 시 낙하) / 출구 문(처치 후 열림). BT 보스(`boss`) 또는 일반 몬스터(`guardian` + `engageRange`) 둘 다 지원
 
 ### 4.5 레벨 / 상호작용 (`Scripts/Level`, `Scripts/Interaction`)
-- `FallingPlatform`(밟으면 흔들림 → 낙하 → 복구), `MovingPlatform`(Kinematic + MovePosition 왕복), `Checkpoint`, `WeaponPickup`(공격력 +3, 무기 스프라이트 교체), `BreakableBox`(IDamageable, 부수면 `LevelUpPickup`), `Crusher`(2스테이지 내려찍는 장애물), `ColorPuzzle/ColorFire/ColorStone`(2스테이지 퍼즐), `EncounterTrigger`(카메라 포커스 + 적 등장), `PlayerSession`
+- `FallingPlatform`(밟으면 흔들림 → 낙하 → 복구), `MovingPlatform`(Kinematic + MovePosition 왕복), `Checkpoint`, `WeaponPickup`(공격력 +3, 무기 스프라이트 교체), `BreakableBox`(IDamageable, 부수면 `LevelUpPickup`), `Crusher`(2스테이지 내려찍는 장애물 : 눈 완전히 감음 = 1회, 반만 감음 = 2회 내려찍기, 장애물 구역에서는 구르기 불가), `DodgeLockZone`(보스 입구 기둥 왼쪽에서는 구르기 금지, 기둥 콜라이더 중심 기준), `ColorPuzzle/ColorFire/ColorStone`(2스테이지 퍼즐 : 불 4개(빨강/파랑/초록/노랑) 중 2개를 섞어 돌 3개의 필요한 색(돌 위 힌트 표시)을 맞춤. 노랑 조합(갈색/청록/라임)은 오답), `EncounterTrigger`(카메라 포커스 + 적 등장), `PlayerSession`
 - `IInteractable` + `PlayerInteractor` : 새 상호작용 대상은 인터페이스만 구현하면 됨
 - `StagePortal` : G키 → `PlayerSession.Save` → `ScreenFader`로 페이드 후 씬 로드, `requiredDefeated`로 잠금 가능
 
@@ -110,7 +114,9 @@
 | Generate Player Roll Clip | 파츠 리그(body/Leg/Leg (1))를 회전시키는 구르기 애니메이션 생성 |
 
 ### 2스테이지 — `Assets/Remake/Scenes/Stage2.unity` (원작 second_stage 복사본)
-- `Build Stage 2` : 씬 복사/열기 → Player/HUD 프리팹 배치 + 카메라 대상 연결 + 레거시 Canvas 끔 → Rockhead x7 → `Crusher` → Boss(Crab)/Dragon → Monster FSM(`CrabStats`, `DragonStats`) → 보스방 Trap/Door → 검 → 색 퍼즐(Stone1=흰색, Stone2=자홍, Stone3=주황 / 빨강+파랑=자홍, 파랑+초록=주황, 초록+빨강=흰색) → key2 = 드래곤 등장 트리거 → 포탈(드래곤 처치 후 `third_stage`) → 체크포인트 5, 스포너 3
+- `Stage 2 - Build Sword Climb` : 보스 문 뒤 → 검까지의 길. 원작은 텔레포트로 오르던 지형 → 점프 + 공중 구르기로 오르는 계단 발판 10개(쉬운 도약 틈 1 / 구르기 도약 틈 3 번갈아, x 90~133), 검 발판에서 오른쪽으로 내려가면 지면(x 134~). 체크포인트3은 중간 발판, 퍼즐 이후 몬스터 없음(스포너는 `Spawner_S2_1` 하나)
+- `Build Crab Boss` / `Build Dragon Boss` : 각각 Behavior Tree 보스로 변환 (Build Stage 2에 포함)
+- `Build Stage 2` : 씬 복사/열기 → Player/HUD 프리팹 배치 + 카메라 대상 연결 + 레거시 Canvas 끔 → Rockhead x7 → `Crusher` → Boss(Crab)/Dragon → Monster FSM(`CrabStats`, `DragonStats`) → 보스방 Trap/Door → 검 → 색 퍼즐(Stone1=흰색, Stone2=자홍, Stone3=주황 / 빨강+파랑=자홍, 파랑+초록=주황, 초록+빨강=흰색 / 노랑 불은 갈색·청록·라임 오답 조합) → key2 = 드래곤 등장 트리거 → 포탈(드래곤 처치 후 `third_stage`) → 체크포인트 5, 스포너 3
 - 빌드 설정에 RemakeTest, Stage2 추가됨
 
 ---
@@ -139,12 +145,12 @@
 
 ### 검증 상태
 - 1스테이지 전 구간 : 사용자 테스트 완료 ("다 잘 작동된다")
-- **2스테이지 : 구성만 완료, 미검증** — 구성 직후 Unity가 크래시해서 플레이 확인 못 함. Unity를 다시 열고 Stage2를 플레이해 확인 필요
-  - 확인 포인트 : 시작 위치/카메라, Crusher 리듬과 판정, Crab 공격 거리(스케일 18), 보스방 문, 검 위치(x 106, y 10.4 — 높이가 닿는지), 퍼즐 상호작용 범위, 드래곤 등장 연출(레거시 camera.isFocusing 사용), 포탈 잠금, 성장 유지(PlayerSession)
+- 2스테이지 : Crusher / Crab 보스 / 검 가는 길은 사용자 플레이 확인("딱 좋다"). **드래곤 보스**는 사용자 플레이 1회 진행(브레스 / 화염구 비 / 발톱 피해 로그 확인), 붙잡아 내려찍기 범위(반지름 4.6) / 제한 시간(1.5초) / 브레스 입 위치 / 화염구 장판 크기는 추가 피드백 대기. 노랑 조합 퍼즐은 미검증
+  - 드래곤 아레나 입구 기둥(보스 이벤트 연동)과 불꽃 파도 패턴은 아직 없음
 
 ### 다음 후보
 - 2스테이지 테스트 피드백 반영 (난이도 / 위치)
-- Crab / Dragon을 BT 보스로 고도화 (현재는 일반 Monster FSM)
+- 드래곤 피드백 반영(수치 / 연출), 아레나 기둥, 2페이즈 추가 패턴
 - 3스테이지(원작 third_stage, Hades) 리메이크 — 현재 2스테이지 포탈은 원작 third_stage로 연결
 - 세이브(현재 PlayerSession은 메모리에만 유지), 사운드(원작 SFX/BGM 매니저 연동 안 됨)
 - 노션 "해야 되는 것들" : 스폰/성장/UI/BT 보스 모두 구현됨 → 사용자와 정리 필요
