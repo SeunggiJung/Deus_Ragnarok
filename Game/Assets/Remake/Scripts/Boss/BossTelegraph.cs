@@ -130,7 +130,7 @@ public class BossTelegraph : MonoBehaviour
         icon.transform.position = new Vector3(b.center.x, b.max.y + 1.6f + 0.12f * Mathf.Sin(elapsed * 12f), 0f);
         icon.transform.localScale = new Vector3(iconScale, iconScale, 1f);
         icon.flipX = kind == TelegraphKind.Charge && boss.FacingDir < 0f;
-        bool flash = t > 0.7f && Mathf.FloorToInt(elapsed * 14f) % 2 == 0;
+        bool flash = t > (kind == TelegraphKind.Heavy ? 0.6f : 0.7f) && Mathf.FloorToInt(elapsed * 14f) % 2 == 0;
         icon.color = flash ? Color.white : color;
 
         if (gather != null)

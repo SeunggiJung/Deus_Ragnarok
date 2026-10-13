@@ -502,12 +502,12 @@ public class LeapSlamAction : BossAction
     }
 }
 
-// 기 모아 강타. 기를 모으는 동안(파랑 별 + 수축 링) 보스는 무방비 → 링이 몸에 닿기 직전 30% 구간(카운터 창)에
+// 기 모아 강타. 기를 모으는 동안(파랑 별 + 수축 링) 보스는 무방비 → 링이 줄어드는 후반 40% 구간(카운터 창)에
 // 플레이어가 점프 공격을 맞추면 패턴이 끊기고 긴 그로기. 놓치면 앞쪽에 큰 한 방 (구르기 무적으로 회피)
 public class HeavyStrikeAction : BossAction
 {
     private enum Phase { Charge, Strike, Recover }
-    private const float WindowRatio = 0.3f;   // BossTelegraph가 임박 점멸을 시작하는 시점(70%)과 맞춤
+    private const float WindowRatio = 0.4f;   // 충전의 후반 40%(예: 2.0초면 1.2~2.0초)가 카운터 창. BossTelegraph 임박 점멸 시작(60%)과 맞춤
 
     private Phase phase;
     private float phaseStart;

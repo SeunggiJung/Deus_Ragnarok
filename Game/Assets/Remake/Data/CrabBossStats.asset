@@ -85,7 +85,7 @@ MonoBehaviour:
   poundTelegraphTint: {r: 1, g: 0.4, b: 0.4, a: 1}
   grabRange: 7
   grabCooldown: 9
-  grabTelegraph: 0.8
+  grabTelegraph: 1.3
   grabLungeSpeed: 12
   grabLungeTime: 0.35
   grabHoldTime: 0.9

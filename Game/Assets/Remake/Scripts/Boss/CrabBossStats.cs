@@ -21,7 +21,7 @@ public class CrabBossStats : BossStats
     [Header("Heavy Strike (기 모아 강타) - 타이밍 맞춘 점프 공격으로 카운터")]
     public float heavyRange = 7f;
     public float heavyCooldown = 10f;
-    public float heavyChargeTime = 1.6f;        // 기 모으는 시간 (끝 30%가 카운터 창)
+    public float heavyChargeTime = 2.0f;        // 기 모으는 시간 (끝 40%가 카운터 창)
     public float heavyDamage = 40f;
     public Vector2 heavyArea = new Vector2(4.5f, 3f);
     public float heavyRecovery = 0.9f;
@@ -44,7 +44,7 @@ public class CrabBossStats : BossStats
     [Header("Grab (잡기)")]
     public float grabRange = 7f;
     public float grabCooldown = 9f;
-    public float grabTelegraph = 0.8f;          // 예고 : 이 동안 구르기 준비
+    public float grabTelegraph = 1.3f;          // 예고 : 이 동안 구르기 준비
     public float grabLungeSpeed = 12f;
     public float grabLungeTime = 0.35f;
     public float grabHoldTime = 0.9f;           // 잡힌 채 제압당하는 시간
