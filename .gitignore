@@ -113,3 +113,5 @@ Thumbs.db
 
 # Mac
 *.unityPackage
+# Unity project lives in Game/
+/Game/[Uu]ser[Ss]ettings/
