@@ -31,6 +31,11 @@ public class PlayerStats : CharacterStats
     public float attackPerPoint = 2f;
     public float staminaPerPoint = 10f;
 
+    [Header("Potion")]
+    public float potionHealAmount = 50f;   // 총 회복량
+    public float potionHealDuration = 5f;  // 이 시간에 걸쳐 나눠서 회복
+    public float potionCooldown = 5f;
+
     [Header("Hit")]
     public float hitStunTime = 0.3f;         // 피격 경직 시간
 }

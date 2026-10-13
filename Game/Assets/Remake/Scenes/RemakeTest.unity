@@ -183,6 +183,7 @@ GameObject:
   - component: {fileID: 49962884}
   - component: {fileID: 49962886}
   - component: {fileID: 49962887}
+  - component: {fileID: 49962888}
   m_Layer: 0
   m_Name: PlayerHUD
   m_TagString: Untagged
@@ -261,6 +262,22 @@ MonoBehaviour:
   size: {x: 800, y: 24}
   bottomMargin: 60
   fillColor: {r: 0.75, g: 0.1, b: 0.1, a: 1}
+--- !u!114 &49962888
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 49962883}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b70e1b2177798a4b9b37fd18cffa993, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  potion: {fileID: 0}
+  slotSize: 72
+  margin: {x: 20, y: 20}
+  keyLabel: 1
 --- !u!1 &158673442
 GameObject:
   m_ObjectHideFlags: 0
@@ -3410,6 +3427,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 887058959}
+    - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 887058960}
     - targetCorrespondingSourceObject: {fileID: 6767065318607765198, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 414876453}
@@ -8293,6 +8313,7 @@ MonoBehaviour:
   input:
     jumpKey: 32
     dodgeKey: 304
+    potionKey: 49
     attackMouseButton: 0
   moveSpeed: 3.5
   jumpHeight: 1.4
@@ -8328,6 +8349,18 @@ MonoBehaviour:
   attackBonus: 50
   hpBonus: 100
   staminaBonus: 100
+--- !u!114 &887058960
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231353589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b37d55f060d602c42ac83b8060cbe850, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &902438070
 GameObject:
   m_ObjectHideFlags: 0

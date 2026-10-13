@@ -181,6 +181,14 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         bonusAttack += amount;
     }
 
+    // 체력 회복 (최대 체력을 넘지 않음, 사망 시 무시)
+    public void Heal(float amount)
+    {
+        if (IsDead || amount <= 0f) return;
+        currentHp = Mathf.Min(MaxHp, currentHp + amount);
+        OnHpChanged?.Invoke(currentHp, MaxHp);
+    }
+
     // 애니메이션 이벤트에서 호출할 함수
     public virtual void AnimationTrigger()
     {

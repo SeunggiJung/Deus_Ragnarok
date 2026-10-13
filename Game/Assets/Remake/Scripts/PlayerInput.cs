@@ -8,12 +8,14 @@ public class PlayerInput
 {
     [SerializeField] private KeyCode jumpKey = KeyCode.Space;
     [SerializeField] private KeyCode dodgeKey = KeyCode.LeftShift;
+    [SerializeField] private KeyCode potionKey = KeyCode.Alpha1;
     [SerializeField] private int attackMouseButton = 0; // 0 : 좌클릭
 
     public float MoveX { get; private set; }
     public bool JumpPressed { get; private set; }
     public bool AttackPressed { get; private set; }
     public bool DodgePressed { get; private set; }
+    public bool PotionPressed { get; private set; }
 
     // 프레임마다 한 번만 호출 (PlayerController.Update)
     public void Read()
@@ -23,6 +25,7 @@ public class PlayerInput
         // UI(레벨업 버튼 등)를 클릭할 때는 공격이 나가지 않도록
         AttackPressed = Input.GetMouseButtonDown(attackMouseButton) && !IsPointerOverUI();
         DodgePressed = Input.GetKeyDown(dodgeKey);
+        PotionPressed = Input.GetKeyDown(potionKey);
     }
 
     private static bool IsPointerOverUI()
@@ -34,6 +37,6 @@ public class PlayerInput
     public void Clear()
     {
         MoveX = 0f;
-        JumpPressed = AttackPressed = DodgePressed = false;
+        JumpPressed = AttackPressed = DodgePressed = PotionPressed = false;
     }
 }

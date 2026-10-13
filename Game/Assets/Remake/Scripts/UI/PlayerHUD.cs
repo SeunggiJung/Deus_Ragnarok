@@ -56,7 +56,7 @@ public class PlayerHUD : MonoBehaviour
         BuildLevelUpPanel(canvasGo.transform, new Vector2(margin.x, -margin.y - step * 3f - spacing));
     }
 
-    // 레벨업 시 나타나는 스탯 선택 패널 (버튼 클릭 또는 숫자키 1/2/3)
+    // 레벨업 시 나타나는 스탯 선택 패널 (버튼 클릭 또는 숫자키 2/3/4, 1은 포션)
     private void BuildLevelUpPanel(Transform parent, Vector2 anchoredPos)
     {
         levelUpPanel = new GameObject("Level Up Panel", typeof(RectTransform), typeof(Image));
@@ -79,9 +79,9 @@ public class PlayerHUD : MonoBehaviour
         levelUpTitle.color = new Color(1f, 0.9f, 0.4f);
 
         PlayerStats s = player != null ? player.Stats : null;
-        CreateStatButton(rect, 0, $"[1]  HP +{s?.hpPerPoint}", StatType.Hp);
-        CreateStatButton(rect, 1, $"[2]  ATK +{s?.attackPerPoint}", StatType.Attack);
-        CreateStatButton(rect, 2, $"[3]  ST +{s?.staminaPerPoint}", StatType.Stamina);
+        CreateStatButton(rect, 0, $"[2]  HP +{s?.hpPerPoint}", StatType.Hp);
+        CreateStatButton(rect, 1, $"[3]  ATK +{s?.attackPerPoint}", StatType.Attack);
+        CreateStatButton(rect, 2, $"[4]  ST +{s?.staminaPerPoint}", StatType.Stamina);
 
         levelUpPanel.SetActive(false);
     }
@@ -150,12 +150,12 @@ public class PlayerHUD : MonoBehaviour
 
     private void Update()
     {
-        // 레벨업 패널이 떠 있을 때 숫자키로도 선택 가능 (UI 전용 단축키라 PlayerInput이 아닌 HUD에서 처리)
+        // 레벨업 패널이 떠 있을 때 숫자키로도 선택 가능 (UI 전용 단축키라 PlayerInput이 아닌 HUD에서 처리, 1은 포션 키라 2부터)
         if (progression == null || !levelUpPanel.activeSelf) return;
 
-        if (Input.GetKeyDown(KeyCode.Alpha1)) progression.SpendPoint(StatType.Hp);
-        else if (Input.GetKeyDown(KeyCode.Alpha2)) progression.SpendPoint(StatType.Attack);
-        else if (Input.GetKeyDown(KeyCode.Alpha3)) progression.SpendPoint(StatType.Stamina);
+        if (Input.GetKeyDown(KeyCode.Alpha2)) progression.SpendPoint(StatType.Hp);
+        else if (Input.GetKeyDown(KeyCode.Alpha3)) progression.SpendPoint(StatType.Attack);
+        else if (Input.GetKeyDown(KeyCode.Alpha4)) progression.SpendPoint(StatType.Stamina);
     }
 
     private void HandleExpChanged(float exp, float expToNext)
