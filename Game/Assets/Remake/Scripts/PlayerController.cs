@@ -24,7 +24,11 @@ public class PlayerController : BaseCharacter
 
     [Header("Movement Settings")]
     public float moveSpeed = 2f;
-    public float jumpForce = 10f;
+    [Tooltip("점프 최고 높이 (유닛, 타일 1칸 = 1)")]
+    public float jumpHeight = 1.4f;
+
+    // 원하는 높이에 도달하기 위한 초기 속도 : v = sqrt(2gh)
+    public float JumpVelocity => Mathf.Sqrt(2f * Mathf.Abs(Physics2D.gravity.y) * rb.gravityScale * jumpHeight);
 
     [Header("Ground Check")]
     [SerializeField] private LayerMask whatIsGround;
