@@ -18,10 +18,7 @@ public class PlayerAttackState : PlayerState
     {
         base.Update();
 
-        // 진입 직후에는 애니메이터가 아직 이전 상태(Idle 등)를 재생 중이므로
-        // 실제로 Attack 상태에 들어온 뒤의 재생률만 보고 Idle로 전환
-        AnimatorStateInfo stateInfo = player.Anim.GetCurrentAnimatorStateInfo(0);
-        if (!player.Anim.IsInTransition(0) && stateInfo.IsName("Attack") && stateInfo.normalizedTime >= 1.0f)
+        if (player.IsAttackAnimationFinished())
         {
             stateMachine.ChangeState(player.IdleState);
         }

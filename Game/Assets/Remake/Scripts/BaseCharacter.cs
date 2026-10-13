@@ -138,6 +138,9 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
             spriteRenderers[i].color = originalColors[i];
     }
 
+    // 현재 공격의 데미지 (크리티컬 등 상황별 배율은 자식 클래스에서)
+    protected virtual float GetAttackDamage() => stats.attackDamage;
+
     // 애니메이션 이벤트에서 호출할 함수
     public virtual void AnimationTrigger()
     {
@@ -155,7 +158,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
 
             if (damageable != null && !ReferenceEquals(damageable, this) && damaged.Add(damageable))
             {
-                damageable.TakeDamage(stats.attackDamage);
+                damageable.TakeDamage(GetAttackDamage());
             }
         }
     }

@@ -22,6 +22,7 @@ MonoBehaviour:
   attackCost: 6
   jumpCost: 3
   dodgeCost: 15
+  criticalMultiplier: 2
   dodgeDistance: 3
   dodgeDuration: 0.35
   dodgeInvincibleTime: 0.3

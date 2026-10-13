@@ -12,6 +12,9 @@ public class PlayerStats : CharacterStats
     public float jumpCost = 3f;
     public float dodgeCost = 15f;
 
+    [Header("Jump Attack")]
+    public float criticalMultiplier = 2f;    // 점프 공격 데미지 배율 (원작 : 점프 중 공격 2배)
+
     [Header("Dodge")]
     public float dodgeDistance = 3f;
     public float dodgeDuration = 0.35f;

@@ -6,6 +6,12 @@ public class PlayerGroundedState : PlayerState
     public PlayerGroundedState(PlayerController player, StateMachine stateMachine, string animBoolName)
         : base(player, stateMachine, animBoolName) { }
 
+    public override void Enter()
+    {
+        base.Enter();
+        player.CanAirAttack = true; // 착지하면 점프 공격 다시 가능
+    }
+
     public override void HandleInput()
     {
         PlayerInput input = player.Input;

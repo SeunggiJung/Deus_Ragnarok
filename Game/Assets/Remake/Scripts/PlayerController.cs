@@ -11,6 +11,7 @@ public class PlayerController : BaseCharacter
     public PlayerMoveState MoveState { get; private set; }
     public PlayerIdleState IdleState { get; private set; }
     public PlayerAttackState AttackState { get; private set; }
+    public PlayerJumpAttackState JumpAttackState { get; private set; }
     public PlayerJumpState JumpState { get; private set; }
     public PlayerFallState FallState { get; private set; }
     public PlayerDodgeState DodgeState { get; private set; }
@@ -37,6 +38,9 @@ public class PlayerController : BaseCharacter
     // 바라보는 방향 (localScale.x = 1 : 왼쪽, -1 : 오른쪽)
     public float FacingDir => transform.localScale.x < 0 ? 1f : -1f;
 
+    // 체공 중 점프 공격 가능 여부 (착지 시 다시 true)
+    public bool CanAirAttack { get; set; } = true;
+
     // 스태미너 (UI 등 외부에서 구독 : 현재값, 최대값)
     public float CurrentStamina { get; private set; }
     public event Action<float, float> OnStaminaChanged;
@@ -56,6 +60,7 @@ public class PlayerController : BaseCharacter
         IdleState = new PlayerIdleState(this, StateMachine, "Idle");
         MoveState = new PlayerMoveState(this, StateMachine, "Move");
         AttackState = new PlayerAttackState(this, StateMachine, "Attack");
+        JumpAttackState = new PlayerJumpAttackState(this, StateMachine, "Attack");
         JumpState = new PlayerJumpState(this, StateMachine, "Jump");
         FallState = new PlayerFallState(this, StateMachine, "Jump");
         DodgeState = new PlayerDodgeState(this, StateMachine, "Dodge");
@@ -106,6 +111,26 @@ public class PlayerController : BaseCharacter
         Vector2 boxCenter = new Vector2(b.center.x, b.min.y);
         Vector2 boxSize = new Vector2(b.size.x * 0.8f, groundCheckDistance * 2f);
         return Physics2D.OverlapBox(boxCenter, boxSize, 0f, whatIsGround) != null;
+    }
+
+    // 진입 직후에는 애니메이터가 아직 이전 상태(Idle 등)를 재생 중이므로
+    // 실제로 Attack 상태에 들어온 뒤의 재생률만 보고 종료 판정
+    public bool IsAttackAnimationFinished()
+    {
+        AnimatorStateInfo info = anim.GetCurrentAnimatorStateInfo(0);
+        return !anim.IsInTransition(0) && info.IsName("Attack") && info.normalizedTime >= 1.0f;
+    }
+
+    // 점프 공격은 크리티컬
+    protected override float GetAttackDamage()
+    {
+        if (StateMachine.CurrentState == JumpAttackState)
+        {
+            float damage = stats.attackDamage * Stats.criticalMultiplier;
+            Debug.Log($"크리티컬! (점프 공격 x{Stats.criticalMultiplier}) 데미지 {damage}");
+            return damage;
+        }
+        return stats.attackDamage;
     }
 
     #region Stamina
@@ -174,16 +199,28 @@ public class PlayerController : BaseCharacter
             if (clearDistance <= distance)
             {
                 passThrough.Add(hit.collider);  // 끝까지 구르면 완전히 빠져나감 → 관통
+                Debug.Log($"[구르기] {hit.collider.name} 관통 : 빠져나가는 데 필요한 거리 {clearDistance:F2} ≤ 구르기 거리 {distance:F2}");
             }
             else
             {
+                Debug.Log($"[구르기] {hit.collider.name} 앞에서 정지 : 빠져나가는 데 필요한 거리 {clearDistance:F2} > 구르기 거리 {distance:F2} → {hit.distance:F2}만 이동");
                 distance = hit.distance;        // 다 못 빠져나감 → 적 앞에서 정지
                 break;
             }
         }
 
+        // Scene 뷰 확인용 기록 (초록 : 관통한 적, 빨강 : 정지한 위치)
+        lastDodgeStart = b.center;
+        lastDodgeEnd = b.center + (Vector3)(castDir * distance);
+        lastDodgeSize = castSize;
+        lastDodgeTime = Time.time;
+
         return distance;
     }
+
+    private Vector3 lastDodgeStart, lastDodgeEnd;
+    private Vector2 lastDodgeSize;
+    private float lastDodgeTime = float.NegativeInfinity;
 
     public void SetIgnoreCollision(List<Collider2D> colliders, bool ignore)
     {
@@ -215,6 +252,16 @@ public class PlayerController : BaseCharacter
         Bounds b = col.bounds;
         Gizmos.color = Color.green;
         Gizmos.DrawWireCube(new Vector2(b.center.x, b.min.y), new Vector2(b.size.x * 0.8f, groundCheckDistance * 2f));
+
+        // 마지막 구르기 계획 (2초간 표시) : 시작 위치(회색) → 도착 예정 위치(청록)
+        if (Application.isPlaying && Time.time - lastDodgeTime < 2f)
+        {
+            Gizmos.color = Color.gray;
+            Gizmos.DrawWireCube(lastDodgeStart, lastDodgeSize);
+            Gizmos.color = Color.cyan;
+            Gizmos.DrawWireCube(lastDodgeEnd, lastDodgeSize);
+            Gizmos.DrawLine(lastDodgeStart, lastDodgeEnd);
+        }
         Gizmos.color = Color.white;
     }
 }
