@@ -3291,6 +3291,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 887058958}
+    - targetCorrespondingSourceObject: {fileID: 8202995443122684391, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 887058959}
     - targetCorrespondingSourceObject: {fileID: 6767065318607765198, guid: 6877fb649746c674d8fbbcf60d41892b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 414876453}
@@ -8193,6 +8196,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8362d2f2db977384e9bc4d8f9ed82fff, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &887058959
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 231353589}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed739956211da984292bb21800d47044, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  buffKey: 282
+  attackBonus: 50
+  hpBonus: 100
+  staminaBonus: 100
 --- !u!1 &943553818
 GameObject:
   m_ObjectHideFlags: 0
