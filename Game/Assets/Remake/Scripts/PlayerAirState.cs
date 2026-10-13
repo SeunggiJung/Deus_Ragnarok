@@ -11,6 +11,8 @@ public class PlayerAirState : PlayerState
     {
         base.HandleInput();
 
+        if (TryDodge()) return; // 점프 / 낙하 중 구르기 캔슬
+
         if (player.Input.AttackPressed && player.CanAirAttack && player.TryUseStamina(player.Stats.attackCost))
         {
             stateMachine.ChangeState(player.JumpAttackState);

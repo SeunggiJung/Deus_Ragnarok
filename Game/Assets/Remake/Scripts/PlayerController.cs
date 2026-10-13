@@ -44,6 +44,8 @@ public class PlayerController : BaseCharacter
 
     // 체공 중 점프 공격 가능 여부 (착지 시 다시 true)
     public bool CanAirAttack { get; set; } = true;
+    // 체공 중 공중 구르기 가능 여부 (착지 시 다시 true)
+    public bool CanAirDodge { get; set; } = true;
 
     // 스태미너 (UI 등 외부에서 구독 : 현재값, 최대값)
     public float CurrentStamina { get; private set; }

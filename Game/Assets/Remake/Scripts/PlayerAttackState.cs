@@ -14,6 +14,13 @@ public class PlayerAttackState : PlayerState
         player.SetVelocity(0, player.Rb.velocity.y);
     }
 
+    // 공격 모션 도중 구르기로 캔슬 (판정 이벤트 전에 캔슬하면 공격은 나가지 않음)
+    public override void HandleInput()
+    {
+        base.HandleInput();
+        TryDodge();
+    }
+
     public override void Update()
     {
         base.Update();

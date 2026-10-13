@@ -25,6 +25,21 @@ public class PlayerState : IState
         player.Anim.SetBool(animBoolName, false);
     }
     public virtual void HandleInput() { }
+
+    // 구르기 캔슬 : 지상/공중/공격 중 어디서든 구르기 입력이 들어오면 현재 모션을 끊고 회피.
+    // 공중 구르기는 체공 중 1회 (연타로 공중에 떠 있는 것 방지). 전환했으면 true
+    protected bool TryDodge()
+    {
+        if (!player.Input.DodgePressed) return false;
+
+        bool grounded = player.IsGrounded();
+        if (!grounded && !player.CanAirDodge) return false;
+        if (!player.TryUseStamina(player.Stats.dodgeCost)) return false;
+
+        if (!grounded) player.CanAirDodge = false;
+        stateMachine.ChangeState(player.DodgeState);
+        return true;
+    }
     public virtual void Update() { }
     public virtual void PhysicsUpdate() { }
 }

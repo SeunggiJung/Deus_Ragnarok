@@ -13,6 +13,13 @@ public class PlayerJumpAttackState : PlayerState
         player.CanAirAttack = false;
     }
 
+    // 점프 공격 도중 구르기로 캔슬
+    public override void HandleInput()
+    {
+        base.HandleInput();
+        TryDodge();
+    }
+
     public override void Update()
     {
         base.Update();

@@ -9,7 +9,8 @@ public class PlayerGroundedState : PlayerState
     public override void Enter()
     {
         base.Enter();
-        player.CanAirAttack = true; // 착지하면 점프 공격 다시 가능
+        player.CanAirAttack = true; // 착지하면 점프 공격 / 공중 구르기 다시 가능
+        player.CanAirDodge = true;
     }
 
     public override void HandleInput()
@@ -17,17 +18,17 @@ public class PlayerGroundedState : PlayerState
         PlayerInput input = player.Input;
         PlayerStats stats = player.Stats;
 
-        // 한 프레임에 상태가 두 번 바뀌지 않도록 우선순위 순으로 else if
+        // 한 프레임에 상태가 두 번 바뀌지 않도록 우선순위 순으로 처리 (낙하 > 구르기 > 점프 > 공격)
         // 스태미너가 부족하면 해당 행동은 무시
         if (!player.IsGrounded())
         {
             stateMachine.ChangeState(player.FallState); // 발판 끝에서 걸어 내려간 경우
+            return;
         }
-        else if (input.DodgePressed && player.TryUseStamina(stats.dodgeCost))
-        {
-            stateMachine.ChangeState(player.DodgeState);
-        }
-        else if (input.JumpPressed && player.TryUseStamina(stats.jumpCost))
+
+        if (TryDodge()) return;
+
+        if (input.JumpPressed && player.TryUseStamina(stats.jumpCost))
         {
             stateMachine.ChangeState(player.JumpState);
         }

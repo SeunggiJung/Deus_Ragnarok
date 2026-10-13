@@ -4,6 +4,7 @@ using UnityEngine;
 // 구르기. 진입 시 경로를 계산해 적을 관통할지 / 적 앞에서 멈출지 결정하고 계산된 거리만큼 일정하게 이동.
 // 시작부터 dodgeInvincibleTime 동안 무적, 적을 관통하는 구르기는 끝날 때까지 무적
 // 관통으로 거리가 연장되면 같은 속도를 유지하도록 시간도 비례해서 늘어남
+// 공중에서 쓰면 구르는 동안 중력을 끄고 수평으로 대시 (높이 유지) 후 낙하
 public class PlayerDodgeState : PlayerState
 {
     private readonly List<Collider2D> passThrough = new List<Collider2D>();
@@ -13,6 +14,8 @@ public class PlayerDodgeState : PlayerState
     private float elapsed;
     private float duration;
     private bool passingEnemy;
+    private bool airDodge;
+    private float savedGravityScale;
 
     public PlayerDodgeState(PlayerController player, StateMachine stateMachine, string animBoolName)
         : base(player, stateMachine, animBoolName) { }
@@ -36,6 +39,14 @@ public class PlayerDodgeState : PlayerState
         startX = player.Rb.position.x;
         elapsed = 0f;
         player.ForceInvincible = true;
+
+        airDodge = !player.IsGrounded();
+        if (airDodge)
+        {
+            savedGravityScale = player.Rb.gravityScale;
+            player.Rb.gravityScale = 0f;
+            player.SetVelocity(0f, 0f);
+        }
     }
 
     public override void Update()
@@ -71,6 +82,8 @@ public class PlayerDodgeState : PlayerState
     public override void Exit()
     {
         base.Exit();
+        if (airDodge)
+            player.Rb.gravityScale = savedGravityScale;
         player.SetVelocity(0f, player.Rb.velocity.y);
         player.SetIgnoreCollision(passThrough, false);
         player.ForceInvincible = false;
