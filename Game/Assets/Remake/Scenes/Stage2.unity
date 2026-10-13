@@ -802,7 +802,8 @@ MonoBehaviour:
   slamSpeed: 18
   riseSpeed: 3
   fakeChance: 0.2
-  fakeDepth: 0.45
+  halfRise: 0.5
+  halfPauseTime: 0.25
   shakeAmount: 0.06
   damage: 20
   sendToCheckpoint: 1
@@ -820,6 +821,7 @@ GameObject:
   - component: {fileID: 169068089}
   - component: {fileID: 169068088}
   - component: {fileID: 169068092}
+  - component: {fileID: 169068093}
   m_Layer: 8
   m_Name: CrabGate
   m_TagString: Untagged
@@ -1167,6 +1169,18 @@ MonoBehaviour:
   openOnDefeat: 1
   openDelay: 2
   openDuration: 1.5
+--- !u!114 &169068093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 169068086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d6742e7dbae568744b660a90f77b1407, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &293560635
 GameObject:
   m_ObjectHideFlags: 0
@@ -1315,7 +1329,8 @@ MonoBehaviour:
   slamSpeed: 18
   riseSpeed: 3
   fakeChance: 0.2
-  fakeDepth: 0.45
+  halfRise: 0.5
+  halfPauseTime: 0.25
   shakeAmount: 0.06
   damage: 20
   sendToCheckpoint: 1
@@ -8942,7 +8957,8 @@ MonoBehaviour:
   slamSpeed: 18
   riseSpeed: 3
   fakeChance: 0.2
-  fakeDepth: 0.45
+  halfRise: 0.5
+  halfPauseTime: 0.25
   shakeAmount: 0.06
   damage: 20
   sendToCheckpoint: 1
@@ -17685,7 +17701,8 @@ MonoBehaviour:
   slamSpeed: 18
   riseSpeed: 3
   fakeChance: 0.2
-  fakeDepth: 0.45
+  halfRise: 0.5
+  halfPauseTime: 0.25
   shakeAmount: 0.06
   damage: 20
   sendToCheckpoint: 1
@@ -17837,7 +17854,8 @@ MonoBehaviour:
   slamSpeed: 18
   riseSpeed: 3
   fakeChance: 0.2
-  fakeDepth: 0.45
+  halfRise: 0.5
+  halfPauseTime: 0.25
   shakeAmount: 0.06
   damage: 20
   sendToCheckpoint: 1
@@ -26410,7 +26428,8 @@ MonoBehaviour:
   slamSpeed: 18
   riseSpeed: 3
   fakeChance: 0.2
-  fakeDepth: 0.45
+  halfRise: 0.5
+  halfPauseTime: 0.25
   shakeAmount: 0.06
   damage: 20
   sendToCheckpoint: 1
@@ -31740,7 +31759,8 @@ MonoBehaviour:
   slamSpeed: 18
   riseSpeed: 3
   fakeChance: 0.2
-  fakeDepth: 0.45
+  halfRise: 0.5
+  halfPauseTime: 0.25
   shakeAmount: 0.06
   damage: 20
   sendToCheckpoint: 1

@@ -268,7 +268,19 @@ public static class Stage2Builder
     {
         if (crab == null) return;
         SetupGate(FindInScene("Trap") ?? FindInScene("CrabGate"), "CrabGate", crab, startsOpen: true, closeOnEngage: true);
+        LockDodgeBeforeBoss();
         SetupGate(FindInScene("Door") ?? FindInScene("CrabExitDoor"), "CrabExitDoor", crab, startsOpen: false, closeOnEngage: false);
+    }
+
+    // 보스 구역(입구 기둥) 이전에서는 구르기 금지
+    [MenuItem("Tools/Deus/Stage 2 - Lock Dodge Before Boss")]
+    public static void LockDodgeBeforeBoss()
+    {
+        GameObject gate = FindInScene("CrabGate") ?? FindInScene("Trap");
+        if (gate == null) { Debug.LogError("보스방 입구 기둥(CrabGate)을 찾을 수 없습니다."); return; }
+        GetOrAdd<DodgeLockZone>(gate);
+        EditorSceneManager.MarkSceneDirty(SceneManager.GetActiveScene());
+        Debug.Log($"구르기 잠금 구역 설정 : x < {gate.transform.position.x}");
     }
 
     private static void SetupGate(GameObject go, string name, Monster guardian, bool startsOpen, bool closeOnEngage)
