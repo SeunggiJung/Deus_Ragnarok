@@ -5,7 +5,7 @@ using UnityEngine;
 
 // 플레이어 3단 콤보 애니메이션 생성기.
 // 플레이어는 파츠 리그(body / Leg / body/Head / body/Weapon)라서 각 파츠의 회전 / 위치를 키프레임으로 만든다.
-//   Attack1 : 사선 휘두르기 (빠름)   Attack2 : 반대 방향 올려 베기   Attack3 : 찌르기 (몸을 던지는 마무리)
+//   Attack1 : 원작 내려치기 (기존 클립 재사용)   Attack2 : 올려 베기   Attack3 : 찌르기 (몸을 던지는 마무리)
 // 기준 자세는 Player.prefab의 현재 값이고, 각 키는 거기서의 변화량(delta)이라 프리팹 자세가 바뀌어도 재생성하면 된다.
 // 무기 회전 : + 방향이 앞으로 휘두르는 쪽 (원작 내려치기가 -96 → +86). 위치 : 로컬 -x가 앞
 // 메뉴 : Tools/Deus/Generate Player Combo Clips  (수치를 바꾸면 다시 실행해서 재생성)
@@ -13,6 +13,8 @@ public static class PlayerComboClipGenerator
 {
     private const string PrefabPath = "Assets/Remake/Prefabs/Player.prefab";
     private const string ClipFolder = "Assets/Remake/Animations/Player";
+    private const string OriginalAttackClip = "Assets/External/Low_Swordman/2.Animation/Attack.anim"; // 1타 : 원작 내려치기
+    private const float Attack1Speed = 1.15f;
     private const string ControllerPath = "Assets/Remake/Animations/Player/Player.controller";
 
     private const string Body = "body";
@@ -52,32 +54,26 @@ public static class PlayerComboClipGenerator
         float r = restWeaponZ;
         return new[]
         {
-            // 1타 : 뒤로 살짝 젖혔다가 앞으로 사선 베기 (0.30초, 판정 0.12초)
-            new ClipDef { name = "Attack1", hitTime = 0.12f, keys = new[]
+            // 2타 : 대검을 아래 앞으로 낮게 끌었다가 힘을 모아 위로 올려 베기 (0.60초, 판정 0.26초)
+            new ClipDef { name = "Attack2", hitTime = 0.26f, keys = new[]
             {
-                new Key(0.00f, r,    V(0f, 0f),        0f,   V(0f, 0f),       0f,  V(0f, 0f)),
-                new Key(0.05f, -30f, V(0.10f, 0.45f),  -9f,  V(0.03f, 0f),    -6f, V(0.02f, 0f)),
-                new Key(0.12f, 95f,  V(-0.30f, -0.10f), 14f, V(-0.06f, 0f),   10f, V(-0.04f, 0f)),
-                new Key(0.20f, 105f, V(-0.32f, -0.12f), 12f, V(-0.06f, 0f),    8f, V(-0.04f, 0f)),
-                new Key(0.30f, r,    V(0f, 0f),        0f,   V(0f, 0f),       0f,  V(0f, 0f)),
+                new Key(0.00f, r,    V(0f, 0f),          0f,   V(0f, 0f),         0f,  V(0f, 0f)),
+                new Key(0.18f, 150f, V(-0.12f, -0.45f),  9f,   V(-0.03f, -0.06f), 7f,  V(-0.04f, 0f)),
+                new Key(0.23f, 150f, V(-0.12f, -0.45f),  10f,  V(-0.03f, -0.07f), 8f,  V(-0.04f, 0f)),
+                new Key(0.27f, 80f,  V(-0.38f, 0.02f),   -2f,  V(-0.08f, 0f),    2f,  V(-0.06f, 0f)),
+                new Key(0.32f, -20f, V(0.02f, 0.62f),    -13f, V(-0.05f, 0.03f), -9f, V(-0.04f, 0f)),
+                new Key(0.42f, -20f, V(0.02f, 0.62f),    -13f, V(-0.05f, 0.03f), -9f, V(-0.04f, 0f)),
+                new Key(0.60f, r,    V(0f, 0f),          0f,   V(0f, 0f),         0f,  V(0f, 0f)),
             }},
-            // 2타 : 아래 앞에서 반대로 올려 베기 (0.30초, 판정 0.09초)
-            new ClipDef { name = "Attack2", hitTime = 0.09f, keys = new[]
+            // 3타 : 대검을 뒤로 끌어 당겨 버티다가 몸을 던지며 찌름 (0.75초, 판정 0.33초)
+            new ClipDef { name = "Attack3", hitTime = 0.33f, keys = new[]
             {
-                new Key(0.00f, r,    V(0f, 0f),         0f,  V(0f, 0f),       0f,  V(0f, 0f)),
-                new Key(0.04f, 135f, V(-0.12f, -0.40f), 7f,  V(-0.02f, -0.02f), 6f, V(-0.03f, 0f)),
-                new Key(0.09f, 80f,  V(-0.35f, 0.05f),  -2f, V(-0.07f, 0f),   2f,  V(-0.05f, 0f)),
-                new Key(0.15f, -35f, V(0.02f, 0.60f),   -12f, V(-0.04f, 0.02f), -8f, V(-0.03f, 0f)),
-                new Key(0.30f, r,    V(0f, 0f),         0f,  V(0f, 0f),       0f,  V(0f, 0f)),
-            }},
-            // 3타 : 칼을 뒤로 당겼다가 앞으로 찌르며 몸을 던짐 (0.40초, 판정 0.15초)
-            new ClipDef { name = "Attack3", hitTime = 0.15f, keys = new[]
-            {
-                new Key(0.00f, r,   V(0f, 0f),           0f,  V(0f, 0f),        0f,  V(0f, 0f)),
-                new Key(0.09f, 88f, V(0.28f, -0.05f),    -10f, V(0.08f, 0f),    -5f, V(0.05f, 0f)),
-                new Key(0.15f, 88f, V(-0.60f, -0.02f),   9f,  V(-0.20f, -0.02f), 8f,  V(-0.12f, 0f)),
-                new Key(0.27f, 88f, V(-0.58f, -0.02f),   8f,  V(-0.19f, -0.02f), 7f,  V(-0.11f, 0f)),
-                new Key(0.40f, r,   V(0f, 0f),           0f,  V(0f, 0f),        0f,  V(0f, 0f)),
+                new Key(0.00f, r,   V(0f, 0f),         0f,   V(0f, 0f),          0f,  V(0f, 0f)),
+                new Key(0.25f, 88f, V(0.30f, -0.05f),  -12f, V(0.10f, -0.03f),   -6f, V(0.06f, 0f)),
+                new Key(0.30f, 88f, V(0.32f, -0.05f),  -13f, V(0.11f, -0.03f),   -7f, V(0.06f, 0f)),
+                new Key(0.36f, 88f, V(-0.68f, -0.02f), 10f,  V(-0.24f, -0.02f),  8f,  V(-0.14f, 0f)),
+                new Key(0.52f, 88f, V(-0.66f, -0.02f), 9f,   V(-0.23f, -0.02f),  7f,  V(-0.13f, 0f)),
+                new Key(0.75f, r,   V(0f, 0f),         0f,   V(0f, 0f),          0f,  V(0f, 0f)),
             }},
         };
     }
@@ -97,6 +93,10 @@ public static class PlayerComboClipGenerator
                 Debug.LogError("Player.prefab에서 body / Leg / body/Head / body/Weapon 파츠를 찾을 수 없습니다.");
                 return;
             }
+
+            AnimationClip original = AssetDatabase.LoadAssetAtPath<AnimationClip>(OriginalAttackClip);
+            if (original != null) HookUpController("Attack1", original, Attack1Speed);
+            else Debug.LogError($"{OriginalAttackClip}를 찾을 수 없습니다.");
 
             Pose bodyBase = new Pose(body), legBase = new Pose(leg), headBase = new Pose(head), weaponBase = new Pose(weapon);
             Debug.Log($"[콤보] 기준 자세 : 무기 z {weaponBase.euler.z:F1}, 무기 위치 {weaponBase.pos}, 머리 위치 {headBase.pos}, 몸 위치 {bodyBase.pos}");
@@ -128,7 +128,7 @@ public static class PlayerComboClipGenerator
                 if (isNew) AssetDatabase.CreateAsset(clip, path);
                 EditorUtility.SetDirty(clip);
 
-                HookUpController(def.name, clip);
+                HookUpController(def.name, clip, 1f);
                 Debug.Log($"콤보 애니메이션 생성 : {path} (길이 {def.keys.Last().t:F2}초, 판정 {def.hitTime:F2}초)");
             }
             AssetDatabase.SaveAssets();
@@ -163,7 +163,7 @@ public static class PlayerComboClipGenerator
         }
         float end = keys.Last().t;
 
-        // 키 사이에서 휘청이지 않도록 선형 보간 (빠른 베기 느낌)
+        // 키 사이는 선형 보간 : 키 간격이 길면 천천히 힘을 모으고, 짧으면 순간적으로 휘두르는 대검 느낌
         foreach (AnimationCurve c in new[] { px, py, rz })
             for (int i = 0; i < c.length; i++)
             {
@@ -180,7 +180,7 @@ public static class PlayerComboClipGenerator
     }
 
     // AttackN bool 파라미터 + 상태 + Any State 전이 (조건 : AttackN) 추가. 여러 번 실행해도 중복 생성하지 않음
-    private static void HookUpController(string name, AnimationClip clip)
+    private static void HookUpController(string name, AnimationClip clip, float speed)
     {
         AnimatorController controller = AssetDatabase.LoadAssetAtPath<AnimatorController>(ControllerPath);
         if (controller == null)
@@ -200,7 +200,7 @@ public static class PlayerComboClipGenerator
             state = sm.AddState(name, new Vector3(780f, 290f + index * 120f, 0f));
         }
         state.motion = clip;
-        state.speed = 1f;
+        state.speed = speed;
         state.writeDefaultValues = true;
 
         AnimatorStateTransition transition = sm.anyStateTransitions.FirstOrDefault(t => t.conditions.Any(c => c.parameter == name));

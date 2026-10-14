@@ -1,9 +1,9 @@
 ﻿using UnityEngine;
 
-// 지상 공격 : 연타하면 3단 콤보 (휘두르기 → 반대 베기 → 찌르기).
-// - 각 단계는 애니메이터의 Attack1 / Attack2 / Attack3 상태 (모션은 Tools/Deus/Generate Player Combo Clips 로 생성)
-// - 판정 이후(comboCancelTime)부터 다음 공격 입력을 받아 모션을 끊고 바로 다음 단계로 이어짐 (선입력 보관)
-// - 같은 구간부터 이동 / 점프로도 캔슬 가능 → 후딜레이를 줄여 속도감 확보
+// 지상 공격 : 3단 콤보 (1타 내려치기 → 2타 올려치기 → 3타 찌르기).
+// - 각 단계는 애니메이터의 Attack1 / Attack2 / Attack3 상태 (2, 3타 모션은 Tools/Deus/Generate Player Combo Clips 로 생성)
+// - 모션은 끝까지 재생된다 (구르기만 캔슬 가능). 모션 후반(comboChainStart)부터 누른 클릭만 콤보로 인정하고,
+//   모션이 끝나는 순간 바로 다음 타로 이어짐. 끝난 직후 comboResumeGrace 안에 눌러도 이어짐
 public class PlayerAttackState : PlayerState
 {
     public const int MaxStep = 2; // 0 ~ 2 (3단)
@@ -11,9 +11,13 @@ public class PlayerAttackState : PlayerState
     public int Step { get; private set; }
 
     private bool advancing;   // 콤보 이어가기로 재진입하는 중인가
-    private bool buffered;    // 판정 이전에 눌러 둔 공격 입력
+    private bool buffered;    // 후반 구간에 눌러 둔 공격 입력
+    private float lungeStart;
     private float lungeEnd;
     private float lungeSpeed;
+
+    private int resumeStep;       // 모션이 끝난 직후 다시 누르면 이어질 단계
+    private float resumeUntil = float.NegativeInfinity;
 
     public PlayerAttackState(PlayerController player, StateMachine stateMachine, string animBoolName)
         : base(player, stateMachine, animBoolName) { }
@@ -22,28 +26,31 @@ public class PlayerAttackState : PlayerState
 
     public override void Enter()
     {
-        Step = advancing ? Mathf.Min(Step + 1, MaxStep) : 0;
+        if (advancing) Step = Mathf.Min(Step + 1, MaxStep);
+        else Step = Time.time <= resumeUntil ? resumeStep : 0;
         advancing = false;
         buffered = false;
+        resumeUntil = float.NegativeInfinity;
 
         animBoolName = StateName; // 단계마다 다른 애니메이터 bool 사용
         base.Enter();
 
         PlayerStats stats = player.Stats;
         lungeSpeed = GetOrDefault(stats.comboLungeSpeed, Step, 0f);
-        lungeEnd = Time.time + GetOrDefault(stats.comboLungeTime, Step, 0f);
+        lungeStart = Time.time + GetOrDefault(stats.comboLungeDelay, Step, 0f);
+        lungeEnd = lungeStart + GetOrDefault(stats.comboLungeTime, Step, 0f);
 
-        // 공격 시작 시 제자리 (콤보 단계에 따라 짧게 앞으로 밀고 나감 : PhysicsUpdate)
+        // 공격 시작 시 제자리 (휘두르는 순간에 짧게 앞으로 나감 : PhysicsUpdate)
         player.SetVelocity(0, player.Rb.velocity.y);
     }
 
-    // 공격 모션 도중 구르기로 캔슬 (판정 이벤트 전에 캔슬하면 공격은 나가지 않음)
     public override void HandleInput()
     {
         base.HandleInput();
-        if (TryDodge()) return;
+        if (TryDodge()) return; // 구르기만 모션 캔슬 가능 (판정 이벤트 전에 캔슬하면 공격은 나가지 않음)
 
-        if (player.Input.AttackPressed)
+        // 후반 구간에 누른 클릭만 보관 (너무 일찍 누른 클릭은 무시 → 모션이 스킵되지 않음)
+        if (player.Input.AttackPressed && Step < MaxStep && InChainWindow())
             buffered = true;
     }
 
@@ -51,46 +58,39 @@ public class PlayerAttackState : PlayerState
     {
         base.Update();
 
-        // 진입 직후에는 애니메이터가 아직 이전 상태를 재생 중이므로 실제로 들어온 뒤부터 판단
         AnimatorStateInfo info = player.Anim.GetCurrentAnimatorStateInfo(0);
         if (player.Anim.IsInTransition(0) || !info.IsName(StateName)) return;
+        if (info.normalizedTime < 1.0f) return;
 
-        float t = info.normalizedTime;
-        PlayerStats stats = player.Stats;
-        bool canCancel = t >= GetOrDefault(stats.comboCancelTime, Step, 0.6f);
-
-        if (canCancel)
+        // 모션 종료
+        if (buffered && player.TryUseStamina(player.Stats.attackCost))
         {
-            if (buffered && Step < MaxStep && player.TryUseStamina(stats.attackCost))
-            {
-                player.CheckFlip(player.Input.MoveX); // 콤보 사이에 방향 전환 가능
-                advancing = true;
-                stateMachine.ChangeState(this);
-                return;
-            }
-
-            if (player.Input.JumpPressed && player.TryUseStamina(stats.jumpCost))
-            {
-                stateMachine.ChangeState(player.JumpState);
-                return;
-            }
-
-            if (player.Input.MoveX != 0f)
-            {
-                stateMachine.ChangeState(player.MoveState);
-                return;
-            }
+            player.CheckFlip(player.Input.MoveX); // 콤보 사이에 방향 전환 가능
+            advancing = true;
+            stateMachine.ChangeState(this);
+            return;
         }
 
-        if (t >= 1.0f)
-            stateMachine.ChangeState(player.IdleState);
+        if (Step < MaxStep)
+        {
+            resumeStep = Step + 1;
+            resumeUntil = Time.time + player.Stats.comboResumeGrace;
+        }
+        stateMachine.ChangeState(player.IdleState);
     }
 
     public override void PhysicsUpdate()
     {
         base.PhysicsUpdate();
-        float vx = Time.time < lungeEnd ? player.FacingDir * lungeSpeed : 0f;
+        float vx = Time.time >= lungeStart && Time.time < lungeEnd ? player.FacingDir * lungeSpeed : 0f;
         player.SetVelocity(vx, player.Rb.velocity.y);
+    }
+
+    private bool InChainWindow()
+    {
+        AnimatorStateInfo info = player.Anim.GetCurrentAnimatorStateInfo(0);
+        if (player.Anim.IsInTransition(0) || !info.IsName(StateName)) return false;
+        return info.normalizedTime >= GetOrDefault(player.Stats.comboChainStart, Step, 0.6f);
     }
 
     private static float GetOrDefault(float[] values, int index, float fallback)

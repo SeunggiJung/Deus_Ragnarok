@@ -17,9 +17,11 @@ public class PlayerStats : CharacterStats
 
     [Header("Combo (지상 3단 콤보, 1~3타 순서)")]
     public float[] comboDamage = { 1f, 1f, 1.5f };         // 공격력 배율 (3타 찌르기는 마무리라 강하게)
-    public float[] comboCancelTime = { 0.55f, 0.5f, 0.6f }; // 모션 진행률이 이 값을 넘으면 다음 공격 / 이동 / 점프로 캔슬 가능
-    public float[] comboLungeSpeed = { 1.5f, 1.5f, 4.5f };  // 공격하며 앞으로 나가는 속도
-    public float[] comboLungeTime = { 0.1f, 0.1f, 0.14f };  // 앞으로 나가는 시간
+    public float[] comboChainStart = { 0.6f, 0.6f, 1f };   // 모션 진행률이 이 값을 넘은 뒤 누른 클릭만 콤보로 인정 (모션은 끝까지 재생)
+    public float comboResumeGrace = 0.25f;                  // 모션이 끝난 직후 이 시간 안에 누르면 다음 타로 이어짐
+    public float[] comboLungeDelay = { 0.2f, 0.2f, 0.28f }; // 공격 시작 후 앞으로 나가기 시작하는 시간 (휘두르는 순간에 맞춤)
+    public float[] comboLungeSpeed = { 1.5f, 1.8f, 4.5f };  // 공격하며 앞으로 나가는 속도
+    public float[] comboLungeTime = { 0.12f, 0.12f, 0.16f };  // 앞으로 나가는 시간
 
     [Header("Jump Attack")]
     public float criticalMultiplier = 2f;    // 점프 공격 데미지 배율 (원작 : 점프 중 공격 2배)
