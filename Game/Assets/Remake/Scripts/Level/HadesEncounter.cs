@@ -17,7 +17,7 @@ public class HadesEncounter : MonoBehaviour, IInteractable
     [Tooltip("웨이브마다 복제해서 쓰는 졸개 원본 (씬에는 비활성으로 두고, 종류 / 크기 / 능력치만 가져옴)")]
     [SerializeField] private Monster[] minions;
     [Tooltip("웨이브별 몬스터 수 (뒤로 갈수록 많아짐)")]
-    [SerializeField] private int[] waveSizes = { 2, 3, 5, 6 };
+    [SerializeField] private int[] waveSizes = { 4, 6, 9, 12 };
     [SerializeField] private float firstWaveDelay = 1.0f;
     [SerializeField] private float waveInterval = 2.5f;       // 웨이브를 전멸시킨 뒤 다음 웨이브까지
     [Tooltip("졸개가 나타나는 좌 / 우 끝 (플레이어 위로 떨어지지 않도록 양쪽 끝에서 입장)")]

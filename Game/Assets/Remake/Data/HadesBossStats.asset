@@ -122,6 +122,33 @@ MonoBehaviour:
   teleportLockTime: 0.55
   teleportRadius: 3.4
   teleportDamage: 30
+  form2TeleportChain: 3
+  teleportChainTrackTime: 0.5
+  teleportChainLockTime: 0.4
+  comboCooldown: 6
+  comboRange: 12
+  comboHits: 3
+  comboLungeSpeed: 14
+  comboLungeTime: 0.22
+  comboReach: 5.5
+  comboHitDuration: 0.65
+  comboDamageRatio: 0.8
+  skyCooldown: 12
+  skyStrikes: 12
+  skyAimed: 4
+  skyInterval: 0.16
+  skyWarnTime: 0.85
+  skyRadius: 0.85
+  skyDamage: 24
+  beamCooldown: 10
+  beamMinRange: 2
+  beamWarnTime: 1
+  beamDuration: 1
+  beamTickInterval: 0.2
+  beamDamage: 14
+  beamHeight: 1.3
+  beamHeightAboveGround: 0.65
+  beamLength: 40
   hasForm2Collider: 1
   form2ColliderOffset: {x: 0.11892463, y: -0.05092688}
   form2ColliderSize: {x: 0.30968007, y: 0.873154}

@@ -66,6 +66,39 @@ public class HadesBossStats : BossStats
     public float teleportLockTime = 0.55f;      // 장판 고정 후 나타나기까지
     public float teleportRadius = 3.4f;
     public float teleportDamage = 30f;
+    public int form2TeleportChain = 3;          // 2형태는 연속으로 여러 번 (이후 강타는 장판 추적 / 고정 시간이 짧아짐)
+    public float teleportChainTrackTime = 0.5f;
+    public float teleportChainLockTime = 0.4f;
+
+    [Header("Phase 2 : Combo (돌진 연타) - 파고들며 3연속 타격")]
+    public float comboCooldown = 6f;
+    public float comboRange = 12f;
+    public int comboHits = 3;
+    public float comboLungeSpeed = 14f;
+    public float comboLungeTime = 0.22f;
+    public float comboReach = 5.5f;
+    public float comboHitDuration = 0.65f;
+    public float comboDamageRatio = 0.8f;       // 공격력 대비 (연타라 한 발은 약함)
+
+    [Header("Phase 2 : Sky Strike (암흑 낙뢰) - 맵 곳곳에 하늘에서 기둥")]
+    public float skyCooldown = 12f;
+    public int skyStrikes = 12;
+    public int skyAimed = 4;                    // 처음 몇 발은 플레이어 위치를 노림
+    public float skyInterval = 0.16f;
+    public float skyWarnTime = 0.85f;
+    public float skyRadius = 0.85f;
+    public float skyDamage = 24f;
+
+    [Header("Phase 2 : Beam (암흑 광선) - 바닥 높이 가로 광선을 양쪽으로")]
+    public float beamCooldown = 10f;
+    public float beamMinRange = 2f;
+    public float beamWarnTime = 1.0f;
+    public float beamDuration = 1.0f;
+    public float beamTickInterval = 0.2f;
+    public float beamDamage = 14f;
+    public float beamHeight = 1.3f;
+    public float beamHeightAboveGround = 0.65f;
+    public float beamLength = 40f;
 
     [Header("Form 2 Hitbox (빌더가 원작 스프라이트 크기 비율로 계산)")]
     public bool hasForm2Collider;

@@ -5,7 +5,7 @@ public class EnemyChaseState : EnemyState
 {
     public EnemyChaseState(Monster enemy, StateMachine stateMachine) : base(enemy, stateMachine) { }
 
-    private bool InAttackRange => enemy.DistanceToTarget <= enemy.Stats.attackRange;
+    private bool InAttackRange => enemy.DistanceToTarget <= enemy.AttackRange;
 
     public override void Update()
     {
@@ -29,7 +29,7 @@ public class EnemyChaseState : EnemyState
 
     public override void PhysicsUpdate()
     {
-        float vx = InAttackRange ? 0f : enemy.DirectionToTarget * enemy.Stats.moveSpeed;
+        float vx = InAttackRange ? 0f : enemy.DirectionToTarget * enemy.Stats.moveSpeed * enemy.SpeedMultiplier;
         enemy.SetVelocityX(vx);
     }
 

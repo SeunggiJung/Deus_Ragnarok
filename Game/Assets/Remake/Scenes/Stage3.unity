@@ -2355,7 +2355,7 @@ Animator:
   m_GameObject: {fileID: 590989898}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 7052c8b4bb06f644ea75e62b72afedbd, type: 2}
+  m_Controller: {fileID: 9100000, guid: ac94dd0c3c756ed44abbc3e96e5e9ecb, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -2414,6 +2414,7 @@ MonoBehaviour:
   hitFlashTime: 0.1
   blinkInterval: 0.08
   spriteFacesRight: 1
+  varyMotion: 1
   attackStateName: Attack
 --- !u!114 &590989905
 MonoBehaviour:
@@ -3077,7 +3078,7 @@ MonoBehaviour:
   - {fileID: 590989904}
   - {fileID: 1451395648}
   - {fileID: 1986588129}
-  waveSizes: 02000000030000000500000006000000
+  waveSizes: 0400000006000000090000000c000000
   firstWaveDelay: 1
   waveInterval: 2.5
   spawnMinX: -8
@@ -8629,7 +8630,7 @@ Animator:
   m_GameObject: {fileID: 1437196233}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b9ffd80256a9a3e4f90e1eac807bff81, type: 2}
+  m_Controller: {fileID: 9100000, guid: b2e365417fdc53040a09c7a2d35fe421, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -8791,6 +8792,7 @@ MonoBehaviour:
   hitFlashTime: 0.1
   blinkInterval: 0.08
   spriteFacesRight: 1
+  varyMotion: 1
   attackStateName: Attack
 --- !u!114 &1437196242
 MonoBehaviour:
@@ -8971,7 +8973,7 @@ Animator:
   m_GameObject: {fileID: 1451395640}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 7052c8b4bb06f644ea75e62b72afedbd, type: 2}
+  m_Controller: {fileID: 9100000, guid: ac94dd0c3c756ed44abbc3e96e5e9ecb, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -9003,6 +9005,7 @@ MonoBehaviour:
   hitFlashTime: 0.1
   blinkInterval: 0.08
   spriteFacesRight: 1
+  varyMotion: 1
   attackStateName: Attack
 --- !u!114 &1451395649
 MonoBehaviour:
@@ -10296,7 +10299,7 @@ Animator:
   m_GameObject: {fileID: 1986588121}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: b9ffd80256a9a3e4f90e1eac807bff81, type: 2}
+  m_Controller: {fileID: 9100000, guid: b2e365417fdc53040a09c7a2d35fe421, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -10328,6 +10331,7 @@ MonoBehaviour:
   hitFlashTime: 0.1
   blinkInterval: 0.08
   spriteFacesRight: 1
+  varyMotion: 1
   attackStateName: Attack
 --- !u!114 &1986588130
 MonoBehaviour:

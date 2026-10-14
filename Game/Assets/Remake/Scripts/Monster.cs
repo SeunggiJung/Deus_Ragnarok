@@ -18,6 +18,12 @@ public class Monster : BaseCharacter
     [Tooltip("localScale.x가 양수일 때 스프라이트가 오른쪽을 보면 체크")]
     [SerializeField] private bool spriteFacesRight = true;
 
+    [Header("Natural Motion")]
+    [Tooltip("몬스터마다 이동 속도 / 공격 거리 / 공격 간격을 조금씩 다르게 해서 여러 마리가 같은 자리에 겹쳐 같은 타이밍에 움직이지 않도록")]
+    [SerializeField] private bool varyMotion = false;
+    public float SpeedMultiplier { get; private set; } = 1f;
+    private float rangeMultiplier = 1f;
+
     [Header("Animator")]
     [Tooltip("attack 트리거로 진입하는 애니메이터 공격 상태 이름 (몬스터마다 다름 : Golem 'Attack', Crab 'Enemy Attack 3' 등)")]
     [SerializeField] private string attackStateName = "Attack";
@@ -27,6 +33,9 @@ public class Monster : BaseCharacter
     public Animator Anim => anim;
     public EnemyStats Stats => (EnemyStats)stats;
     public BaseCharacter Target { get; private set; }
+    // 개체별 공격 사거리 / 공격 직후 추가 대기 (varyMotion일 때만 차이)
+    public float AttackRange => Stats.attackRange * rangeMultiplier;
+    public float AttackJitter => varyMotion ? UnityEngine.Random.Range(0f, 0.5f) : 0f;
     public float FacingDir => Mathf.Sign(transform.localScale.x) * (spriteFacesRight ? 1f : -1f);
 
     // 스포너(오브젝트 풀)가 지정하는 반환 처리. 없으면(씬에 직접 배치) 사망 후 Destroy
@@ -46,6 +55,12 @@ public class Monster : BaseCharacter
         }
 
         initialConstraints = rb.constraints;
+
+        if (varyMotion)
+        {
+            SpeedMultiplier = UnityEngine.Random.Range(0.9f, 1.2f);
+            rangeMultiplier = UnityEngine.Random.Range(0.8f, 1f);
+        }
 
         StateMachine = new StateMachine();
         IdleState = new EnemyIdleState(this, StateMachine);
@@ -82,9 +97,26 @@ public class Monster : BaseCharacter
         ? Mathf.Abs(Target.transform.position.x - transform.position.x)
         : float.PositiveInfinity;
 
-    public float DirectionToTarget => HasTarget
-        ? Mathf.Sign(Target.transform.position.x - transform.position.x)
-        : 0f;
+    // 플레이어와 거의 겹쳤을 때는 방향을 0으로 → 좌우로 계속 뒤집히며 떨리는 현상 방지
+    public float DirectionToTarget
+    {
+        get
+        {
+            if (!HasTarget) return 0f;
+            float dx = Target.transform.position.x - transform.position.x;
+            return Mathf.Abs(dx) < 0.2f ? 0f : Mathf.Sign(dx);
+        }
+    }
+
+    // 등장(spawn) 모션이 재생되는 동안 : 제자리에서 모션이 끝나길 기다림 (등장 모션 중 미끄러져 이동 / 공격하는 문제 방지)
+    public bool IsSpawning
+    {
+        get
+        {
+            var clips = anim.GetCurrentAnimatorClipInfo(0);
+            return clips.Length > 0 && clips[0].clip != null && clips[0].clip.name.ToLowerInvariant().Contains("spawn");
+        }
+    }
 
     public bool IsAttackReady => Time.time - LastAttackTime >= Stats.attackCooldown;
 

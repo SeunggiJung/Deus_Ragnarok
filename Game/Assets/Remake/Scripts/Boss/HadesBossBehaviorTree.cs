@@ -7,7 +7,10 @@
 // │   ├─ (쿨다운) [중거리]      → 지면 폭발 파도 (플레이어 쪽으로 번지는 기둥, 2형태는 양쪽)
 // │   ├─ (쿨다운)               → 화염탄 비 (맵 전체, 2형태는 더 많이)
 // │   ├─ (쿨다운) [중거리]      → 돌진 (공통 노드)
-// │   └─ (쿨다운) [근~중거리]   → 순간이동 강타 (무적으로 사라졌다가 플레이어 위치에 출현)
+// │   ├─ (쿨다운) [근~중거리]   → 순간이동 강타 (무적으로 사라졌다가 플레이어 위치에 출현, 2형태는 3연속)
+// │   ├─ (쿨다운) [2형태]       → 돌진 연타 (파고들며 3연속 타격)
+// │   ├─ (쿨다운) [2형태]       → 암흑 낙뢰 (맵 곳곳에 하늘에서 기둥)
+// │   └─ (쿨다운) [2형태]       → 암흑 광선 (바닥 높이 가로 광선을 양쪽으로)
 // └─ 추적
 public static class HadesBossBehaviorTree
 {
@@ -51,6 +54,25 @@ public static class HadesBossBehaviorTree
                     new Sequence(
                         new Condition(() => boss.DistanceToTarget >= s.teleportMinRange),
                         new HadesShadowStrikeAction(boss),
+                        Recovery(boss))),
+
+                // ---- 2형태 전용 (되살아난 뒤에만 사용) ----
+                new Cooldown(() => s.comboCooldown * boss.CooldownScale,
+                    new Sequence(
+                        new Condition(() => boss.Revived && boss.DistanceToTarget <= s.comboRange),
+                        new HadesComboAction(boss),
+                        Recovery(boss))),
+
+                new Cooldown(() => s.skyCooldown * boss.CooldownScale,
+                    new Sequence(
+                        new Condition(() => boss.Revived),
+                        new HadesSkyStrikeAction(boss),
+                        Recovery(boss))),
+
+                new Cooldown(() => s.beamCooldown * boss.CooldownScale,
+                    new Sequence(
+                        new Condition(() => boss.Revived && boss.DistanceToTarget >= s.beamMinRange),
+                        new HadesBeamAction(boss),
                         Recovery(boss)))),
 
             new ChaseAction(boss));

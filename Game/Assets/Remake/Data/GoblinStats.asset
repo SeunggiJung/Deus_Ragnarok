@@ -17,8 +17,8 @@ MonoBehaviour:
   attackDamage: 12
   attackRadius: 1.6
   moveSpeed: 2
-  detectRange: 14
-  loseRange: 24
+  detectRange: 200
+  loseRange: 400
   attackRange: 2.4
   attackCooldown: 1.1
   expReward: 50

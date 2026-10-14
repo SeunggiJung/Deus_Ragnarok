@@ -42,7 +42,7 @@ public class EnemyAttackState : EnemyState
 
     public override void Exit()
     {
-        enemy.LastAttackTime = Time.time;
+        enemy.LastAttackTime = Time.time + enemy.AttackJitter;
         enemy.Anim.ResetTrigger("attack");
     }
 }

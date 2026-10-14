@@ -390,8 +390,13 @@ public class HadesShadowStrikeAction : BossAction
 {
     private enum Phase { Fade, Track, Lock, Strike }
 
-    private const float FadeTime = 0.35f;
     private const float StrikeDelay = 0.25f;   // 나타난 뒤 내려찍기까지
+
+    private int strikeIndex, strikeTotal;      // 2형태는 연속으로 여러 번
+    private bool Chained => strikeIndex > 0;
+    private float FadeTime => Chained ? 0.15f : 0.35f;
+    private float TrackTime => Chained ? HS.teleportChainTrackTime : HS.teleportTrackTime;
+    private float LockTime => Chained ? HS.teleportChainLockTime : HS.teleportLockTime;
 
     private Phase phase;
     private float phaseStart;
@@ -413,6 +418,8 @@ public class HadesShadowStrikeAction : BossAction
         restY = boss.transform.position.y;
         struck = false;
         zone = null;
+        strikeIndex = 0;
+        strikeTotal = Hades.Revived ? HS.form2TeleportChain : 1;
         phase = Phase.Fade;
         phaseStart = Time.time;
         boss.ForceInvincible = true;
@@ -444,16 +451,16 @@ public class HadesShadowStrikeAction : BossAction
                 // 장판이 플레이어를 부드럽게 따라다님
                 float x = Mathf.MoveTowards(zone.X, ClampToArena(boss.Target.transform.position.x), 9f * Time.deltaTime);
                 zone.SetX(x);
-                if (elapsed >= HS.teleportTrackTime)
+                if (elapsed >= TrackTime)
                 {
                     targetX = zone.X;
-                    zone.Lock(HS.teleportLockTime);
+                    zone.Lock(LockTime);
                     Enter(Phase.Lock);
                 }
                 return NodeState.Running;
 
             case Phase.Lock:
-                if (elapsed >= HS.teleportLockTime)
+                if (elapsed >= LockTime)
                 {
                     Appear();
                     Enter(Phase.Strike);
@@ -466,7 +473,19 @@ public class HadesShadowStrikeAction : BossAction
                     struck = true;
                     Strike();
                 }
-                return elapsed >= 0.8f / boss.AnimSpeed ? NodeState.Success : NodeState.Running;
+                bool last = strikeIndex + 1 >= strikeTotal;
+                // 연속 강타 : 내려찍은 직후 바로 다시 사라져 다음 위치로
+                if (!last && struck && elapsed >= 0.4f / boss.AnimSpeed)
+                {
+                    strikeIndex++;
+                    struck = false;
+                    boss.ForceInvincible = true;
+                    invincibleSet = true;
+                    zone = null;
+                    Enter(Phase.Fade);
+                    return NodeState.Running;
+                }
+                return last && elapsed >= 0.8f / boss.AnimSpeed ? NodeState.Success : NodeState.Running;
         }
     }
 

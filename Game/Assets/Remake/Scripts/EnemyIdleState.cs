@@ -13,6 +13,7 @@ public class EnemyIdleState : EnemyState
 
     public override void Update()
     {
+        if (enemy.IsSpawning) return;   // 등장 모션이 끝난 뒤부터 추적 시작
         if (enemy.DistanceToTarget <= enemy.Stats.detectRange)
             stateMachine.ChangeState(enemy.ChaseState);
     }

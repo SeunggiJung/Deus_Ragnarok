@@ -36,7 +36,31 @@ public class HadesBoss : BossController
     protected override bool IsValidStats(CharacterStats s) => s is HadesBossStats;
     protected override CharacterStats CreateDefaultStats() => ScriptableObject.CreateInstance<HadesBossStats>();
 
-    private void OnEnable() => enabledTime = Time.time;
+    private void OnEnable()
+    {
+        enabledTime = Time.time;
+        StartCoroutine(IgnorePlayerBody());
+    }
+
+    // 보스가 거대해서 바짝 붙으면 몸 / 팔 쪽 콜라이더에 막혀 점프가 안 되는 문제 →
+    // 플레이어와는 물리 충돌을 끔 (겹쳐 지나갈 수 있음). 피격 판정은 OverlapCircle / OverlapBox 질의라 영향 없음
+    // 플레이어의 공격과 보스의 범위 공격은 그대로 몸통(콜라이더) 기준으로 맞음
+    private IEnumerator IgnorePlayerBody()
+    {
+        yield return null;   // Awake / Start 이후 (Target 탐색 시점)
+        PlayerController player = FindObjectOfType<PlayerController>();
+        if (player == null) yield break;
+
+        var theirs = player.GetComponentsInChildren<Collider2D>(true);
+        while (true)
+        {
+            // 플레이어의 구르기가 끝나면서 충돌 무시를 되돌릴 수 있어 주기적으로 다시 적용
+            foreach (var mine in GetComponentsInChildren<Collider2D>(true))
+                foreach (var other in theirs)
+                    if (other != null) Physics2D.IgnoreCollision(mine, other, true);
+            yield return new WaitForSeconds(0.2f);
+        }
+    }
 
     // 1형태 사망 : 쓰러진 모습을 잠시 보여준 뒤 모습만 숨김 (오브젝트는 유지해 Revive에서 재사용)
     protected override void OnFormDefeated()
@@ -79,6 +103,7 @@ public class HadesBoss : BossController
 
         enabledTime = Time.time;
         EnterPhase2();          // 쿨다운 / 이동 속도 / 모션 속도 강화 + 색 변화
+        StartCoroutine(IgnorePlayerBody());   // StopAllCoroutines로 끊긴 충돌 무시 갱신 재시작
         anim.SetBool(HadesAnim.Revived, true);
         anim.ResetTrigger(AnimParams.Die);
         anim.SetTrigger(HadesAnim.Spawn);

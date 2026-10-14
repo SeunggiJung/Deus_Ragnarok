@@ -89,14 +89,15 @@
 - **Crab (2스테이지 보스, 체력 500)** : `CrabBoss` / `CrabBossStats` / `CrabBossBehaviorTree` / `CrabActions` / `Editor/CrabBossBuilder`. 패턴 : 집게 연타, 바닥 찍기(발밑 + 좌우 충격파), 잡기(구르기로만 회피), 기 모아 강타(후반 40%에 점프 공격 카운터 → 3초 그로기, 2페이즈는 충전 0.8배 / 창 0.85배), 도약 내려찍기(장판 추적 → 내려찍기, 2페이즈 2연속), 돌진 / 방어 / 포효(공통 노드 재사용)
 - **Dragon (2스테이지 최종 보스, 체력 900)** : `DragonBoss` / `DragonBossStats` / `DragonBossBehaviorTree` / `DragonActions` / `Editor/DragonBossBuilder`(에셋 팩 PNG 프레임으로 모션 클립 생성, 컨트롤러 `Animations/Boss/DragonBoss.controller`). 패턴 : 발톱(공통 근접 노드), 화염 브레스(후반 40% 카운터, 2페이즈 2연속), 화염구 비(장판 + 낙하), 붙잡아 내려찍기(제한 시간 안에 범위 밖으로 못 나가면 잡혀서 들어올려진 뒤 내려찍힘 → 서로 반대로 날아가고 보스 그로기 1.5초 / 플레이어 스태미너 0). 등장 연출 동안은 `CanEngage`로 전투 지연. 보스 체력바는 보스마다 하나(`BossHealthBar.boss`)
 - **Hades (3스테이지 최종 보스, 2형태)** : `HadesBoss` / `HadesBossStats` / `HadesBossBehaviorTree` / `HadesActions` / `Editor/HadesBossBuilder`(원작 `Hades.controller`의 Wizard_* / Rades_* 모션을 재사용해 `Animations/Boss/HadesBoss.controller` 생성, `revived` 불 값으로 모션 세트 전환). 1형태(체력 1000) 처치 시 `BossController.HasMoreForms` 훅으로 사망 연출 없이 쓰러진 채 대기 → 레버로 `Revive()` → 더 큰 2형태(체력 1400, 공격 38, Phase2 강화)로 부활 → 2형태 처치 시 일반 보스처럼 슬로모션 + 파편
-  - 패턴 6종(RandomSelector, 패턴 시작 시 `[Hades] 패턴 : ...` 로그) : 마법 타격 / 암흑탄 부채꼴(2형태 5발 x 2연속) / 지면 폭발 파도(보스 → 플레이어 쪽으로 번지는 기둥, 2형태 양쪽) / 화염탄 비(맵 전체) / 돌진(공통 `ChargeAction`) / 순간이동 강타(무적으로 사라졌다가 장판 위치에 출현)
+  - 패턴 6종 + **2형태 전용 3종**(RandomSelector, 패턴 시작 시 `[Hades] 패턴 : ...` 로그) : 마법 타격 / 암흑탄 부채꼴(2형태 5발 x 2연속) / 지면 폭발 파도(보스 → 플레이어 쪽으로 번지는 기둥, 2형태 양쪽) / 화염탄 비(맵 전체) / 돌진(공통 `ChargeAction`) / 순간이동 강타(무적으로 사라졌다가 장판 위치에 출현, 2형태는 3연속) + [2형태] 돌진 연타(파고들며 3연속, `HadesComboAction`) / 암흑 낙뢰(맵 곳곳 하늘에서 기둥 12발, `HadesSkyStrikeAction`) / 암흑 광선(바닥 높이 가로 광선을 양쪽으로 1초 유지, `HadesBeamAction`) — 2형태 전용은 `HadesPhase2Actions.cs`
+  - 보스 몸통이 거대해서 바짝 붙으면 점프가 막히던 문제 → `HadesBoss.IgnorePlayerBody`가 플레이어 콜라이더와 물리 충돌만 끔(0.2초마다 재적용, 구르기 종료 시 되돌아가는 것 방지). 피격 판정은 Overlap 질의라 그대로 몸통 기준
   - 이펙트 색은 형태별 테마(`HadesBoss.FxColor` 등) : 1형태(붉은 불꽃 마법사) 주황, 2형태(검은 로브 + 보라 불꽃) 보라. `GroundZone.SetColors`로 장판 색도 변경
   - 수치는 `HadesBossStats` 에셋이 기준. 빌더의 `TuningVersion`이 올라갔을 때만 한 번 덮어씀(현재 v2). 직접 조정한 값이 있으면 버전을 올리기 전에 확인
   - 2형태 스프라이트는 1형태와 크기 / 발 위치가 달라서(보이는 영역 0.55 vs 0.95, 발 -0.25 vs -0.42) 같은 콜라이더를 쓰면 바닥 아래로 가라앉아 보임 → 빌더가 두 형태 첫 프레임의 보이는 픽셀 영역을 측정해 2형태 콜라이더(`form2ColliderOffset/Size`)를 계산, `Revive`에서 교체
 - `Boss/BossArenaGate` : 입구 기둥(전투 시작 시 낙하) / 출구 문(처치 후 열림). BT 보스(`boss`) 또는 일반 몬스터(`guardian` + `engageRange`) 둘 다 지원
 
 ### 4.5 레벨 / 상호작용 (`Scripts/Level`, `Scripts/Interaction`)
-- `FallingPlatform`(밟으면 흔들림 → 낙하 → 복구), `MovingPlatform`(Kinematic + MovePosition 왕복), `Checkpoint`, `WeaponPickup`(공격력 +3, 무기 스프라이트 교체), `BreakableBox`(IDamageable, 부수면 `LevelUpPickup`), `Crusher`(2스테이지 내려찍는 장애물 : 눈 완전히 감음 = 1회, 반만 감음 = 2회 내려찍기, 장애물 구역에서는 구르기 불가), `DodgeLockZone`(보스 입구 기둥 왼쪽에서는 구르기 금지, 기둥 콜라이더 중심 기준), `ColorPuzzle/ColorFire/ColorStone`(2스테이지 퍼즐 : 불 4개(빨강/파랑/초록/노랑) 중 2개를 섞어 돌 3개의 필요한 색(돌 위 힌트 표시)을 맞춤. 노랑 조합(갈색/청록/라임)은 오답), `EncounterTrigger`(카메라 포커스 + 적 등장), `PlayerSession`, `HadesEncounter`(3스테이지 전투 흐름 : 제단 G → 졸개 웨이브 4회(2/3/5/6마리, 앞 웨이브 전멸 시 다음 웨이브, 씬의 졸개 4개는 복제 원본) → G → 하데스 등장 → 레버 → 부활 → 레버 → 출구 문) / `HadesLever` / `EndingTrigger`(문 너머 트리거 → Ending 씬)
+- `FallingPlatform`(밟으면 흔들림 → 낙하 → 복구), `MovingPlatform`(Kinematic + MovePosition 왕복), `Checkpoint`, `WeaponPickup`(공격력 +3, 무기 스프라이트 교체), `BreakableBox`(IDamageable, 부수면 `LevelUpPickup`), `Crusher`(2스테이지 내려찍는 장애물 : 눈 완전히 감음 = 1회, 반만 감음 = 2회 내려찍기, 장애물 구역에서는 구르기 불가), `DodgeLockZone`(보스 입구 기둥 왼쪽에서는 구르기 금지, 기둥 콜라이더 중심 기준), `ColorPuzzle/ColorFire/ColorStone`(2스테이지 퍼즐 : 불 4개(빨강/파랑/초록/노랑) 중 2개를 섞어 돌 3개의 필요한 색(돌 위 힌트 표시)을 맞춤. 노랑 조합(갈색/청록/라임)은 오답), `EncounterTrigger`(카메라 포커스 + 적 등장), `PlayerSession`, `HadesEncounter`(3스테이지 전투 흐름 : 제단 G → 졸개 웨이브 4회(4/6/9/12마리, 앞 웨이브 전멸 시 다음 웨이브, 씬의 졸개 4개는 복제 원본) → G → 하데스 등장 → 레버 → 부활 → 레버 → 출구 문) / `HadesLever` / `EndingTrigger`(문 너머 트리거 → Ending 씬)
 - `IInteractable` + `PlayerInteractor` : 새 상호작용 대상은 인터페이스만 구현하면 됨
 - `StagePortal` : G키 → `PlayerSession.Save` → `ScreenFader`로 페이드 후 씬 로드, `requiredDefeated`로 잠금 가능
 
@@ -165,6 +166,8 @@
 
 - 3스테이지 : 코드 / 씬 구성 완료, 스모크 테스트(졸개 → 하데스 등장 → 1형태 처치 → 부활 → 2형태 처치 → 문 상승)까지 통과. **사용자 플레이 테스트 대기**(난이도 수치 / 화염탄 위치 / 레버 위치 / Ending 씬 진입 확인 필요)
 - 검 크기 축소(`EquipWeapon`) : 사용자 플레이 확인 대기. 그립 위치(피벗)가 어색하면 `WeaponWorldLength` 또는 무기 Transform 오프셋 조정
+
+- 졸개(해골 / 고블린) : 웨이브마다 거리와 상관없이 플레이어를 끝까지 추적(`detectRange` 200). `Monster` 개선 — 등장(spawn) 모션 중에는 대기(`IsSpawning`), 플레이어와 겹치면 방향 0(좌우 떨림 방지), `varyMotion`(개체별 속도 x0.9~1.2 / 공격 거리 x0.8~1 / 공격 직후 0~0.5초 추가 대기). 에셋 팩의 걷기 클립이 반복이 아니라 한 걸음만 재생되던 문제는 `MinionAnimationBuilder`가 컨트롤러 / 걷기 클립을 `Remake/Animations/Monsters`로 복사해 반복으로 설정(원본 팩은 그대로)
 
 ### 다음 후보
 - 2스테이지 테스트 피드백 반영 (난이도 / 위치)

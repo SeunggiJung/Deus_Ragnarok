@@ -89,14 +89,41 @@ public static class Stage3Builder
             s.attackCooldown = 1.1f; s.expReward = 50f; s.hitStunTime = 0.15f; s.deathDelay = 1.2f;
         });
 
+        // 웨이브 전투 : 거리와 상관없이 플레이어를 끝까지 추적 (방 안 어디에 있든 따라옴)
+        foreach (EnemyStats s in new[] { skeleton, goblin })
+        {
+            s.detectRange = 200f;
+            s.loseRange = 400f;
+            EditorUtility.SetDirty(s);
+        }
+        AssetDatabase.SaveAssets();
+
+        // 걷기 반복 등을 손본 리메이크용 애니메이터 컨트롤러
+        RuntimeAnimatorController skeletonAnim = MinionAnimationBuilder.Prepare(MinionAnimationBuilder.SkeletonSource, "Skeleton");
+        RuntimeAnimatorController goblinAnim = MinionAnimationBuilder.Prepare(MinionAnimationBuilder.GoblinSource, "Goblin");
+
         // 4마리 모두 애니메이터의 공격 상태 이름은 "Attack"
-        return new[]
+        var minions = new[]
         {
             Stage2Builder.ConvertMonster("Goblin1", "Goblin1", "Attack", goblin),
             Stage2Builder.ConvertMonster("Skeleton1", "Skeleton1", "Attack", skeleton),
             Stage2Builder.ConvertMonster("Skeleton2", "Skeleton2", "Attack", skeleton),
             Stage2Builder.ConvertMonster("Goblin2", "Goblin2", "Attack", goblin),
         }.Where(m => m != null).ToArray();
+
+        foreach (Monster m in minions)
+        {
+            bool isSkeleton = m.name.StartsWith("Skeleton");
+            var animator = m.GetComponent<Animator>();
+            if (animator != null)
+                animator.runtimeAnimatorController = isSkeleton ? skeletonAnim : goblinAnim;
+
+            // 개체별로 속도 / 공격 거리 / 공격 간격을 조금씩 다르게 (여러 마리가 겹쳐 같은 타이밍에 움직이지 않도록)
+            var so = new SerializedObject(m);
+            so.FindProperty("varyMotion").boolValue = true;
+            so.ApplyModifiedProperties();
+        }
+        return minions;
     }
     #endregion
 
@@ -134,6 +161,12 @@ public static class Stage3Builder
         array.arraySize = minions.Length;
         for (int i = 0; i < minions.Length; i++)
             array.GetArrayElementAtIndex(i).objectReferenceValue = minions[i];
+        // 웨이브별 몬스터 수 (4웨이브, 뒤로 갈수록 많아짐)
+        SerializedProperty waves = so.FindProperty("waveSizes");
+        int[] sizes = { 4, 6, 9, 12 };
+        waves.arraySize = sizes.Length;
+        for (int i = 0; i < sizes.Length; i++)
+            waves.GetArrayElementAtIndex(i).intValue = sizes[i];
         so.FindProperty("hades").objectReferenceValue = hades;
         so.FindProperty("lever").objectReferenceValue = lever;
         so.FindProperty("door").objectReferenceValue = door != null ? door.transform : null;
