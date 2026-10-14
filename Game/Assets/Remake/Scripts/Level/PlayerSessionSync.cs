@@ -11,6 +11,9 @@ public class PlayerSessionSync : MonoBehaviour
     private void Start()
     {
         PlayerSession.Restore(GetComponent<PlayerController>());
+
+        var respawn = GetComponent<PlayerRespawn>();
+        if (respawn != null) respawn.ApplySavedCheckpoint();
     }
 
     public static SpriteRenderer GetWeaponRenderer(PlayerController player)

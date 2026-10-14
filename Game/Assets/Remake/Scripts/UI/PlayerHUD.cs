@@ -32,6 +32,10 @@ public class PlayerHUD : MonoBehaviour
             progression = player.GetComponent<PlayerProgression>();
 
         BuildCanvas();
+
+        // 사망 화면 (홈으로 / 체크포인트에서 재시작)
+        if (player != null && GetComponent<DeathScreen>() == null)
+            gameObject.AddComponent<DeathScreen>().Init(player);
     }
 
     private void BuildCanvas()

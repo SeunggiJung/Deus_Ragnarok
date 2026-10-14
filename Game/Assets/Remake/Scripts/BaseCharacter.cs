@@ -88,6 +88,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         Debug.Log($"{gameObject.name} took {damage} damage. HP: {currentHp}");
         OnHpChanged?.Invoke(currentHp, MaxHp);
         DamageTaken?.Invoke(damage);
+        DamagePopup.Show(this, damage, DamagePopup.NextIsCritical);
 
         if (currentHp <= 0)
         {
@@ -155,6 +156,9 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
     // 현재 공격의 데미지 (크리티컬 등 상황별 배율은 자식 클래스에서)
     protected virtual float GetAttackDamage() => AttackDamage;
 
+    // 크리티컬 공격인지 (피해량 표시를 노란색으로)
+    protected virtual bool IsCriticalHit() => false;
+
     // 상태 연출용 색 지정 (피격 플래시 중이면 플래시가 끝난 뒤 적용됨)
     public void SetTint(Color color)
     {
@@ -207,6 +211,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
 
         // 콜라이더가 여러 개인 대상이 한 번의 공격에 여러 번 맞지 않도록 대상 단위로 중복 제거
         HashSet<IDamageable> damaged = new HashSet<IDamageable>();
+        DamagePopup.NextIsCritical = IsCriticalHit();
         foreach (var hit in colliders)
         {
             // 상대방이 IDamageable을 가지고 있는지 확인 (인터페이스의 힘!)
@@ -217,6 +222,7 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
                 damageable.TakeDamage(GetAttackDamage());
             }
         }
+        DamagePopup.NextIsCritical = false;
     }
 
     // 에디터 뷰에서 판정 범위를 시각적으로 확인하기 위함

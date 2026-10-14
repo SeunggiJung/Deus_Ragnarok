@@ -14,6 +14,32 @@ public static class PlayerSession
     private static float bonusStamina;
     private static Sprite weaponSprite;
 
+    // 마지막으로 밟은 체크포인트 (사망 후 같은 씬을 다시 불러와도 그 위치에서 시작하기 위해 보관)
+    private static string checkpointScene;
+    private static Vector2 checkpointPosition;
+
+    public static void SetCheckpoint(string scene, Vector2 position)
+    {
+        checkpointScene = scene;
+        checkpointPosition = position;
+    }
+
+    public static bool TryGetCheckpoint(string scene, out Vector2 position)
+    {
+        position = checkpointPosition;
+        return checkpointScene == scene;
+    }
+
+    // 홈으로 나가면 성장 / 체크포인트 모두 초기화
+    public static void Reset()
+    {
+        HasData = false;
+        checkpointScene = null;
+        level = 0; exp = 0f; statPoints = 0;
+        bonusHp = bonusAttack = bonusStamina = 0f;
+        weaponSprite = null;
+    }
+
     public static void Save(PlayerController player)
     {
         var progression = player.GetComponent<PlayerProgression>();

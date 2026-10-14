@@ -70,6 +70,9 @@
 - 상태 : `PlayerGroundedState`(Idle/Move 부모 : 낙하 > 구르기 > 점프 > 공격 우선순위) / `PlayerAirState`(Jump/Fall 부모) / `Attack` / `JumpAttack` / `Dodge` / `Hit` / `Dead`
   - `PlayerState.TryDodge()` : 어느 상태에서든 구르기 캔슬 공통 처리
 - **구르기 관통 규칙 (사용자가 B안 선택)** : 기본 거리 안에서 플레이어 중심이 적 중심을 넘을 수 있으면 관통(빠져나갈 때까지 거리 연장, 끝까지 무적), 아니면 적 앞에서 정지. 벽 뒤로는 관통 안 함
+- **지상 3단 콤보** (`PlayerAttackState`) : 1타 내려치기(원작 클립) → 2타 올려치기 → 3타 찌르기(데미지 x1.5, 크리티컬 표시). 모션은 끝까지 재생(구르기만 캔슬), 모션 후반(`comboChainStart`)에 누른 클릭만 인정해 끝나는 순간 다음 타로 연결, 끝난 직후 `comboResumeGrace` 안에 눌러도 이어짐. 2/3타 클립은 `Editor/PlayerComboClipGenerator`(`Tools/Deus/Generate Player Combo Clips`)로 생성, 수치는 `PlayerStats`의 combo* 필드
+- **피해량 표시** (`UI/DamagePopup`) : `BaseCharacter.TakeDamage`에서 실제 피해가 들어갈 때 호출. 흰색 / 점프 공격·3타 찌르기 노란색(`IsCriticalHit`) / 플레이어 피격 빨간색
+- **사망 화면** (`UI/DeathScreen`, `PlayerHUD`가 자동 부착) : 체크포인트에서 재시작(성장 저장 → 현재 씬 재로드 → `PlayerSession`에 보관된 체크포인트 위치에서 시작) / 홈으로(`start` 씬, 세션 초기화)
 - 기타 컴포넌트 : `PlayerProgression`(경험치 50 x 1.5^(Lv-1)), `PlayerPotion`, `PlayerRespawn`(낙사/함정 → 체크포인트, 최대체력 20% 감소), `PlayerInteractor`(G키), `PlayerSessionSync`(스테이지 간 성장 유지), `DebugCheats`
 - **프리팹** : `Prefabs/Player.prefab`, `Prefabs/PlayerHUD.prefab` (RemakeTest의 오브젝트에서 생성, `Tools/Deus/Build Player Prefabs`)
 

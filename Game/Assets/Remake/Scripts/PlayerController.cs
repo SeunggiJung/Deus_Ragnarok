@@ -133,6 +133,13 @@ public class PlayerController : BaseCharacter
         return !anim.IsInTransition(0) && info.IsName("Attack") && info.normalizedTime >= 1.0f;
     }
 
+    // 점프 공격과 3타 찌르기는 크리티컬 연출(노란 피해량)
+    protected override bool IsCriticalHit()
+    {
+        var state = StateMachine.CurrentState;
+        return state == JumpAttackState || (state == AttackState && AttackState.Step == PlayerAttackState.MaxStep);
+    }
+
     // 점프 공격은 크리티컬
     protected override float GetAttackDamage()
     {
