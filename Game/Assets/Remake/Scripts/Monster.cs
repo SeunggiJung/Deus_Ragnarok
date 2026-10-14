@@ -59,7 +59,7 @@ public class Monster : BaseCharacter
         if (varyMotion)
         {
             SpeedMultiplier = UnityEngine.Random.Range(0.9f, 1.2f);
-            rangeMultiplier = UnityEngine.Random.Range(0.8f, 1f);
+            rangeMultiplier = UnityEngine.Random.Range(0.55f, 1f);   // 멈추는 거리가 제각각이라 한 줄로 겹쳐 서지 않음
         }
 
         StateMachine = new StateMachine();
@@ -69,6 +69,59 @@ public class Monster : BaseCharacter
         HitState = new EnemyHitState(this, StateMachine);
         DeadState = new EnemyDeadState(this, StateMachine);
     }
+
+    #region Pass-through (몸끼리 부딪히지 않음)
+    // 몬스터끼리 / 플레이어와는 몸이 부딪히지 않음 : 여러 마리가 서로 막아 1대1로만 싸우게 되거나, 플레이어가 몬스터에 막혀
+    // 구르기 없이는 지나가지 못하는 문제. 공격 / 피격 판정은 Overlap 질의라 서로 때리고 맞는 것은 그대로
+    private static readonly List<Monster> activeMonsters = new List<Monster>();
+
+    private void OnEnable()
+    {
+        activeMonsters.Add(this);
+        StartCoroutine(PassThroughRoutine());
+    }
+
+    private void OnDisable()
+    {
+        activeMonsters.Remove(this);
+    }
+
+    private IEnumerator PassThroughRoutine()
+    {
+        yield return null;   // Awake / Start 이후
+        var wait = new WaitForSeconds(0.25f);
+        while (true)
+        {
+            ApplyPassThrough();
+            yield return wait;   // 플레이어의 구르기가 끝나며 충돌 무시를 되돌릴 수 있어 주기적으로 다시 적용
+        }
+    }
+
+    private void ApplyPassThrough()
+    {
+        var mine = GetComponentsInChildren<Collider2D>();
+        var player = FindObjectOfType<PlayerController>();
+        if (player != null)
+            foreach (var theirs in player.GetComponentsInChildren<Collider2D>())
+                foreach (var m in mine)
+                    Ignore(m, theirs);
+
+        foreach (var other in activeMonsters)
+        {
+            if (other == null || other == this) continue;
+            foreach (var theirs in other.GetComponentsInChildren<Collider2D>())
+                foreach (var m in mine)
+                    Ignore(m, theirs);
+        }
+    }
+
+    // 꺼진 콜라이더(사망한 몬스터 등)는 건너뜀
+    private static void Ignore(Collider2D a, Collider2D b)
+    {
+        if (a == null || b == null || !a.enabled || !b.enabled) return;
+        Physics2D.IgnoreCollision(a, b, true);
+    }
+    #endregion
 
     protected override bool IsValidStats(CharacterStats s) => s is EnemyStats;
     protected override CharacterStats CreateDefaultStats() => ScriptableObject.CreateInstance<EnemyStats>();
@@ -182,6 +235,7 @@ public class Monster : BaseCharacter
         if (Target == null)
             Target = FindObjectOfType<PlayerController>();
         StateMachine.Initialize(IdleState);
+        StartCoroutine(PassThroughRoutine());   // ResetCharacter가 코루틴을 모두 끊으므로 다시 시작
     }
 
     // 사망 연출이 끝난 뒤 풀로 반환 (풀이 없으면 제거)

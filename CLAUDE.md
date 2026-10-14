@@ -90,6 +90,8 @@
 - **Dragon (2스테이지 최종 보스, 체력 900)** : `DragonBoss` / `DragonBossStats` / `DragonBossBehaviorTree` / `DragonActions` / `Editor/DragonBossBuilder`(에셋 팩 PNG 프레임으로 모션 클립 생성, 컨트롤러 `Animations/Boss/DragonBoss.controller`). 패턴 : 발톱(공통 근접 노드), 화염 브레스(후반 40% 카운터, 2페이즈 2연속), 화염구 비(장판 + 낙하), 붙잡아 내려찍기(제한 시간 안에 범위 밖으로 못 나가면 잡혀서 들어올려진 뒤 내려찍힘 → 서로 반대로 날아가고 보스 그로기 1.5초 / 플레이어 스태미너 0). 등장 연출 동안은 `CanEngage`로 전투 지연. 보스 체력바는 보스마다 하나(`BossHealthBar.boss`)
 - **Hades (3스테이지 최종 보스, 2형태)** : `HadesBoss` / `HadesBossStats` / `HadesBossBehaviorTree` / `HadesActions` / `Editor/HadesBossBuilder`(원작 `Hades.controller`의 Wizard_* / Rades_* 모션을 재사용해 `Animations/Boss/HadesBoss.controller` 생성, `revived` 불 값으로 모션 세트 전환). 1형태(체력 1000) 처치 시 `BossController.HasMoreForms` 훅으로 사망 연출 없이 쓰러진 채 대기 → 레버로 `Revive()` → 더 큰 2형태(체력 1400, 공격 38, Phase2 강화)로 부활 → 2형태 처치 시 일반 보스처럼 슬로모션 + 파편
   - 패턴 6종 + **2형태 전용 3종**(RandomSelector, 패턴 시작 시 `[Hades] 패턴 : ...` 로그) : 마법 타격 / 암흑탄 부채꼴(2형태 5발 x 2연속) / 지면 폭발 파도(보스 → 플레이어 쪽으로 번지는 기둥, 2형태 양쪽) / 화염탄 비(맵 전체) / 돌진(공통 `ChargeAction`) / 순간이동 강타(무적으로 사라졌다가 장판 위치에 출현, 2형태는 3연속) + [2형태] 돌진 연타(파고들며 3연속, `HadesComboAction`) / 암흑 낙뢰(맵 곳곳 하늘에서 기둥 12발, `HadesSkyStrikeAction`) / 암흑 광선(바닥 높이 가로 광선을 양쪽으로 1초 유지, `HadesBeamAction`) — 2형태 전용은 `HadesPhase2Actions.cs`
+  - **대형 연출 패턴 3종**(`HadesSpectacleActions.cs`) : 회전 탄막(`HadesSpiralNovaAction`, 소용돌이 탄막 3.2초 + 중간에 회전 반전, 2형태 3갈래) / 공허의 소용돌이(`HadesVoidVortexAction`, 검은 구체가 플레이어를 끌어당김 → 경고 장판이 차오르면 보스 주변 폭발, 끌려오는 속도 3.4 ≈ 플레이어 이동 속도) / 심판(`HadesJudgementAction`, 2형태 전용, 바닥 전체 경고 + 초록 안전지대 2곳 밖은 전부 폭발)
+  - 소용돌이 끌어당김은 반드시 `Rb.position` 기준 + `MoveTowards`로 보스 앞(1.5)에서 멈추고 방 범위로 clamp (transform과 Rb.position을 섞어 쓰면 어긋나서 보스를 지나쳐 방 밖으로 날아가 낙사하던 버그가 있었음)
   - 보스 몸통이 거대해서 바짝 붙으면 점프가 막히던 문제 → `HadesBoss.IgnorePlayerBody`가 플레이어 콜라이더와 물리 충돌만 끔(0.2초마다 재적용, 구르기 종료 시 되돌아가는 것 방지). 피격 판정은 Overlap 질의라 그대로 몸통 기준
   - 이펙트 색은 형태별 테마(`HadesBoss.FxColor` 등) : 1형태(붉은 불꽃 마법사) 주황, 2형태(검은 로브 + 보라 불꽃) 보라. `GroundZone.SetColors`로 장판 색도 변경
   - 수치는 `HadesBossStats` 에셋이 기준. 빌더의 `TuningVersion`이 올라갔을 때만 한 번 덮어씀(현재 v2). 직접 조정한 값이 있으면 버전을 올리기 전에 확인
@@ -167,6 +169,7 @@
 - 3스테이지 : 코드 / 씬 구성 완료, 스모크 테스트(졸개 → 하데스 등장 → 1형태 처치 → 부활 → 2형태 처치 → 문 상승)까지 통과. **사용자 플레이 테스트 대기**(난이도 수치 / 화염탄 위치 / 레버 위치 / Ending 씬 진입 확인 필요)
 - 검 크기 축소(`EquipWeapon`) : 사용자 플레이 확인 대기. 그립 위치(피벗)가 어색하면 `WeaponWorldLength` 또는 무기 Transform 오프셋 조정
 
+- **몬스터 몸 충돌 없음** : `Monster`는 다른 몬스터 / 플레이어와 물리 충돌을 끔(`PassThroughRoutine`, 0.25초마다 재적용 — 플레이어 구르기가 끝나며 충돌 무시를 되돌리기 때문). 공격 / 피격 판정은 Overlap 질의라 서로 때리고 맞는 것은 그대로. 멈추는 거리는 개체별로 x0.55~1이라 한 줄로 겹쳐 서지 않음. Stage 1 / 2의 몬스터에도 동일 적용(보스는 해당 없음, 하데스만 별도로 플레이어와 충돌 무시)
 - 졸개(해골 / 고블린) : 웨이브마다 거리와 상관없이 플레이어를 끝까지 추적(`detectRange` 200). `Monster` 개선 — 등장(spawn) 모션 중에는 대기(`IsSpawning`), 플레이어와 겹치면 방향 0(좌우 떨림 방지), `varyMotion`(개체별 속도 x0.9~1.2 / 공격 거리 x0.8~1 / 공격 직후 0~0.5초 추가 대기). 에셋 팩의 걷기 클립이 반복이 아니라 한 걸음만 재생되던 문제는 `MinionAnimationBuilder`가 컨트롤러 / 걷기 클립을 `Remake/Animations/Monsters`로 복사해 반복으로 설정(원본 팩은 그대로)
 
 ### 다음 후보

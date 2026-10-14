@@ -100,6 +100,34 @@ public class HadesBossStats : BossStats
     public float beamHeightAboveGround = 0.65f;
     public float beamLength = 40f;
 
+    [Header("Spiral Nova (회전 탄막) - 보스를 중심으로 소용돌이치며 뻗어나가는 탄막, 도중에 회전 방향이 뒤집힘")]
+    public float novaCooldown = 11f;
+    public float novaCastTime = 0.8f;
+    public float novaDuration = 3.2f;
+    public float novaInterval = 0.09f;
+    public int novaArms = 2;
+    public int form2NovaArms = 3;
+    public float novaTurnSpeed = 130f;          // 초당 회전 각도 (중간에 반대로)
+    public float novaBoltSpeed = 6f;
+    public float novaDamage = 11f;
+    public float novaBoltRadius = 0.32f;
+
+    [Header("Void Vortex (공허의 소용돌이) - 플레이어를 끌어당긴 뒤 보스 주변을 폭발")]
+    public float vortexCooldown = 13f;
+    public float vortexChargeTime = 1.0f;
+    public float vortexPullTime = 2.4f;
+    public float vortexPullSpeed = 3.4f;        // 플레이어 이동 속도(3.5)와 비슷 : 제자리에 서 있으면 끌려옴
+    public float form2VortexPullSpeed = 4.0f;
+    public float vortexRadius = 5.5f;           // 폭발 범위 (경고 장판)
+    public float vortexDamage = 42f;
+
+    [Header("Judgement (심판) - 2형태 전용 : 안전지대 밖은 전부 폭발")]
+    public float judgementCooldown = 17f;
+    public float judgementWarnTime = 3.0f;
+    public int judgementSafeZones = 2;
+    public float judgementSafeRadius = 2.0f;
+    public float judgementDamage = 55f;
+
     [Header("Form 2 Hitbox (빌더가 원작 스프라이트 크기 비율로 계산)")]
     public bool hasForm2Collider;
     public Vector2 form2ColliderOffset;

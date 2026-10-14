@@ -8,6 +8,9 @@
 // │   ├─ (쿨다운)               → 화염탄 비 (맵 전체, 2형태는 더 많이)
 // │   ├─ (쿨다운) [중거리]      → 돌진 (공통 노드)
 // │   ├─ (쿨다운) [근~중거리]   → 순간이동 강타 (무적으로 사라졌다가 플레이어 위치에 출현, 2형태는 3연속)
+// │   ├─ (쿨다운)               → 회전 탄막 (소용돌이치는 탄막, 중간에 방향 반전)
+// │   ├─ (쿨다운) [중거리 이상] → 공허의 소용돌이 (끌어당긴 뒤 보스 주변 폭발)
+// │   ├─ (쿨다운) [2형태]       → 심판 (안전지대 밖 전체 폭발)
 // │   ├─ (쿨다운) [2형태]       → 돌진 연타 (파고들며 3연속 타격)
 // │   ├─ (쿨다운) [2형태]       → 암흑 낙뢰 (맵 곳곳에 하늘에서 기둥)
 // │   └─ (쿨다운) [2형태]       → 암흑 광선 (바닥 높이 가로 광선을 양쪽으로)
@@ -56,7 +59,25 @@ public static class HadesBossBehaviorTree
                         new HadesShadowStrikeAction(boss),
                         Recovery(boss))),
 
+                // ---- 대형 연출 패턴 ----
+                new Cooldown(() => s.novaCooldown * boss.CooldownScale,
+                    new Sequence(
+                        new HadesSpiralNovaAction(boss),
+                        Recovery(boss))),
+
+                new Cooldown(() => s.vortexCooldown * boss.CooldownScale,
+                    new Sequence(
+                        new Condition(() => boss.DistanceToTarget >= 3f),
+                        new HadesVoidVortexAction(boss),
+                        Recovery(boss))),
+
                 // ---- 2형태 전용 (되살아난 뒤에만 사용) ----
+                new Cooldown(() => s.judgementCooldown * boss.CooldownScale,
+                    new Sequence(
+                        new Condition(() => boss.Revived),
+                        new HadesJudgementAction(boss),
+                        Recovery(boss))),
+
                 new Cooldown(() => s.comboCooldown * boss.CooldownScale,
                     new Sequence(
                         new Condition(() => boss.Revived && boss.DistanceToTarget <= s.comboRange),
