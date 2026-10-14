@@ -55,6 +55,7 @@ public class PlayerProgression : MonoBehaviour
             Level++;
             StatPoints += Stats.pointsPerLevel;
             Debug.Log($"레벨 업! Lv {Level}, 스탯 포인트 {StatPoints}");
+            GameAudio.Play(Sfx.LevelUp, 0.8f);
             OnLevelUp?.Invoke(Level);
             OnStatPointsChanged?.Invoke(StatPoints);
         }

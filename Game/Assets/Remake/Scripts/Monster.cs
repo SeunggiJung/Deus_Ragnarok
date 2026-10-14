@@ -227,7 +227,10 @@ public class Monster : BaseCharacter
     public void Hit()
     {
         if (StateMachine.CurrentState == AttackState)
+        {
+            GameAudio.Play(Sfx.MonsterSwing, 0.6f);
             PerformAttack();
+        }
     }
 
     // 실제 공격 방식. 기본은 근접 판정(OverlapCircle), 원거리 몬스터는 투사체 발사로 재정의

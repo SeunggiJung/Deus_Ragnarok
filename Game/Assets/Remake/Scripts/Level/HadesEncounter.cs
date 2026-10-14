@@ -326,6 +326,7 @@ public class HadesEncounter : MonoBehaviour, IInteractable
     private IEnumerator OpenDoorRoutine()
     {
         if (door == null) yield break;
+        GameAudio.Play(Sfx.Rumble, 0.9f, 0f);   // 문이 올라가는 땅울림
         Vector3 start = door.position;
         Vector3 end = start + Vector3.up * doorRiseHeight;
         float elapsed = 0f;

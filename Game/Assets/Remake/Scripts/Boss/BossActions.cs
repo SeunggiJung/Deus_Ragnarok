@@ -336,6 +336,7 @@ public class RoarAction : BossAction
     protected override void OnStart()
     {
         boss.PlayAction(BossController.AnimParams.Ability);
+        GameAudio.Play(Sfx.Roar, 1f, 0.02f);
         boss.ForceInvincible = true;
         boss.SetTint(S.roarTint);
         endTime = Time.time + S.roarTime;

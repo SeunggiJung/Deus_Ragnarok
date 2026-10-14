@@ -81,6 +81,7 @@ public class RevivePickup : MonoBehaviour
 
         collected = true;
         player.AddReviveChance(1);
+        GameAudio.Play(Sfx.Pickup);
         Fx.Burst(transform.position, Vector2.up, 360f, new Color(1f, 0.85f, 0.5f), 14, 2f, 5f, 0.1f, 0.2f, 0.6f, 0.5f);
         StartCoroutine(CollectRoutine());
     }

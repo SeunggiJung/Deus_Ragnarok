@@ -10,6 +10,7 @@ public class PlayerJumpState : PlayerAirState
     {
         base.Enter();
         player.SetVelocity(player.Rb.velocity.x, player.JumpVelocity);
+        GameAudio.Play(Sfx.Jump, 0.7f);
     }
 
     public override void Update()

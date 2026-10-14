@@ -9,6 +9,7 @@ public class FxBeam : MonoBehaviour
 
     public static FxBeam Spawn(Vector2 center, Vector2 size, Color color, float life, int sortingOrder = 34)
     {
+        GameAudio.Play(Sfx.Beam, 0.8f);
         var go = new GameObject("FxBeam");
         go.transform.position = center;
         go.transform.localScale = new Vector3(size.x, size.y, 1f);

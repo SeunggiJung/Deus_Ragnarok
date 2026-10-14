@@ -302,6 +302,7 @@ public static class Fx
     // 바닥에 납작하게 퍼지는 충격 링 (폭이 startWidth → endWidth로 커지며 투명해짐)
     public static void Ring(Vector2 position, Color color, float startWidth, float endWidth, float duration, float squash = 0.35f)
     {
+        GameAudio.PlayShockwave(endWidth);   // 충격파 / 폭발 / 착지 소리 (퍼지는 폭이 클수록 크고 낮음)
         var go = new GameObject("FxRing");
         go.transform.position = position;
         var sr = go.AddComponent<SpriteRenderer>();

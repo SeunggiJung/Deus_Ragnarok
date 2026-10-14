@@ -89,10 +89,12 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         OnHpChanged?.Invoke(currentHp, MaxHp);
         DamageTaken?.Invoke(damage);
         DamagePopup.Show(this, damage, DamagePopup.NextIsCritical);
+        GameAudio.PlayDamaged(this, DamagePopup.NextIsCritical);
 
         if (currentHp <= 0)
         {
             IsDead = true;
+            GameAudio.PlayDeath(this);
             // 진행 중인 피격 연출을 정리하고 원래 색으로 복구
             StopAllCoroutines();
             RestoreSpriteColor();

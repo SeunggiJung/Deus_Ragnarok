@@ -124,6 +124,7 @@ public class EndingTrigger : MonoBehaviour
     #region Pillars
     private IEnumerator RisePillars(Camera cam, Vector3 focus, bool shake)
     {
+        GameAudio.Play(Sfx.Rumble, 0.9f, 0f);   // 기둥이 솟는 땅울림
         var rbs = new Rigidbody2D[pillars.Length];
         var done = new bool[pillars.Length];
         var nextDust = new float[pillars.Length];

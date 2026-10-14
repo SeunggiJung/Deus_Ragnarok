@@ -44,6 +44,7 @@ public class WeaponPickup : MonoBehaviour
 
         collected = true;
         player.AddAttack(attackBonus);
+        GameAudio.Play(Sfx.Pickup);
 
         Transform weapon = player.transform.Find(weaponRendererPath);
         if (weapon != null && spriteRenderer != null)

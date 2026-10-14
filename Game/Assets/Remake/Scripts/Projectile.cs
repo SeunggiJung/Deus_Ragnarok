@@ -36,6 +36,7 @@ public class Projectile : MonoBehaviour
                        LayerMask targetMask, LayerMask obstacleMask,
                        Sprite sprite, Color color, float radius)
     {
+        GameAudio.Play(Sfx.Fire, 0.5f);
         transform.position = position;
         rb.position = position;
         direction = dir.normalized;

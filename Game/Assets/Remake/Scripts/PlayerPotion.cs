@@ -65,6 +65,7 @@ public class PlayerPotion : MonoBehaviour
         healPerSecond = s.potionHealAmount / Mathf.Max(0.01f, s.potionHealDuration);
         healPausedUntil = float.NegativeInfinity;
         OnUsed?.Invoke();
+        GameAudio.Play(Sfx.Potion, 0.8f);
         Debug.Log($"포션 사용 : {s.potionHealDuration}초에 걸쳐 체력 {s.potionHealAmount} 회복");
         return true;
     }

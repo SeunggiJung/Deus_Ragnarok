@@ -7,10 +7,15 @@ public class PlayerJumpAttackState : PlayerState
     public PlayerJumpAttackState(PlayerController player, StateMachine stateMachine, string animBoolName)
         : base(player, stateMachine, animBoolName) { }
 
+    private float swingSoundTime;
+    private bool swingSoundPlayed;
+
     public override void Enter()
     {
         base.Enter();
         player.CanAirAttack = false;
+        swingSoundTime = Time.time + 0.14f;   // 휘두르는 순간(판정 직전)에 맞춰 바람 소리
+        swingSoundPlayed = false;
     }
 
     // 점프 공격 도중 구르기로 캔슬
@@ -23,6 +28,12 @@ public class PlayerJumpAttackState : PlayerState
     public override void Update()
     {
         base.Update();
+
+        if (!swingSoundPlayed && Time.time >= swingSoundTime)
+        {
+            swingSoundPlayed = true;
+            GameAudio.Play(Sfx.SwingJump, 0.95f);
+        }
 
         if (player.IsAttackAnimationFinished())
         {

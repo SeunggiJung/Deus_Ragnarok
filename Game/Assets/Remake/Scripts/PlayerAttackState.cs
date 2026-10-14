@@ -15,6 +15,10 @@ public class PlayerAttackState : PlayerState
     private float lungeStart;
     private float lungeEnd;
     private float lungeSpeed;
+    private float swingSoundTime;
+    private bool swingSoundPlayed;
+    // 모션 시작 후 휘두르는 소리가 나는 시점 (판정 직전. 1타 내려치기 / 2타 올려치기 / 3타 찌르기)
+    private static readonly float[] SwingSoundDelay = { 0.18f, 0.14f, 0.16f };
 
     private int resumeStep;       // 모션이 끝난 직후 다시 누르면 이어질 단계
     private float resumeUntil = float.NegativeInfinity;
@@ -39,6 +43,8 @@ public class PlayerAttackState : PlayerState
         lungeSpeed = GetOrDefault(stats.comboLungeSpeed, Step, 0f);
         lungeStart = Time.time + GetOrDefault(stats.comboLungeDelay, Step, 0f);
         lungeEnd = lungeStart + GetOrDefault(stats.comboLungeTime, Step, 0f);
+        swingSoundTime = Time.time + SwingSoundDelay[Step];
+        swingSoundPlayed = false;
 
         // 공격 시작 시 제자리 (휘두르는 순간에 짧게 앞으로 나감 : PhysicsUpdate)
         player.SetVelocity(0, player.Rb.velocity.y);
@@ -57,6 +63,13 @@ public class PlayerAttackState : PlayerState
     public override void Update()
     {
         base.Update();
+
+        // 모션 도중 구르기로 캔슬하면 상태가 바뀌어 이 소리도 나지 않음
+        if (!swingSoundPlayed && Time.time >= swingSoundTime)
+        {
+            swingSoundPlayed = true;
+            GameAudio.Play(Step == 0 ? Sfx.SwingSlash : Step == 1 ? Sfx.SwingUpper : Sfx.SwingThrust, 0.9f);
+        }
 
         AnimatorStateInfo info = player.Anim.GetCurrentAnimatorStateInfo(0);
         if (player.Anim.IsInTransition(0) || !info.IsName(StateName)) return;

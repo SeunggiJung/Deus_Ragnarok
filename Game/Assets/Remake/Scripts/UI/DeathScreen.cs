@@ -124,6 +124,7 @@ public class DeathScreen : MonoBehaviour
     {
         if (choosing) return;
         choosing = true;
+        GameAudio.Play(Sfx.Click);
         PlayerSession.PrepareRestart(SceneManager.GetActiveScene().name); // 체크포인트 시점의 성장으로 되돌림
         ScreenFader.FadeAndLoad(SceneManager.GetActiveScene().name, 0.5f);
     }
@@ -132,6 +133,7 @@ public class DeathScreen : MonoBehaviour
     {
         if (choosing) return;
         choosing = true;
+        GameAudio.Play(Sfx.Click);
         PlayerSession.Reset();
         ScreenFader.FadeAndLoad(HomeScene, 0.5f);
     }

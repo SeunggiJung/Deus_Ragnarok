@@ -57,6 +57,7 @@ public class BossTelegraph : MonoBehaviour
     public void Show(TelegraphKind kind, float duration)
     {
         Hide();
+        GameAudio.PlayTelegraph(kind);   // 패턴별 예고음
         this.kind = kind;
         this.duration = Mathf.Max(0.05f, duration);
         color = ColorOf(kind);

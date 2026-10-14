@@ -44,6 +44,7 @@ public class ReviveEffect : MonoBehaviour
 
     private IEnumerator Run()
     {
+        GameAudio.Play(Sfx.Chime, 0.9f, 0f);
         float gravity = rb.gravityScale;
         player.InputLocked = true;
         player.ForceInvincible = true;

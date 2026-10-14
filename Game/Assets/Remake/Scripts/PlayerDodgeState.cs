@@ -29,6 +29,7 @@ public class PlayerDodgeState : PlayerState
         dir = xInput != 0 ? Mathf.Sign(xInput) : player.FacingDir;
         player.CheckFlip(dir);
 
+        GameAudio.Play(Sfx.Dodge, 0.8f);
         distance = player.PlanDodge(dir, passThrough);
         player.SetIgnoreCollision(passThrough, true);
 

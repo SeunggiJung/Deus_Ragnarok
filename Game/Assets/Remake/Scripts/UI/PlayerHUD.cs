@@ -37,6 +37,10 @@ public class PlayerHUD : MonoBehaviour
         // 사망 화면 (홈으로 / 체크포인트에서 재시작)
         if (player != null && GetComponent<DeathScreen>() == null)
             gameObject.AddComponent<DeathScreen>().Init(player);
+
+        // ESC 메뉴 (계속하기 / 다시시작 / 메인으로 + 볼륨)
+        if (player != null && GetComponent<PauseMenu>() == null)
+            gameObject.AddComponent<PauseMenu>().Init(player);
     }
 
     private void BuildCanvas()
@@ -132,7 +136,7 @@ public class PlayerHUD : MonoBehaviour
         go.GetComponent<Image>().color = new Color(0.25f, 0.25f, 0.3f, 1f);
 
         UIBar.CreateText(rect, "Text", 14).text = label;
-        go.GetComponent<Button>().onClick.AddListener(() => progression.SpendPoint(type));
+        go.GetComponent<Button>().onClick.AddListener(() => { GameAudio.Play(Sfx.Click); progression.SpendPoint(type); });
     }
 
     private void OnEnable()
