@@ -14,7 +14,7 @@ using UnityEngine.Tilemaps;
 // - 보스 2종 : Crab → CrabBossBuilder, 드래곤 → DragonBossBuilder (둘 다 Behavior Tree 보스, 보스 체력바는 보스마다 하나씩)
 // - 보스방 입구 기둥(Trap) / 출구 문(Door) : Crab과 연동되는 BossArenaGate
 // - 검(key) : WeaponPickup, 색 조합 퍼즐(불 3 + 돌 3 → Door2) : ColorPuzzle / ColorFire / ColorStone
-// - 드래곤 등장(key2) : EncounterTrigger, 포탈 : 드래곤 처치 후 third_stage
+// - 드래곤 등장(key2) : EncounterTrigger, 포탈 : 드래곤 처치 후 Stage3 (리메이크 3스테이지)
 // - 검 가는 길 : 텔레포트용 지형 → 점프 + 공중 구르기 계단 발판 (Stage2SwordClimb)
 // - 체크포인트, 사냥용 스포너
 // 메뉴 : Tools/Deus/Build Stage 2  (어느 씬에서 실행해도 Stage2 씬을 열고 구성, 여러 번 실행해도 결과 동일)
@@ -90,7 +90,7 @@ public static class Stage2Builder
     }
 
     // 비활성 오브젝트까지 포함해 이름으로 찾기
-    private static GameObject FindInScene(string name)
+    internal static GameObject FindInScene(string name)
     {
         foreach (GameObject root in SceneManager.GetActiveScene().GetRootGameObjects())
         {
@@ -110,7 +110,7 @@ public static class Stage2Builder
     }
 
     // x 위치의 지면 윗면 높이 (해당 열의 가장 높은 타일 위)
-    private static float GroundY(Tilemap ground, float worldX, float fallback = 0f)
+    internal static float GroundY(Tilemap ground, float worldX, float fallback = 0f)
     {
         if (ground == null) return fallback;
         Vector3Int cell = ground.WorldToCell(new Vector3(worldX, 0f, 0f));
@@ -123,7 +123,7 @@ public static class Stage2Builder
         return fallback;
     }
 
-    private static void RemoveLegacyScripts(GameObject go, params string[] typeNames)
+    internal static void RemoveLegacyScripts(GameObject go, params string[] typeNames)
     {
         foreach (var mb in go.GetComponents<MonoBehaviour>())
         {
@@ -134,7 +134,7 @@ public static class Stage2Builder
     #endregion
 
     #region Player / Camera / HUD
-    private static GameObject SetupPlayer(Tilemap ground)
+    internal static GameObject SetupPlayer(Tilemap ground)
     {
         GameObject existing = GameObject.Find("sword_man");
         if (existing != null && existing.GetComponent<PlayerController>() != null)
@@ -155,7 +155,7 @@ public static class Stage2Builder
         return player;
     }
 
-    private static void SetupCamera(GameObject player)
+    internal static void SetupCamera(GameObject player)
     {
         if (player == null) return;
         GameObject cam = GameObject.Find("Main Camera");
@@ -170,7 +170,7 @@ public static class Stage2Builder
         }
     }
 
-    private static void SetupHud()
+    internal static void SetupHud()
     {
         GameObject legacyCanvas = FindInScene("Canvas");
         if (legacyCanvas != null) legacyCanvas.SetActive(false); // 레거시 체력/마나 바 등
@@ -227,7 +227,7 @@ public static class Stage2Builder
         });
     }
 
-    private static T LoadOrCreate<T>(string name, System.Action<T> init) where T : ScriptableObject
+    internal static T LoadOrCreate<T>(string name, System.Action<T> init) where T : ScriptableObject
     {
         string path = $"{DataFolder}/{name}.asset";
         var asset = AssetDatabase.LoadAssetAtPath<T>(path);
@@ -239,7 +239,7 @@ public static class Stage2Builder
     }
 
     // 레거시 몬스터를 제자리에서 Monster FSM으로 변환 (같은 attack / die / moving 애니메이터 사용)
-    private static Monster ConvertMonster(string legacyName, string newName, string attackState, EnemyStats stats)
+    internal static Monster ConvertMonster(string legacyName, string newName, string attackState, EnemyStats stats)
     {
         GameObject go = FindInScene(legacyName) ?? FindInScene(newName);
         if (go == null) return null;
@@ -415,7 +415,7 @@ public static class Stage2Builder
         if (portal == null) return;
         var stagePortal = GetOrAdd<StagePortal>(portal);
         var so = new SerializedObject(stagePortal);
-        so.FindProperty("nextSceneName").stringValue = "third_stage";
+        so.FindProperty("nextSceneName").stringValue = "Stage3";
         so.FindProperty("requiredDefeated").objectReferenceValue = dragon;
         so.FindProperty("lockedPrompt").stringValue = "Defeat the Dragon";
         so.ApplyModifiedProperties();
@@ -471,7 +471,7 @@ public static class Stage2Builder
     #endregion
 
     // Unity 오브젝트는 없을 때 가짜 null을 반환할 수 있어 ?? 연산자 대신 명시적으로 검사
-    private static T GetOrAdd<T>(GameObject go) where T : Component
+    internal static T GetOrAdd<T>(GameObject go) where T : Component
     {
         T component = go.GetComponent<T>();
         return component != null ? component : go.AddComponent<T>();

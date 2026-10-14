@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cca9e5fb0484ea246a7f8982c045ff36, type: 3}
+  m_Name: SkeletonStats
+  m_EditorClassIdentifier: 
+  maxHp: 130
+  invincibleTime: 0.2
+  attackDamage: 10
+  attackRadius: 1.8
+  moveSpeed: 1.8
+  detectRange: 14
+  loseRange: 24
+  attackRange: 2.6
+  attackCooldown: 1.4
+  expReward: 60
+  hitStunTime: 0.15
+  deathDelay: 1.2

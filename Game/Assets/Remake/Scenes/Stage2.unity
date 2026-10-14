@@ -8178,7 +8178,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 64b625e91f78340498eed99b829ec8ef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextSceneName: third_stage
+  nextSceneName: Stage3
   prompt: Next Stage
   promptOffset: {x: 0, y: 1.6}
   fadeDuration: 0.8

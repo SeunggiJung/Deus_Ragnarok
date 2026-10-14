@@ -1,7 +1,7 @@
 # Deus_Ragnarok 리팩토링 & 리마스터링 — 작업 인수인계 문서
 
 > 다른 AI 모델 / 다른 세션이 이 프로젝트를 이어서 작업할 때 가장 먼저 읽는 문서.
-> 마지막 갱신 : 2026-10-14 (커밋 `7c46f46` 기준)
+> 마지막 갱신 : 2026-10-14 (3스테이지 리메이크 반영)
 
 ---
 
@@ -88,10 +88,11 @@
 - **카운터 규칙** : 기를 모으는 패턴의 후반 구간(`CounterWindowOpen`)에 플레이어가 점프 공격(`JumpAttackState`)으로 맞히면 패턴이 끊기고 긴 그로기(`CounterStaggerTime`). `BossController.StaggerFor(duration)`는 행동 노드 안에서 그로기를 걸 때 사용(다음 프레임 적용)
 - **Crab (2스테이지 보스, 체력 500)** : `CrabBoss` / `CrabBossStats` / `CrabBossBehaviorTree` / `CrabActions` / `Editor/CrabBossBuilder`. 패턴 : 집게 연타, 바닥 찍기(발밑 + 좌우 충격파), 잡기(구르기로만 회피), 기 모아 강타(후반 40%에 점프 공격 카운터 → 3초 그로기, 2페이즈는 충전 0.8배 / 창 0.85배), 도약 내려찍기(장판 추적 → 내려찍기, 2페이즈 2연속), 돌진 / 방어 / 포효(공통 노드 재사용)
 - **Dragon (2스테이지 최종 보스, 체력 900)** : `DragonBoss` / `DragonBossStats` / `DragonBossBehaviorTree` / `DragonActions` / `Editor/DragonBossBuilder`(에셋 팩 PNG 프레임으로 모션 클립 생성, 컨트롤러 `Animations/Boss/DragonBoss.controller`). 패턴 : 발톱(공통 근접 노드), 화염 브레스(후반 40% 카운터, 2페이즈 2연속), 화염구 비(장판 + 낙하), 붙잡아 내려찍기(제한 시간 안에 범위 밖으로 못 나가면 잡혀서 들어올려진 뒤 내려찍힘 → 서로 반대로 날아가고 보스 그로기 1.5초 / 플레이어 스태미너 0). 등장 연출 동안은 `CanEngage`로 전투 지연. 보스 체력바는 보스마다 하나(`BossHealthBar.boss`)
+- **Hades (3스테이지 최종 보스, 2형태)** : `HadesBoss` / `HadesBossStats` / `HadesBossBehaviorTree` / `HadesActions` / `Editor/HadesBossBuilder`(원작 `Hades.controller`의 Wizard_* / Rades_* 모션을 재사용해 `Animations/Boss/HadesBoss.controller` 생성, `revived` 불 값으로 모션 세트 전환). 1형태(체력 900) 처치 시 `BossController.HasMoreForms` 훅으로 사망 연출 없이 쓰러진 채 대기 → 레버로 `Revive()` → 더 큰 2형태(체력 1200, 공격 34, Phase2 강화)로 부활 → 2형태 처치 시 일반 보스처럼 슬로모션 + 파편. 패턴 : 마법 타격(`HadesMeleeAction`, 시간 기반 판정, 2형태는 모션 번갈아) / 화염탄 비(`HadesBombAction`, 맵 전체 3발·2형태 5발, 첫 발은 플레이어 위치)
 - `Boss/BossArenaGate` : 입구 기둥(전투 시작 시 낙하) / 출구 문(처치 후 열림). BT 보스(`boss`) 또는 일반 몬스터(`guardian` + `engageRange`) 둘 다 지원
 
 ### 4.5 레벨 / 상호작용 (`Scripts/Level`, `Scripts/Interaction`)
-- `FallingPlatform`(밟으면 흔들림 → 낙하 → 복구), `MovingPlatform`(Kinematic + MovePosition 왕복), `Checkpoint`, `WeaponPickup`(공격력 +3, 무기 스프라이트 교체), `BreakableBox`(IDamageable, 부수면 `LevelUpPickup`), `Crusher`(2스테이지 내려찍는 장애물 : 눈 완전히 감음 = 1회, 반만 감음 = 2회 내려찍기, 장애물 구역에서는 구르기 불가), `DodgeLockZone`(보스 입구 기둥 왼쪽에서는 구르기 금지, 기둥 콜라이더 중심 기준), `ColorPuzzle/ColorFire/ColorStone`(2스테이지 퍼즐 : 불 4개(빨강/파랑/초록/노랑) 중 2개를 섞어 돌 3개의 필요한 색(돌 위 힌트 표시)을 맞춤. 노랑 조합(갈색/청록/라임)은 오답), `EncounterTrigger`(카메라 포커스 + 적 등장), `PlayerSession`
+- `FallingPlatform`(밟으면 흔들림 → 낙하 → 복구), `MovingPlatform`(Kinematic + MovePosition 왕복), `Checkpoint`, `WeaponPickup`(공격력 +3, 무기 스프라이트 교체), `BreakableBox`(IDamageable, 부수면 `LevelUpPickup`), `Crusher`(2스테이지 내려찍는 장애물 : 눈 완전히 감음 = 1회, 반만 감음 = 2회 내려찍기, 장애물 구역에서는 구르기 불가), `DodgeLockZone`(보스 입구 기둥 왼쪽에서는 구르기 금지, 기둥 콜라이더 중심 기준), `ColorPuzzle/ColorFire/ColorStone`(2스테이지 퍼즐 : 불 4개(빨강/파랑/초록/노랑) 중 2개를 섞어 돌 3개의 필요한 색(돌 위 힌트 표시)을 맞춤. 노랑 조합(갈색/청록/라임)은 오답), `EncounterTrigger`(카메라 포커스 + 적 등장), `PlayerSession`, `HadesEncounter`(3스테이지 전투 흐름 : 제단 G → 졸개 4마리 → G → 하데스 등장 → 레버 → 부활 → 레버 → 출구 문) / `HadesLever` / `EndingTrigger`(문 너머 트리거 → Ending 씬)
 - `IInteractable` + `PlayerInteractor` : 새 상호작용 대상은 인터페이스만 구현하면 됨
 - `StagePortal` : G키 → `PlayerSession.Save` → `ScreenFader`로 페이드 후 씬 로드, `requiredDefeated`로 잠금 가능
 
@@ -119,7 +120,13 @@
 - `Stage 2 - Build Sword Climb` : 보스 문 뒤 → 검까지의 길. 원작은 텔레포트로 오르던 지형 → 점프 + 공중 구르기로 오르는 계단 발판 10개(쉬운 도약 틈 1 / 구르기 도약 틈 3 번갈아, x 90~133), 검 발판에서 오른쪽으로 내려가면 지면(x 134~). 체크포인트3은 중간 발판, 퍼즐 이후 몬스터 없음(스포너는 `Spawner_S2_1` 하나)
 - `Build Crab Boss` / `Build Dragon Boss` : 각각 Behavior Tree 보스로 변환 (Build Stage 2에 포함)
 - `Build Stage 2` : 씬 복사/열기 → Player/HUD 프리팹 배치 + 카메라 대상 연결 + 레거시 Canvas 끔 → Rockhead x7 → `Crusher` → Crab(`CrabBossBuilder`) / Dragon(`DragonBossBuilder`) BT 보스 → 보스방 Trap/Door → 검 → 색 퍼즐(Stone1=흰색, Stone2=자홍, Stone3=주황 / 빨강+파랑=자홍, 파랑+초록=주황, 초록+빨강=흰색 / 노랑 불은 갈색·청록·라임 오답 조합) → key2 = 드래곤 등장 트리거 → 포탈(드래곤 처치 후 `third_stage`) → 체크포인트 5, 스포너 1(`Spawner_S2_1`, x 138)
-- 빌드 설정에 RemakeTest, Stage2 추가됨
+- 빌드 설정에 RemakeTest, Stage2, Stage3 추가됨
+
+### 3스테이지 — `Assets/Remake/Scenes/Stage3.unity` (원작 third_stage 복사본)
+- `Tools/Deus/Build Stage 3` : 씬 복사/열기 → Player/HUD 프리팹 + 카메라 연결 + 레거시 Canvas 끔 → 졸개 4마리(Skeleton x2, Goblin x2 : 레거시 Enemy/EnemyAI → `Monster`, `SkeletonStats`/`GoblinStats`) → `HadesBossBuilder.Convert`(Hades → `HadesBoss`, 보스 체력바 연결) → 제단(원래 `Spawner`, 이름을 `HadesAltar`로)에 `HadesEncounter`, 레버(`HadesLever`, 처음엔 비활성), 출구 문(`Door`)/왼쪽 벽(`Trap`)은 Kinematic + Ground 레이어 → `trigger` 오브젝트에 `EndingTrigger` → 체크포인트 2개
+- 졸개 / 하데스 / 레버는 씬에 비활성으로 저장되고 `HadesEncounter`가 순서대로 활성화. 원작 `BGMManager_Hades`는 보스 / 최종 형태 BGM 전환에 재사용
+- 원작의 MP 파이어볼 스킬(하데스에게 추가 피해)은 리메이크에 MP 시스템이 없어 이식하지 않음
+- 2스테이지 포탈의 `nextSceneName`은 `Stage3`
 
 ---
 
@@ -132,6 +139,8 @@
 5. 공격 종료 판정은 `IsName(상태) && !IsInTransition && normalizedTime >= 1` (진입 직후 이전 상태를 읽는 문제)
 6. 원작 Attack 클립(`External/Low_Swordman/2.Animation/Attack.anim`)은 Loop Time을 끔
 7. 플레이어 무기 스프라이트 경로 : `body/Weapon/Weapon-Sword`
+8. **검 획득 시 크기** : 획득한 검(`key`) 스프라이트는 기본 검보다 2배 커서(높이 0.64 vs 0.32) 그대로 교체하면 몸보다 큼 → `PlayerSessionSync.EquipWeapon`이 기본 검과 같은 월드 길이(1.28)로 스케일을 맞춤. `WeaponPickup`과 `PlayerSession.Restore` 둘 다 이 함수를 사용(스테이지 이동 후에도 동일)
+9. **비활성 상태에서 시작하는 몬스터**를 코드로 즉시 죽이면 `Start` 전이라 StateMachine이 null → 테스트 시 한 프레임 진행 후 피해를 줄 것
 
 ### MCP Unity 도구 사용 시 주의
 - Unity 창이 비활성이면 **플레이 모드가 거의 진행되지 않음** → `pause` 후 `step` 반복으로 검증
@@ -150,9 +159,12 @@
 - 2스테이지 : Crusher / Crab 보스 / 검 가는 길은 사용자 플레이 확인("딱 좋다"). **드래곤 보스**는 사용자 플레이 1회 진행(브레스 / 화염구 비 / 발톱 피해 로그 확인), 붙잡아 내려찍기 범위(반지름 4.6) / 제한 시간(1.5초) / 브레스 입 위치 / 화염구 장판 크기는 추가 피드백 대기. 노랑 조합 퍼즐은 미검증
   - 드래곤 아레나 입구 기둥(보스 이벤트 연동)과 불꽃 파도 패턴은 아직 없음
 
+- 3스테이지 : 코드 / 씬 구성 완료, 스모크 테스트(졸개 → 하데스 등장 → 1형태 처치 → 부활 → 2형태 처치 → 문 상승)까지 통과. **사용자 플레이 테스트 대기**(난이도 수치 / 화염탄 위치 / 레버 위치 / Ending 씬 진입 확인 필요)
+- 검 크기 축소(`EquipWeapon`) : 사용자 플레이 확인 대기. 그립 위치(피벗)가 어색하면 `WeaponWorldLength` 또는 무기 Transform 오프셋 조정
+
 ### 다음 후보
 - 2스테이지 테스트 피드백 반영 (난이도 / 위치)
 - 드래곤 피드백 반영(수치 / 연출), 아레나 기둥, 2페이즈 추가 패턴
-- 3스테이지(원작 third_stage, Hades) 리메이크 — 현재 2스테이지 포탈은 원작 third_stage로 연결
+- 3스테이지 피드백 반영 (하데스 수치 / 연출, Ending 씬 리메이크 연동)
 - 세이브(현재 PlayerSession은 메모리에만 유지), 사운드(원작 SFX/BGM 매니저 연동 안 됨)
 - 노션 "해야 되는 것들" : 스폰/성장/UI/BT 보스 모두 구현됨 → 사용자와 정리 필요

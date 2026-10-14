@@ -83,6 +83,26 @@ public class BossController : BaseCharacter
         anim.speed = AnimSpeed;
     }
 
+    // 처치돼도 다음 형태로 되살아나는 보스는 true (사망 연출 / 제거 대신 OnFormDefeated 호출)
+    protected virtual bool HasMoreForms => false;
+    protected virtual void OnFormDefeated() { }
+
+    // 되살아난 보스가 처음부터 다시 싸우도록 전투 상태를 초기화 (체력 / 사망 상태는 호출하는 쪽에서 ResetCharacter)
+    protected void RestartFight()
+    {
+        tree.Abort();
+        Engaged = false;
+        IsGuarding = false;
+        CounterWindowOpen = false;
+        HitEventHandler = null;
+        poise = Stats.maxPoise;
+        staggerEndTime = float.NegativeInfinity;
+        wasStaggered = false;
+        recentHitTimes.Clear();
+        anim.speed = AnimSpeed;
+        rb.constraints = initialConstraints;
+    }
+
     // 등장 연출 중에는 전투를 시작하지 않도록 보스마다 제한할 수 있음
     protected virtual bool CanEngage => true;
 
@@ -315,6 +335,13 @@ public class BossController : BaseCharacter
         rb.simulated = false;
 
         CombatEvents.RaiseEnemyKilled(this, Stats.expReward);
+
+        // 형태가 더 남은 보스(하데스 1형태)는 여기서 끝 : 시체를 부수지 않고 두었다가 Revive로 되살림
+        if (HasMoreForms)
+        {
+            OnFormDefeated();
+            return;
+        }
         OnDefeated?.Invoke();
         Debug.Log($"[Boss] {Stats.bossName} 처치");
 
