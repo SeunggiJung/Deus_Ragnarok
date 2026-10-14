@@ -156,9 +156,9 @@ public class ReviveEffect : MonoBehaviour
     {
         if (wingRight == null) return;
 
-        Vector2 shoulder = Center + new Vector2(0f, 0.2f);
+        Vector2 shoulder = Center + new Vector2(0f, 0.1f);
         float fold = Mathf.Clamp01(1f - unfold);
-        float angle = Mathf.Lerp(0f, 55f, fold) + flap * 8f;
+        float angle = Mathf.Lerp(8f, 50f, fold) + flap * 8f;
         Vector3 scale = new Vector3(Mathf.Lerp(1f, 0.25f, fold), Mathf.Lerp(1f, 0.5f, fold), 1f) * Mathf.Max(1f, unfold); // 펼칠 때 살짝 오버슈트
 
         wingRight.transform.position = shoulder + new Vector2(0.08f, 0f);
@@ -230,56 +230,100 @@ public class ReviveEffect : MonoBehaviour
     #endregion
 
     #region Sprites
-    // 흰색에서 금색으로 번지는 깃털 날개 (오른쪽 날개. 왼쪽은 flipX). 피벗은 어깨 쪽 뿌리
+    // 천사 날개 (오른쪽 날개. 왼쪽은 flipX). 어깨에서 위 / 바깥으로 휘어 오르는 윗선(팔)과, 거기서 아래로 늘어지는
+    // 긴 깃털 한 층 + 짧은 덧깃털 한 층. 깃털 끝으로 갈수록 금색을 띠고 가장자리에 옅은 윤곽선을 둠. 피벗은 어깨
     private static Sprite GetWing()
     {
         if (wingSprite != null) return wingSprite;
 
-        const int w = 256, h = 210;
-        var origin = new Vector2(10f, 60f);
+        const int w = 270, h = 260;
+        var origin = new Vector2(14f, 95f);
+        var pixels = new Color[w * h];
+        const int featherCount = 10;
+
+        // 깃털 : 윗선 위의 한 점에서 아래 바깥쪽으로 뻗는 둥근 막대
+        for (int layer = 0; layer < 2; layer++)
+        {
+            for (int i = 0; i < featherCount; i++)
+            {
+                float s = layer == 0 ? (i + 0.5f) / featherCount : (i + 1f) / featherCount;
+                if (s > 0.98f) continue;
+
+                float angle = Mathf.Lerp(-108f, -32f, s) * Mathf.Deg2Rad;               // 안쪽은 아래로, 바깥쪽은 옆으로
+                float length = Mathf.Lerp(70f, 165f, Mathf.Sin(s * Mathf.PI * 0.5f));  // 바깥쪽일수록 김
+                if (s > 0.9f) length *= 0.9f;
+                if (layer == 1) length *= 0.55f;
+
+                Vector2 from = WingArm(origin, s);
+                Vector2 to = from + new Vector2(Mathf.Cos(angle), Mathf.Sin(angle)) * length;
+                float radius = layer == 0 ? 17f : 14f;
+                Color tipColor = layer == 0 ? new Color(1f, 0.9f, 0.62f) : new Color(1f, 0.96f, 0.82f);
+                PaintCapsule(pixels, w, h, from, to, radius, radius * (layer == 0 ? 0.35f : 0.5f), Color.white, tipColor, true); // 끝이 뾰족한 깃털
+            }
+        }
+
+        // 윗선(팔) : 맨 위에 덧그려 깃털 뿌리를 가림
+        var cream = new Color(1f, 0.97f, 0.88f);
+        var edge = new Color(0.82f, 0.72f, 0.5f);
+        for (int pass = 0; pass < 2; pass++)   // 먼저 한 겹 두껍게 윤곽색으로, 그 위에 본색
+        {
+            for (int k = 0; k < 80; k++)
+            {
+                float s = k / 79f;
+                Vector2 c = WingArm(origin, s);
+                float r = Mathf.Lerp(9f, 4.5f, s) + (pass == 0 ? 1.5f : 0f);
+                PaintCapsule(pixels, w, h, c, c, r, r, pass == 0 ? edge : cream, pass == 0 ? edge : cream, false);
+            }
+        }
+
         var tex = new Texture2D(w, h, TextureFormat.RGBA32, false)
         {
             filterMode = FilterMode.Bilinear,
             wrapMode = TextureWrapMode.Clamp
         };
-        var pixels = new Color[w * h];
-        var gold = new Color(1f, 0.88f, 0.55f);
-
-        for (int y = 0; y < h; y++)
-        {
-            for (int x = 0; x < w; x++)
-            {
-                float dx = x - origin.x, dy = y - origin.y;
-                float r = Mathf.Sqrt(dx * dx + dy * dy);
-                float a = Mathf.Atan2(dy, dx) * Mathf.Rad2Deg;
-                Color c = new Color(1f, 1f, 1f, 0f);
-
-                if (r > 6f && a > -30f && a < 100f)
-                {
-                    float t = Mathf.InverseLerp(100f, -30f, a);                       // 0 위쪽 ~ 1 아래쪽
-                    float profile = Mathf.Sin(Mathf.Clamp01(t * 0.85f + 0.08f) * Mathf.PI);
-                    float longest = 80f + 150f * profile;                              // 가운데 깃털이 가장 김
-                    float f = t * 8f;                                                  // 깃털 8장
-                    float frac = f - Mathf.Floor(f);
-                    float rMax = longest * (1f - 0.12f * (1f - Mathf.Sin(frac * Mathf.PI))); // 깃털 사이는 살짝 파임
-
-                    if (r <= rMax)
-                    {
-                        float tip = Mathf.Clamp01((rMax - r) / 4f);
-                        float side = Mathf.Clamp01(Mathf.Min(a + 30f, 100f - a) / 3f);
-                        float k = r / rMax;
-                        Color body = Color.Lerp(Color.white, gold, k * k);
-                        float seam = (frac < 0.05f || frac > 0.95f) && r > 40f ? 0.82f : 1f; // 깃털 경계선
-                        c = new Color(body.r * seam, body.g * seam, body.b * seam, tip * side);
-                    }
-                }
-                pixels[y * w + x] = c;
-            }
-        }
         tex.SetPixels(pixels);
         tex.Apply();
-        wingSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(origin.x / w, origin.y / h), 170f);
+        wingSprite = Sprite.Create(tex, new Rect(0, 0, w, h), new Vector2(origin.x / w, origin.y / h), 125f);
         return wingSprite;
+    }
+
+    // 윗선 : 어깨에서 바깥으로 나가며 위로 휘어 오르다 완만해지는 곡선 (s : 0 어깨 ~ 1 날개 끝)
+    private static Vector2 WingArm(Vector2 origin, float s)
+    {
+        return origin + new Vector2(215f * s, 135f * (1f - (1f - s) * (1f - s)));
+    }
+
+    // 두 점 사이의 둥근 막대를 그림 (반지름은 from에서 to로 갈수록 변함, 색도 from → to로 번짐). 기존 픽셀 위에 덮어씀
+    private static void PaintCapsule(Color[] pixels, int w, int h, Vector2 a, Vector2 b, float radiusA, float radiusB, Color colorA, Color colorB, bool outline)
+    {
+        float pad = Mathf.Max(radiusA, radiusB) + 2f;
+        int x0 = Mathf.Max(0, Mathf.FloorToInt(Mathf.Min(a.x, b.x) - pad));
+        int x1 = Mathf.Min(w - 1, Mathf.CeilToInt(Mathf.Max(a.x, b.x) + pad));
+        int y0 = Mathf.Max(0, Mathf.FloorToInt(Mathf.Min(a.y, b.y) - pad));
+        int y1 = Mathf.Min(h - 1, Mathf.CeilToInt(Mathf.Max(a.y, b.y) + pad));
+        Vector2 ab = b - a;
+        float lenSq = ab.sqrMagnitude;
+
+        for (int y = y0; y <= y1; y++)
+        {
+            for (int x = x0; x <= x1; x++)
+            {
+                var p = new Vector2(x, y);
+                float t = lenSq > 0.0001f ? Mathf.Clamp01(Vector2.Dot(p - a, ab) / lenSq) : 0f;
+                float dist = Vector2.Distance(p, a + ab * t);
+                float radius = Mathf.Lerp(radiusA, radiusB, t);
+                if (dist > radius) continue;
+
+                float alpha = Mathf.Clamp01((radius - dist) / 1.5f);
+                Color col = Color.Lerp(colorA, colorB, t * t);
+                if (outline && radius - dist < 2.5f) col *= 0.86f;   // 가장자리 윤곽선
+
+                Color old = pixels[y * w + x];
+                float outA = alpha + old.a * (1f - alpha);
+                Vector3 rgb = (new Vector3(col.r, col.g, col.b) * alpha + new Vector3(old.r, old.g, old.b) * old.a * (1f - alpha)) / Mathf.Max(0.0001f, outA);
+                pixels[y * w + x] = new Color(rgb.x, rgb.y, rgb.z, outA);
+            }
+        }
     }
 
     // 가운데가 밝고 가장자리로 부드럽게 사라지는 둥근 빛
