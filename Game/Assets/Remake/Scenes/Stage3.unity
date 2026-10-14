@@ -3077,6 +3077,11 @@ MonoBehaviour:
   - {fileID: 590989904}
   - {fileID: 1451395648}
   - {fileID: 1986588129}
+  waveSizes: 02000000030000000500000006000000
+  firstWaveDelay: 1
+  waveInterval: 2.5
+  spawnMinX: -8
+  spawnMaxX: 26
   hades: {fileID: 1081344186}
   lever: {fileID: 1110194769}
   door: {fileID: 1480523463}

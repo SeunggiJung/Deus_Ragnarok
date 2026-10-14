@@ -11,6 +11,8 @@ public class GroundZone : MonoBehaviour
     private bool locked;
     private float lockStart, lockDuration = 1f;
     private float fadeStart = -1f;
+    private Color idleColor = new Color(1f, 0.6f, 0.1f);
+    private Color lockedColor = new Color(1f, 0.15f, 0.1f);
 
     public float X => transform.position.x;
     public float Radius => radius;
@@ -35,6 +37,13 @@ public class GroundZone : MonoBehaviour
         sr.sprite = sprite;
         sr.sortingOrder = order;
         return sr;
+    }
+
+    // 보스 테마색에 맞춰 장판 색 변경 (기본 : 주황 → 붉은색)
+    public void SetColors(Color idle, Color locked)
+    {
+        idleColor = idle;
+        lockedColor = locked;
     }
 
     public void SetX(float x) => transform.position = new Vector3(x, transform.position.y, transform.position.z);
@@ -73,8 +82,8 @@ public class GroundZone : MonoBehaviour
         fill.transform.localScale = new Vector3(fillWidth, fillWidth * Flatten, 1f);
 
         float pulse = 0.5f + 0.5f * Mathf.Sin(Time.time * (locked ? 26f : 6f));
-        Color baseColor = locked ? new Color(1f, 0.15f, 0.1f) : new Color(1f, 0.6f, 0.1f);
+        Color baseColor = locked ? lockedColor : idleColor;
         outline.color = new Color(baseColor.r, baseColor.g, baseColor.b, (0.65f + 0.35f * pulse) * fade);
-        fill.color = new Color(1f, locked ? 0.1f : 0.5f, 0.05f, (locked ? 0.5f + 0.2f * pulse : 0.25f) * fade);
+        fill.color = new Color(baseColor.r, baseColor.g * 0.8f, baseColor.b, (locked ? 0.5f + 0.2f * pulse : 0.25f) * fade);
     }
 }

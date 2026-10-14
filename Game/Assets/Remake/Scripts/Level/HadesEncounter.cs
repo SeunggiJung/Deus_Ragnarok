@@ -1,9 +1,11 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 // 3스테이지 하데스 전투 흐름 (원작 Sword_Man의 third_stage 처리를 계승)
-//  1) 제단(Spawner)에서 G → 해골 / 고블린 4마리 등장
-//  2) 전부 처치하고 다시 G → 카메라가 하데스를 비추며 등장 (BGM 전환)
+//  1) 제단(Spawner)에서 G → 해골 / 고블린 웨이브 시작 (waveSizes 만큼 여러 차례, 앞 웨이브를 전멸시키면 다음 웨이브)
+//  2) 모든 웨이브를 막아낸 뒤 다시 G → 카메라가 하데스를 비추며 등장 (BGM 전환)
 //  3) 하데스 1형태 처치 → 레버 등장. 레버 G → 더 거대한 2형태로 부활
 //  4) 2형태 처치 → 레버 G → 출구 문이 열림 → 문 너머 트리거에 닿으면 엔딩
 // 제단 오브젝트에 붙이며, 레버(HadesLever)가 이 클래스로 상호작용을 전달
@@ -12,7 +14,15 @@ public class HadesEncounter : MonoBehaviour, IInteractable
 {
     public enum Stage { Ready, MinionsAlive, BossReady, BossFight, FirstFormDown, SecondForm, Cleared, DoorOpen }
 
+    [Tooltip("웨이브마다 복제해서 쓰는 졸개 원본 (씬에는 비활성으로 두고, 종류 / 크기 / 능력치만 가져옴)")]
     [SerializeField] private Monster[] minions;
+    [Tooltip("웨이브별 몬스터 수 (뒤로 갈수록 많아짐)")]
+    [SerializeField] private int[] waveSizes = { 2, 3, 5, 6 };
+    [SerializeField] private float firstWaveDelay = 1.0f;
+    [SerializeField] private float waveInterval = 2.5f;       // 웨이브를 전멸시킨 뒤 다음 웨이브까지
+    [Tooltip("졸개가 나타나는 좌 / 우 끝 (플레이어 위로 떨어지지 않도록 양쪽 끝에서 입장)")]
+    [SerializeField] private float spawnMinX = -8f;
+    [SerializeField] private float spawnMaxX = 26f;
     [SerializeField] private HadesBoss hades;
     [SerializeField] private GameObject lever;
     [SerializeField] private Transform door;
@@ -26,12 +36,15 @@ public class HadesEncounter : MonoBehaviour, IInteractable
     public Stage Current { get; private set; } = Stage.Ready;
 
     private bool busy;
+    private readonly List<Monster> alive = new List<Monster>();
+    private Text banner;
+    private Coroutine bannerRoutine;
 
-    private bool AllMinionsDead
+    private bool AllWaveDead
     {
         get
         {
-            foreach (var m in minions)
+            foreach (var m in alive)
                 if (m != null && !m.IsDead) return false;
             return true;
         }
@@ -88,13 +101,7 @@ public class HadesEncounter : MonoBehaviour, IInteractable
     public bool CanInteract(PlayerController player)
     {
         if (busy || player.IsDead) return false;
-        if (Current == Stage.Ready) return true;
-        if (Current == Stage.MinionsAlive && AllMinionsDead)
-        {
-            Current = Stage.BossReady;
-            return true;
-        }
-        return Current == Stage.BossReady;
+        return Current == Stage.Ready || Current == Stage.BossReady;
     }
 
     public void Interact(PlayerController player)
@@ -103,10 +110,8 @@ public class HadesEncounter : MonoBehaviour, IInteractable
 
         if (Current == Stage.Ready)
         {
-            foreach (var m in minions)
-                if (m != null) m.gameObject.SetActive(true);
             Current = Stage.MinionsAlive;
-            Debug.Log("하데스의 방 : 졸개 등장");
+            StartCoroutine(WaveRoutine());
         }
         else
         {
@@ -167,6 +172,107 @@ public class HadesEncounter : MonoBehaviour, IInteractable
         // 대기 중에 흐름이 넘어갔다면(예: 이미 부활) 레버를 보이지 않음
         if (lever != null && (Current == Stage.FirstFormDown || Current == Stage.Cleared))
             lever.SetActive(true);
+    }
+    #endregion
+
+    #region Waves
+    // 웨이브 : 앞 웨이브를 전멸시키면 잠시 뒤 다음 웨이브. 마지막 웨이브까지 막아내면 하데스를 소환할 수 있음
+    private IEnumerator WaveRoutine()
+    {
+        yield return new WaitForSeconds(firstWaveDelay);
+
+        for (int wave = 0; wave < waveSizes.Length; wave++)
+        {
+            ShowBanner($"WAVE {wave + 1} / {waveSizes.Length}", 2f);
+            SpawnWave(wave, waveSizes[wave]);
+            Debug.Log($"하데스의 방 : 웨이브 {wave + 1}/{waveSizes.Length} ({waveSizes[wave]}마리)");
+
+            yield return new WaitForSeconds(1f);   // 등장 직후 즉시 판정되지 않도록
+            while (!AllWaveDead) yield return null;
+
+            if (wave < waveSizes.Length - 1)
+            {
+                ShowBanner("Wave cleared", waveInterval);
+                yield return new WaitForSeconds(waveInterval);
+            }
+        }
+
+        Current = Stage.BossReady;
+        ShowBanner("All waves cleared - Summon Hades", 3f);
+    }
+
+    private void SpawnWave(int wave, int count)
+    {
+        alive.Clear();
+        for (int i = 0; i < count; i++)
+        {
+            Monster template = minions[(wave + i) % minions.Length];
+            if (template == null) continue;
+
+            // 좌 / 우 끝에서 번갈아 입장 (같은 쪽에서는 안쪽으로 간격을 두고)
+            float inward = (i / 2) * 2.2f;
+            float x = i % 2 == 0 ? spawnMinX + inward : spawnMaxX - inward;
+            Vector3 pos = new Vector3(x, template.transform.position.y, template.transform.position.z);
+
+            Monster clone = Instantiate(template, pos, template.transform.rotation);
+            clone.name = $"{template.name}_W{wave + 1}_{i + 1}";
+            clone.gameObject.SetActive(true);
+            alive.Add(clone);
+        }
+    }
+
+    // 화면 상단 중앙에 잠깐 표시되는 안내 문구 (코드로 생성)
+    private void ShowBanner(string message, float duration)
+    {
+        if (banner == null) banner = CreateBanner();
+        banner.text = message;
+        if (bannerRoutine != null) StopCoroutine(bannerRoutine);
+        bannerRoutine = StartCoroutine(BannerRoutine(duration));
+    }
+
+    private IEnumerator BannerRoutine(float duration)
+    {
+        banner.gameObject.SetActive(true);
+        float fade = 0.4f;
+        float elapsed = 0f;
+        while (elapsed < duration)
+        {
+            elapsed += Time.deltaTime;
+            float a = Mathf.Clamp01(Mathf.Min(elapsed, duration - elapsed) / fade);
+            Color c = banner.color;
+            banner.color = new Color(c.r, c.g, c.b, a);
+            yield return null;
+        }
+        banner.gameObject.SetActive(false);
+    }
+
+    private static Text CreateBanner()
+    {
+        var canvasGo = new GameObject("Wave Banner Canvas", typeof(Canvas), typeof(CanvasScaler));
+        var canvas = canvasGo.GetComponent<Canvas>();
+        canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+        canvas.sortingOrder = 90;
+        var scaler = canvasGo.GetComponent<CanvasScaler>();
+        scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
+        scaler.referenceResolution = new Vector2(1920f, 1080f);
+
+        var rectGo = new GameObject("Banner", typeof(RectTransform));
+        var rect = rectGo.GetComponent<RectTransform>();
+        rect.SetParent(canvasGo.transform, false);
+        rect.anchorMin = new Vector2(0.5f, 1f);
+        rect.anchorMax = new Vector2(0.5f, 1f);
+        rect.pivot = new Vector2(0.5f, 1f);
+        rect.anchoredPosition = new Vector2(0f, -150f);
+        rect.sizeDelta = new Vector2(1200f, 90f);
+
+        Text text = UIBar.CreateText(rect, "Text", 56);
+        text.fontStyle = FontStyle.Bold;
+        text.color = new Color(1f, 0.85f, 0.4f, 0f);
+        var outline = text.gameObject.AddComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.8f);
+        outline.effectDistance = new Vector2(3f, -3f);
+        text.gameObject.SetActive(false);
+        return text;
     }
     #endregion
 

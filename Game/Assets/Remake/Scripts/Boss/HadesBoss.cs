@@ -22,6 +22,12 @@ public class HadesBoss : BossController
     public bool Revived { get; private set; }
     public event Action OnFirstFormDefeated;   // 1형태가 쓰러졌을 때 (레버 등장)
 
+    // 형태별 이펙트 색 : 1형태(붉은 불꽃 마법사)는 주황, 2형태(검은 로브 + 보라 불꽃)는 보라
+    public Color FxColor => Revived ? new Color(0.65f, 0.25f, 1f) : new Color(1f, 0.55f, 0.15f);
+    public Color FxDarkColor => Revived ? new Color(0.3f, 0.05f, 0.5f) : new Color(0.9f, 0.2f, 0.05f);
+    public Color ZoneIdleColor => Revived ? new Color(0.6f, 0.3f, 1f) : new Color(1f, 0.6f, 0.1f);
+    public Color ZoneLockedColor => Revived ? new Color(0.75f, 0.15f, 1f) : new Color(1f, 0.15f, 0.1f);
+
     protected override bool HasMoreForms => !Revived;
     protected override bool CanEngage => Time.time - enabledTime >= spawnDelay;
     protected override float CounterStaggerTime => Stats.staggerTime * 2f;
@@ -68,7 +74,8 @@ public class HadesBoss : BossController
 
         Vector3 s = transform.localScale;
         transform.localScale = new Vector3(s.x * hs.form2ScaleMultiplier, s.y * hs.form2ScaleMultiplier, s.z);
-        transform.position += Vector3.up * 0.5f;   // 커진 몸이 바닥에 끼지 않도록 살짝 띄워 착지
+        ApplyForm2Hitbox();
+        transform.position += Vector3.up * 0.5f;   // 바닥에 끼지 않도록 살짝 띄워 착지 (중력으로 내려앉음)
 
         enabledTime = Time.time;
         EnterPhase2();          // 쿨다운 / 이동 속도 / 모션 속도 강화 + 색 변화
@@ -76,5 +83,16 @@ public class HadesBoss : BossController
         anim.ResetTrigger(AnimParams.Die);
         anim.SetTrigger(HadesAnim.Spawn);
         Debug.Log("[Boss] 하데스 2형태 부활");
+    }
+
+    // 2형태 스프라이트는 1형태와 크기 / 발 위치가 달라서 같은 콜라이더를 쓰면 몸이 바닥 아래로 내려가 보임
+    // → 빌더가 계산한 2형태용 콜라이더(스프라이트의 보이는 영역 기준)로 교체
+    private void ApplyForm2Hitbox()
+    {
+        HadesBossStats hs = HadesStats;
+        var capsule = GetComponent<CapsuleCollider2D>();
+        if (!hs.hasForm2Collider || capsule == null) return;
+        capsule.offset = hs.form2ColliderOffset;
+        capsule.size = hs.form2ColliderSize;
     }
 }
