@@ -43,7 +43,6 @@ public static class PlayerSession
         player.AddMaxStamina(bonusStamina);
 
         var weapon = PlayerSessionSync.GetWeaponRenderer(player);
-        if (weapon != null && weaponSprite != null)
-            weapon.sprite = weaponSprite;
+        PlayerSessionSync.EquipWeapon(weapon, weaponSprite);
     }
 }

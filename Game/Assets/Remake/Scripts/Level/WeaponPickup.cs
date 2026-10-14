@@ -47,7 +47,7 @@ public class WeaponPickup : MonoBehaviour
 
         Transform weapon = player.transform.Find(weaponRendererPath);
         if (weapon != null && spriteRenderer != null)
-            weapon.GetComponent<SpriteRenderer>().sprite = spriteRenderer.sprite;
+            PlayerSessionSync.EquipWeapon(weapon.GetComponent<SpriteRenderer>(), spriteRenderer.sprite); // 몸 크기에 맞게 축소
 
         Debug.Log($"무기 획득 : 공격력 +{attackBonus} (현재 {player.AttackDamage})");
         gameObject.SetActive(false);
