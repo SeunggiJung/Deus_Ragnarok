@@ -36,6 +36,13 @@ public class PlayerInput
         return EventSystem.current != null && EventSystem.current.IsPointerOverGameObject();
     }
 
+    // 컷신에서 플레이어를 자동으로 움직일 때 (InputLocked 중에도 이동 / 점프만 주입)
+    public void SetAuto(float moveX, bool jump)
+    {
+        MoveX = moveX;
+        JumpPressed = jump;
+    }
+
     // 사망 등 입력을 막아야 할 때
     public void Clear()
     {

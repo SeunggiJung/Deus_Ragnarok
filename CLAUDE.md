@@ -133,7 +133,7 @@
 - 빌드 설정에 RemakeTest, Stage2, Stage3 추가됨
 
 ### 3스테이지 — `Assets/Remake/Scenes/Stage3.unity` (원작 third_stage 복사본)
-- `Tools/Deus/Build Stage 3` : 씬 복사/열기 → Player/HUD 프리팹 + 카메라 연결 + 레거시 Canvas 끔 → 졸개 4마리(Skeleton x2, Goblin x2 : 레거시 Enemy/EnemyAI → `Monster`, `SkeletonStats`/`GoblinStats`) → `HadesBossBuilder.Convert`(Hades → `HadesBoss`, 보스 체력바 연결) → 제단(원래 `Spawner`, 이름을 `HadesAltar`로)에 `HadesEncounter`, 레버(`HadesLever`, 처음엔 비활성), 출구 문(`Door`)/왼쪽 벽(`Trap`)은 Kinematic + Ground 레이어 → `trigger` 오브젝트에 `EndingTrigger` → 체크포인트 2개
+- `Tools/Deus/Build Stage 3` : 씬 복사/열기 → Player/HUD 프리팹 + 카메라 연결 + 레거시 Canvas 끔 → 졸개 4마리(Skeleton x2, Goblin x2 : 레거시 Enemy/EnemyAI → `Monster`, `SkeletonStats`/`GoblinStats`) → `HadesBossBuilder.Convert`(Hades → `HadesBoss`, 보스 체력바 연결) → 제단(원래 `Spawner`, 이름을 `HadesAltar`로)에 `HadesEncounter`, 레버(`HadesLever`, 처음엔 비활성), 출구 문(`Door`)/왼쪽 벽(`Trap`)은 Kinematic + Ground 레이어 → `trigger` 오브젝트(`EndingTrigger`, 엔딩 연출 : 조작 불가 → 카메라가 `Target`을 비춤 → 돌 기둥 `Stair1~3`이 솟아 계단이 됨(충돌체는 코드로 추가) → 카메라 복귀 → 플레이어가 자동으로 걸어가며(계단 턱은 `AutoJump`) 페이드 → Ending. 기둥 / Target은 이름으로 자동 탐색, 씬 수정 없음)에 `EndingTrigger` → 체크포인트 2개
 - 졸개 / 하데스 / 레버는 씬에 비활성으로 저장되고 `HadesEncounter`가 순서대로 활성화. 원작 `BGMManager_Hades`는 보스 / 최종 형태 BGM 전환에 재사용
 - 원작의 MP 파이어볼 스킬(하데스에게 추가 피해)은 리메이크에 MP 시스템이 없어 이식하지 않음
 - 2스테이지 포탈의 `nextSceneName`은 `Stage3`

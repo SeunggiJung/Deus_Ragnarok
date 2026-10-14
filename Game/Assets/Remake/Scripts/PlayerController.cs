@@ -45,6 +45,10 @@ public class PlayerController : BaseCharacter
     // 컷신 / 스테이지 이동 중 등 입력을 막아야 할 때
     public bool InputLocked { get; set; }
 
+    // 입력이 잠긴 동안 컷신이 주입하는 자동 이동 (엔딩에서 계단을 걸어 올라갈 때). AutoJump는 한 번 소비됨
+    public float AutoMoveX { get; set; }
+    public bool AutoJump { get; set; }
+
     // 체공 중 점프 공격 가능 여부 (착지 시 다시 true)
     public bool CanAirAttack { get; set; } = true;
     // 체공 중 공중 구르기 가능 여부 (착지 시 다시 true)
@@ -94,7 +98,12 @@ public class PlayerController : BaseCharacter
 
     private void Update()
     {
-        if (IsDead || InputLocked) input.Clear();
+        if (IsDead || InputLocked)
+        {
+            input.Clear();
+            if (!IsDead && (AutoMoveX != 0f || AutoJump)) input.SetAuto(AutoMoveX, AutoJump);
+            AutoJump = false;
+        }
         else input.Read();
 
         RegenStamina();
