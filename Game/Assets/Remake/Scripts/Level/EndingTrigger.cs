@@ -81,11 +81,13 @@ public class EndingTrigger : MonoBehaviour
         if (follow != null) follow.isFocusing = false;
         yield return new WaitForSeconds(returnDelay);
 
-        // 5. 플레이어가 앞으로 걸어감 : 계단 턱 앞에서 자동 점프, 계단 끝에 닿으면 엔딩으로 전환
-        float endX = cameraTarget != null ? cameraTarget.position.x - 0.5f : player.transform.position.x + 12f;
+        // 5. 플레이어가 앞으로 걸어감 : 계단 턱 앞에서 자동 점프. 마지막 기둥 위에서는 끝까지 걸어가 가장자리에서 멈춤
+        //    (끝 너머에는 바닥이 없어서 떨어지지 않도록). 가장자리 가까이 오면 어두워지기 시작해 엔딩으로 전환
+        float edgeX = StairEdgeX(player);
+        float fadeStartX = edgeX - 1.2f;
         player.AutoMoveX = 1f;
         float walked = 0f;
-        while (walked < walkTimeout && player.transform.position.x < endX)
+        while (walked < walkTimeout && player.transform.position.x < fadeStartX)
         {
             walked += Time.deltaTime;
             player.RefillStamina();   // 점프 스태미너가 모자라 멈추는 일이 없도록
@@ -95,13 +97,28 @@ public class EndingTrigger : MonoBehaviour
 
         ScreenFader.FadeAndLoad(endingSceneName, fadeDuration);
         float fade = 0f;
-        while (fade < fadeDuration)   // 어두워지는 동안에도 계속 걸어감
+        while (fade < fadeDuration)   // 어두워지는 동안 가장자리까지 계속 걸어감
         {
             fade += Time.deltaTime;
+            if (player.transform.position.x >= edgeX) player.AutoMoveX = 0f;
             if (NeedsJump(player)) player.AutoJump = true;
             yield return null;
         }
         player.AutoMoveX = 0f;
+    }
+
+    // 걸어갈 끝 지점 : 가장 오른쪽 기둥의 오른쪽 끝에서 조금 안쪽 (기둥이 없으면 카메라 목표 앞)
+    private float StairEdgeX(PlayerController player)
+    {
+        float edge = float.NegativeInfinity;
+        foreach (Transform p in pillars)
+        {
+            if (p == null) continue;
+            var renderer = p.GetComponent<Renderer>();
+            if (renderer != null) edge = Mathf.Max(edge, renderer.bounds.max.x);
+        }
+        if (edge > float.NegativeInfinity) return edge - 0.5f;
+        return cameraTarget != null ? cameraTarget.position.x - 0.5f : player.transform.position.x + 12f;
     }
 
     #region Pillars
