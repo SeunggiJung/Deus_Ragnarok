@@ -23,6 +23,7 @@ public class PlayerHUD : MonoBehaviour
     private UIBar expBar;
     private GameObject levelUpPanel;
     private Text levelUpTitle;
+    private Text reviveText;
 
     private void Awake()
     {
@@ -58,6 +59,34 @@ public class PlayerHUD : MonoBehaviour
                               new Vector2(margin.x, -margin.y - step * 2f), barSize);
 
         BuildLevelUpPanel(canvasGo.transform, new Vector2(margin.x, -margin.y - step * 3f - spacing));
+        BuildReviveText(canvasGo.transform);
+    }
+
+    // 오른쪽 위 부활 기회 표시 (기회가 있을 때만 보임)
+    private void BuildReviveText(Transform parent)
+    {
+        var go = new GameObject("Revive Count", typeof(RectTransform), typeof(Text));
+        var rect = go.GetComponent<RectTransform>();
+        rect.SetParent(parent, false);
+        rect.anchorMin = rect.anchorMax = new Vector2(1f, 1f);
+        rect.pivot = new Vector2(1f, 1f);
+        rect.anchoredPosition = new Vector2(-margin.x, -margin.y);
+        rect.sizeDelta = new Vector2(320f, 40f);
+
+        reviveText = go.GetComponent<Text>();
+        reviveText.font = DeathScreen.LoadFont();
+        reviveText.fontSize = 26;
+        reviveText.alignment = TextAnchor.MiddleRight;
+        reviveText.color = new Color(1f, 0.85f, 0.4f, 1f);
+        reviveText.raycastTarget = false;
+        reviveText.gameObject.SetActive(false);
+    }
+
+    private void HandleReviveCountChanged(int count)
+    {
+        if (reviveText == null) return;
+        reviveText.gameObject.SetActive(count > 0);
+        reviveText.text = $"♥ 부활 x {count}";
     }
 
     // 레벨업 시 나타나는 스탯 선택 패널 (버튼 클릭 또는 숫자키 2/3/4, 1은 포션)
@@ -112,6 +141,7 @@ public class PlayerHUD : MonoBehaviour
         {
             player.OnHpChanged += hpBar.Set;
             player.OnStaminaChanged += staminaBar.Set;
+            player.OnReviveCountChanged += HandleReviveCountChanged;
         }
         if (progression != null)
         {
@@ -128,6 +158,7 @@ public class PlayerHUD : MonoBehaviour
         {
             hpBar.Set(player.CurrentHp, player.MaxHp);
             staminaBar.Set(player.CurrentStamina, player.MaxStamina);
+            HandleReviveCountChanged(player.ReviveCount);
         }
         if (progression != null)
         {
@@ -143,6 +174,7 @@ public class PlayerHUD : MonoBehaviour
         {
             player.OnHpChanged -= hpBar.Set;
             player.OnStaminaChanged -= staminaBar.Set;
+            player.OnReviveCountChanged -= HandleReviveCountChanged;
         }
         if (progression != null)
         {

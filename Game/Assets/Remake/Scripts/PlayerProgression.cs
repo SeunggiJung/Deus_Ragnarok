@@ -73,13 +73,6 @@ public class PlayerProgression : MonoBehaviour
         OnStatPointsChanged?.Invoke(StatPoints);
     }
 
-    // 남은 경험치를 한 번에 채워 즉시 레벨업 (레벨업 아이템)
-    public void LevelUpInstantly()
-    {
-        if (player.IsDead) return;
-        AddExp(ExpToNext - Exp);
-    }
-
     public bool SpendPoint(StatType type)
     {
         if (StatPoints <= 0 || player.IsDead) return false;

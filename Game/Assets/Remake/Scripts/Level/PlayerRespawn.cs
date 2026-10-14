@@ -22,7 +22,7 @@ public class PlayerRespawn : MonoBehaviour
     public void SetCheckpoint(Vector2 point)
     {
         respawnPoint = point;
-        PlayerSession.SetCheckpoint(SceneManager.GetActiveScene().name, point);
+        PlayerSession.SetCheckpoint(SceneManager.GetActiveScene().name, point, player); // 이 시점의 성장도 함께 스냅샷
     }
 
     // 사망 후 씬을 다시 불러왔을 때 저장된 체크포인트에서 시작

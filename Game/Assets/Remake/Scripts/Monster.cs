@@ -134,13 +134,40 @@ public class Monster : BaseCharacter
 
     private void Update()
     {
+        if (IsKnockedBack) return;
         StateMachine.CurrentState.Update();
     }
 
     private void FixedUpdate()
     {
+        if (IsKnockedBack)
+        {
+            // 밀려나는 동안 AI는 멈추고 속도가 점점 줄어듦
+            rb.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
+            float remaining = (knockbackUntil - Time.time) / knockbackDuration;
+            rb.velocity = new Vector2(knockbackVelocityX * Mathf.Clamp01(remaining), rb.velocity.y);
+            return;
+        }
         StateMachine.CurrentState.PhysicsUpdate();
     }
+
+    #region Knockback
+    // 플레이어 부활 연출처럼 특정 상황에서만 쓰는 밀어내기 (평소 전투에는 넉백이 없음 : 원작에 없는 규칙)
+    private float knockbackUntil = float.NegativeInfinity;
+    private float knockbackDuration = 1f;
+    private float knockbackVelocityX;
+    private bool IsKnockedBack => Time.time < knockbackUntil && !IsDead;
+
+    public void Knockback(float directionX, float speed, float duration, float hop)
+    {
+        if (IsDead) return;
+        knockbackDuration = Mathf.Max(0.01f, duration);
+        knockbackUntil = Time.time + knockbackDuration;
+        knockbackVelocityX = Mathf.Sign(directionX) * speed;
+        rb.constraints &= ~RigidbodyConstraints2D.FreezePositionX;
+        rb.velocity = new Vector2(knockbackVelocityX, hop);
+    }
+    #endregion
 
     #region AI Helpers
     public bool HasTarget => Target != null && !Target.IsDead;
@@ -221,6 +248,7 @@ public class Monster : BaseCharacter
         rb.simulated = true;
         rb.velocity = Vector2.zero;
         rb.constraints = initialConstraints;
+        knockbackUntil = float.NegativeInfinity;
 
         anim.Rebind();
         anim.Update(0f);

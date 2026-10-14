@@ -50,6 +50,10 @@ public class PlayerController : BaseCharacter
     // 체공 중 공중 구르기 가능 여부 (착지 시 다시 true)
     public bool CanAirDodge { get; set; } = true;
 
+    // 부활 기회 : 사망 후 제한 시간 안에 부활하기를 누르면 제자리에서 부활 (상자에서 획득)
+    public int ReviveCount { get; private set; }
+    public event Action<int> OnReviveCountChanged;
+
     // 스태미너 (UI 등 외부에서 구독 : 현재값, 최대값)
     public float CurrentStamina { get; private set; }
     private float bonusMaxStamina;
@@ -158,6 +162,38 @@ public class PlayerController : BaseCharacter
         }
         return AttackDamage;
     }
+
+    #region Revive
+    public void AddReviveChance(int amount)
+    {
+        SetReviveCount(ReviveCount + amount);
+    }
+
+    public void SetReviveCount(int count)
+    {
+        ReviveCount = Mathf.Max(0, count);
+        OnReviveCountChanged?.Invoke(ReviveCount);
+    }
+
+    // 제자리 부활 : 체력 / 스태미너를 채우고 대기 상태로 복귀. 연출(떠오르는 빛 + 날개 + 주변 몬스터 밀어내기)은 ReviveEffect
+    public bool TryRevive()
+    {
+        if (!IsDead || ReviveCount <= 0) return false;
+
+        SetReviveCount(ReviveCount - 1);
+        ResetCharacter();   // 체력 전부 회복 + 사망 / 무적 상태 초기화
+        RefillStamina();
+        input.Clear();
+
+        anim.ResetTrigger("die");
+        StateMachine.ChangeState(IdleState);
+        anim.Play("Idle", 0, 0f);
+
+        ReviveEffect.Play(this);
+        Debug.Log($"[부활] 남은 부활 기회 {ReviveCount}");
+        return true;
+    }
+    #endregion
 
     #region Stamina
     // 스태미너가 충분하면 소모하고 true, 부족하면 소모하지 않고 false
