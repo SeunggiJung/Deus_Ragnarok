@@ -32,4 +32,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Remake/Scenes/Stage2.unity
     guid: a33baf7a3b394884dac5e021caf3e5ec
+  - enabled: 1
+    path: Assets/Remake/Scenes/Stage3.unity
+    guid: 6098cee225ddb044a98eaee807c7733b
   m_configObjects: {}
