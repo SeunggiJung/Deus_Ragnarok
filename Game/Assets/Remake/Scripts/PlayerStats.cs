@@ -15,6 +15,12 @@ public class PlayerStats : CharacterStats
     public float jumpCost = 3f;
     public float dodgeCost = 15f;
 
+    [Header("Combo (지상 3단 콤보, 1~3타 순서)")]
+    public float[] comboDamage = { 1f, 1f, 1.5f };         // 공격력 배율 (3타 찌르기는 마무리라 강하게)
+    public float[] comboCancelTime = { 0.55f, 0.5f, 0.6f }; // 모션 진행률이 이 값을 넘으면 다음 공격 / 이동 / 점프로 캔슬 가능
+    public float[] comboLungeSpeed = { 1.5f, 1.5f, 4.5f };  // 공격하며 앞으로 나가는 속도
+    public float[] comboLungeTime = { 0.1f, 0.1f, 0.14f };  // 앞으로 나가는 시간
+
     [Header("Jump Attack")]
     public float criticalMultiplier = 2f;    // 점프 공격 데미지 배율 (원작 : 점프 중 공격 2배)
 

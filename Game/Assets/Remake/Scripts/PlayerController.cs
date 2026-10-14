@@ -142,6 +142,13 @@ public class PlayerController : BaseCharacter
             Debug.Log($"크리티컬! (점프 공격 x{Stats.criticalMultiplier}) 데미지 {damage}");
             return damage;
         }
+        if (StateMachine.CurrentState == AttackState)
+        {
+            float[] multipliers = Stats.comboDamage;
+            int step = AttackState.Step;
+            if (multipliers != null && step < multipliers.Length)
+                return AttackDamage * multipliers[step];
+        }
         return AttackDamage;
     }
 
