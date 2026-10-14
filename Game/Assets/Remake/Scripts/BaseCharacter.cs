@@ -108,6 +108,15 @@ public abstract class BaseCharacter : MonoBehaviour, IDamageable
         OnDamaged();
     }
 
+    // 무적 여부와 상관없이 즉시 처치 (테스트용 치트 등)
+    public void Kill()
+    {
+        if (IsDead) return;
+        ForceInvincible = false;
+        hitInvincible = false;
+        TakeDamage(currentHp);   // 남은 체력만큼 (피해량 표시가 터무니없이 커지지 않게)
+    }
+
     // 피격 후 살아있을 때 호출 (경직 상태 전환 등은 자식 클래스에서)
     protected virtual void OnDamaged() { }
 

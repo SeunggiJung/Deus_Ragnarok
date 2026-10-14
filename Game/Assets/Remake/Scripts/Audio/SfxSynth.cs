@@ -93,23 +93,25 @@ public static class SfxSynth
         switch (sfx)
         {
             // ───── 플레이어 ─────
-            case Sfx.SwingSlash: return Whoosh(sfx, 0.24f, 500f, 2400f, 0.5f, 0.6f);          // 1타 : 위에서 아래로 가르는 소리 (점점 높아짐)
-            case Sfx.SwingUpper: return Whoosh(sfx, 0.28f, 2600f, 600f, 0.35f, 0.6f);         // 2타 : 올려 베며 낮아지는 소리
+            case Sfx.SwingSlash: return Whoosh(sfx, 0.28f, 240f, 1100f, 0.5f, 0.7f, false, 125f, 0.55f);   // 1타 : 대검이 위에서 아래로 가르는 묵직한 소리
+            case Sfx.SwingUpper: return Whoosh(sfx, 0.32f, 1200f, 280f, 0.35f, 0.7f, false, 110f, 0.55f);  // 2타 : 올려 베며 낮아지는 소리
             case Sfx.SwingThrust:                                                              // 3타 : 낮은 바람 + 끝에 묵직하게 찌르는 소리
             {
                 var band = new BandNoise(); var osc = new Osc(); var lp = new Lowpass();
                 return Build(sfx.ToString(), 0.36f, (t, n) =>
                 {
-                    float wind = band.Process(Mathf.Lerp(250f, 900f, n), Mathf.Lerp(700f, 2200f, n)) * Mathf.Sin(Mathf.PI * Mathf.Min(1f, n * 1.3f)) * 3f;
-                    float thrust = n > 0.5f ? osc.Sin(Mathf.Lerp(170f, 70f, (n - 0.5f) * 2f)) * Decay(t - 0.18f, 14f) * 0.9f : 0f;
-                    return wind + thrust + lp.Process(Noise(), 500f) * (n > 0.5f ? Decay(t - 0.18f, 22f) : 0f) * 0.6f;
-                }, 0.65f);
+                    float wind = band.Process(Mathf.Lerp(130f, 450f, n), Mathf.Lerp(380f, 1100f, n)) * Mathf.Sin(Mathf.PI * Mathf.Min(1f, n * 1.3f)) * 3.2f;
+                    float thrust = n > 0.5f ? osc.Sin(Mathf.Lerp(130f, 48f, (n - 0.5f) * 2f)) * Decay(t - 0.18f, 11f) * 1.2f : 0f;
+                    return wind + thrust + lp.Process(Noise(), 380f) * (n > 0.5f ? Decay(t - 0.18f, 18f) : 0f) * 0.7f;
+                }, 0.72f);
             }
-            case Sfx.SwingJump: return Whoosh(sfx, 0.32f, 300f, 3200f, 0.55f, 0.7f);          // 점프 공격 : 넓고 큰 바람
+            case Sfx.SwingJump: return Whoosh(sfx, 0.36f, 200f, 1600f, 0.55f, 0.78f, false, 100f, 0.75f);   // 점프 공격 : 넓고 무거운 바람
             case Sfx.Jump:
             {
-                var osc = new Osc();
-                return Build(sfx.ToString(), 0.14f, (t, n) => osc.Sin(Mathf.Lerp(300f, 640f, n)) * Attack(t, 0.01f) * Decay(t, 14f), 0.3f);
+                var osc = new Osc(); var lp = new Lowpass();
+                return Build(sfx.ToString(), 0.17f, (t, n) =>
+                    osc.Sin(Mathf.Lerp(120f, 200f, n)) * Attack(t, 0.012f) * Decay(t, 15f)
+                    + lp.Process(Noise(), 520f) * Attack(t, 0.01f) * Decay(t, 20f) * 0.6f, 0.4f);
             }
             case Sfx.Dodge: return Whoosh(sfx, 0.32f, 900f, 220f, 0.45f, 0.4f, soft: true);   // 구르기 : 부드럽게 옷깃 스치는 소리
             case Sfx.Hurt:
@@ -205,7 +207,26 @@ public static class SfxSynth
 
             // ───── 아이템 / UI ─────
             case Sfx.Chime:   return Arpeggio(sfx, new[] { 523f, 659f, 784f, 1047f, 1319f }, 0.13f, 2.6f, 1.9f, 0.7f);   // 부활 : 맑고 긴 종소리
-            case Sfx.LevelUp: return Arpeggio(sfx, new[] { 523f, 659f, 784f, 1047f, 1319f }, 0.08f, 7f, 0.75f, 0.6f);
+            case Sfx.LevelUp:   // 낮은 단조(A3 C4 E4 A4) 종소리 + 아래에서 받치는 저음
+            {
+                float[] notes = { 220f, 262f, 330f, 440f };
+                var osc = new Osc[notes.Length * 2];
+                for (int i = 0; i < osc.Length; i++) osc[i] = new Osc();
+                var sub = new Osc();
+                return Build(sfx.ToString(), 1.1f, (t, n) =>
+                {
+                    float v = 0f;
+                    for (int i = 0; i < notes.Length; i++)
+                    {
+                        float local = t - i * 0.11f;
+                        if (local < 0f) continue;
+                        float env = Attack(local, 0.006f) * Decay(local, 4.2f);
+                        v += (osc[i * 2].Sin(notes[i]) + osc[i * 2 + 1].Sin(notes[i] * 2f) * 0.15f) * env;
+                    }
+                    v += sub.Sin(110f) * Attack(t, 0.08f) * Decay(t, 2.6f) * 0.55f;
+                    return v;
+                }, 0.6f);
+            }
             case Sfx.Pickup:  return Arpeggio(sfx, new[] { 880f, 1320f }, 0.07f, 9f, 0.32f, 0.5f);
             case Sfx.Potion:
             {
@@ -228,14 +249,22 @@ public static class SfxSynth
 
     #region Recipes
     // 노이즈 바람 소리 : 대역이 fromHz → toHz로 이동. peakAt : 소리가 가장 큰 시점(진행률)
-    private static AudioClip Whoosh(Sfx sfx, float duration, float fromHz, float toHz, float peakAt, float peak, bool soft = false)
+    // bodyHz > 0이면 소리가 가장 큰 시점에 저음 "붕" 소리(공기를 가르는 무게감)를 더함
+    private static AudioClip Whoosh(Sfx sfx, float duration, float fromHz, float toHz, float peakAt, float peak, bool soft = false, float bodyHz = 0f, float bodyAmount = 0f)
     {
         var band = new BandNoise();
+        var body = new Osc();
         return Build(sfx.ToString(), duration, (t, n) =>
         {
             float fc = Mathf.Lerp(fromHz, toHz, n);
             float env = n < peakAt ? Mathf.Pow(n / peakAt, soft ? 1.2f : 0.7f) : Mathf.Pow(1f - (n - peakAt) / (1f - peakAt), 1.6f);
-            return band.Process(fc * 0.55f, fc * 1.6f) * env * 3f;
+            float v = band.Process(fc * 0.5f, fc * 1.25f) * env * 3f;
+            if (bodyHz > 0f)
+            {
+                float d = (n - peakAt) / 0.22f;
+                v += body.Sin(Mathf.Lerp(bodyHz, bodyHz * 0.55f, n)) * Mathf.Exp(-d * d) * bodyAmount * 1.4f;
+            }
+            return v;
         }, peak);
     }
 
